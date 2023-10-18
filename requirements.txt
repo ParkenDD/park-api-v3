@@ -29,5 +29,5 @@ utm~=0.7.0
 
 # binary butterfly shared libraries (https://git.sectio-aurea.org/public_libraries)
 --extra-index-url https://git.sectio-aurea.org/api/v4/groups/262/-/packages/pypi/simple
-validataclass-search-queries~=0.4.1
+validataclass-search-queries~=0.4.2
 flask-openapi~=2.0.2
