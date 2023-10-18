@@ -25,16 +25,16 @@ class ConfigLoader:
         # load all OCPDB-prefixed values from prefixed ENV
         app.config.from_prefixed_env('PARK_API')
 
-        # load db credentials from env
+        # load postgresql credentials from env
         if (
             os.getenv('PARK_API_POSTGRES_USER')
             and os.getenv('PARK_API_POSTGRES_DB')
             and os.getenv('PARK_API_POSTGRES_PASSWORD')
-            and os.getenv('PARK_API_POSTGRES_DOCKER_COMPOSE_SERVICE')
+            and os.getenv('PARK_API_POSTGRES_HOST')
         ):
             app.config['SQLALCHEMY_DATABASE_URI'] = (
                 f'postgresql://{os.getenv("PARK_API_POSTGRES_USER")}:{os.getenv("PARK_API_POSTGRES_PASSWORD")}'
-                f'@{os.getenv("PARK_API_POSTGRES_DOCKER_COMPOSE_SERVICE")}/{os.getenv("PARK_API_POSTGRES_DB")}'
+                f'@{os.getenv("PARK_API_POSTGRES_HOST")}/{os.getenv("PARK_API_POSTGRES_DB")}'
             )
 
         # Load config from yaml file
