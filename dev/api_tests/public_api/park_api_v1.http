@@ -1,0 +1,10 @@
+### List park api v1 overview data
+GET {{api_host}}/api/public/v1/park-api-v1
+
+
+### List park api v1 detail data
+GET {{api_host}}/api/public/v1/park-api-v1/example-source
+
+
+### List park api v1 detail data with name filter
+GET {{api_host}}/api/public/v1/park-api-v1/example-source?name=Bahnhof

@@ -1,0 +1,16 @@
+### Post generic parking sites json
+POST {{api_host}}/api/admin/v1/generic-parking-sites/json
+Content-Type: application/json
+Authorization: Basic {{server_api_username}} {{server_api_password}}
+
+
+{
+  "some": "data"
+}
+
+
+### Post generic parking sites xlsx
+POST {{api_host}}/api/admin/v1/generic-parking-sites/xlsx
+Authorization: Basic {{server_api_username}} {{server_api_password}}
+
+< data/example-table.xlsx

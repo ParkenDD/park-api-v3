@@ -1,0 +1,26 @@
+"""
+Copyright 2023 binary butterfly GmbH
+Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
+"""
+
+from enum import Enum
+
+
+class EventSource(Enum):
+    CLIENT_API = 'CLIENT_API'
+    CLI = 'CLI'
+    ORM = 'ORM'
+    SERVER_API = 'SERVER_API'
+    SERVICE = 'SERVICE'
+
+
+class EventType(Enum):
+    OPTION_CREATED = 'OPTION_CREATED'
+    OPTION_UPDATED = 'OPTION_UPDATED'
+    OPTION_DELETED = 'OPTION_DELETED'
+    CUSTOMER_CREATED = 'CUSTOMER_CREATED'
+    CUSTOMER_UPDATED = 'CUSTOMER_UPDATED'
+    CUSTOMER_DELETED = 'CUSTOMER_DELETED'
+    CUSTOMER_REFRESH_TOKEN_CREATED = 'CUSTOMER_REFRESH_TOKEN_CREATED'  # noqa: S105
+    CUSTOMER_REFRESH_TOKEN_UPDATED = 'CUSTOMER_REFRESH_TOKEN_UPDATED'  # noqa: S105
+    CUSTOMER_REFRESH_TOKEN_DELETED = 'CUSTOMER_REFRESH_TOKEN_DELETED'  # noqa: S105

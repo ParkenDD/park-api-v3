@@ -1,0 +1,68 @@
+# Docker Compose project for local development
+name: park-api
+
+# Define placeholder for running a container with the same UID/GID as your local user
+x-local-user: &local-user ${DOCKER_LOCAL_USER:?Variable needs to be set in .env (e.g. "DOCKER_LOCAL_USER=1000:1000")}
+
+# Define common defaults to reuse them in the service definitions (YAML anchors)
+x-flask-defaults: &flask-defaults
+  image: park-api:local-dev
+  build:
+    context: .
+    dockerfile: Dockerfile.dev
+  volumes:
+    - .:/app
+  environment:
+    # Set this variable in .env to start the app with a different config file (default: config.yaml)
+    CONFIG_FILE:
+  # The containers should run with the same UID/GID as your local user, so that files created by the containers are
+  # owned by and accessible to the local user.
+  user: *local-user
+  depends_on:
+    postgresql:
+      condition: service_healthy
+    rabbitmq:
+      condition: service_healthy
+
+
+# Define actual services (containers)
+services:
+  flask:
+    <<: *flask-defaults
+    command: ["python3", "run-flask-dev.py"]
+    ports:
+      - '5000:5000'
+
+  worker:
+    <<: *flask-defaults
+    command: ["python3", "run-celery-dev.py"]
+
+  postgresql:
+    image: postgis/postgis:16-3.4
+    volumes:
+      - postgresql:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=park-api
+      - POSTGRES_PASSWORD=development
+      - POSTGRES_DB=park-api
+      - PGUSER=park-api
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U park-api -d park-api'" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  rabbitmq:
+    image: rabbitmq:3.12
+    environment:
+      # Disable spammy logging
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: '-rabbit log [{console,[{level,warning}]}]'
+      RABBITMQ_ERLANG_COOKIE: dev-cookie
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 1s
+      timeout: 1s
+      retries: 20
+
+volumes:
+  postgresql:
