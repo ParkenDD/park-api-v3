@@ -21,6 +21,7 @@ from webapp.services.sqlalchemy_service import SqlalchemyService
 if TYPE_CHECKING:
     from webapp.common.events import EventHelper
     from webapp.common.server_auth import ServerAuthHelper
+    from webapp.services.tasks import TaskRunner
 
 
 T = TypeVar('T')
@@ -147,6 +148,16 @@ class Dependencies:
     def get_sqlalchemy_service(self) -> SqlalchemyService:
         return SqlalchemyService(
             **self.get_base_service_dependencies(),
+        )
+
+    @cache_dependency
+    def get_task_runner(self) -> 'TaskRunner':
+        from webapp.services.tasks import TaskRunner
+
+        return TaskRunner(
+            celery_helper=self.get_celery_helper(),
+            logger=self.get_logger(),
+            config_helper=self.get_config_helper(),
         )
 
 

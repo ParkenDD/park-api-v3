@@ -8,9 +8,9 @@ from typing import Any
 from validataclass.validators import StringValidator
 
 
-class ExtendedStringValidator(StringValidator):
+class NumberCastingStringValidator(StringValidator):
     def validate(self, input_data: Any, **kwargs) -> str:
         if isinstance(input_data, int) or isinstance(input_data, float):
             input_data = str(input_data)
 
-        return super().validate(input_data)
+        return super().validate(input_data, **kwargs)

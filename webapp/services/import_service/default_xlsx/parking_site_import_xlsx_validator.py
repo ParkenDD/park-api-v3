@@ -11,6 +11,7 @@ from validataclass.validators import (
     AnyOfValidator,
     DecimalValidator,
     IntegerValidator,
+    NumericValidator,
     StringValidator,
     UrlValidator,
 )
@@ -19,14 +20,14 @@ from webapp.common.validation import (
     ExcelNoneable,
     ExcelTimeValidator,
     ExtendedBooleanValidator,
-    ExtendedStringValidator,
     GermanDurationIntegerValidator,
+    NumberCastingStringValidator,
 )
 
 
 @validataclass
 class ParkingSiteInput:
-    original_uid: str = ExtendedStringValidator(min_length=1, max_length=256)
+    original_uid: str = NumberCastingStringValidator(min_length=1, max_length=256)
     name: str = StringValidator(max_length=256)
     operator_name: Optional[str] = ExcelNoneable(StringValidator(max_length=256)), Default(None)
     public_url: Optional[str] = ExcelNoneable(UrlValidator(max_length=4096)), Default(None)
@@ -42,8 +43,8 @@ class ParkingSiteInput:
     has_live_data: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)
     type: Optional[str] = ExcelNoneable(AnyOfValidator(['Parkplatz', 'Parkhaus', 'Tiefgarage', 'Am Straßenrand'])), Default(None)
 
-    lat: Decimal = DecimalValidator()
-    lon: Decimal = DecimalValidator()
+    lat: Decimal = NumericValidator()
+    lon: Decimal = NumericValidator()
 
     capacity: Optional[int] = ExcelNoneable(IntegerValidator()), Default(None)
     capacity_disabled: Optional[int] = ExcelNoneable(IntegerValidator()), Default(None)
