@@ -19,4 +19,4 @@ def cli_source_init_converters():
         **dependencies.get_base_service_dependencies(),
     )
     parking_site_import_generic_service.update_sources_static()
-    parking_site_import_generic_service.update_source_realtime()
+    parking_site_import_generic_service.update_sources_realtime()
