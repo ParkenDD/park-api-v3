@@ -6,6 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from webapp.dependencies import dependencies
 from webapp.extensions import celery
 from webapp.services.import_service import ParkingSiteGenericImportService
+
 from .base_task import BaseTask
 
 

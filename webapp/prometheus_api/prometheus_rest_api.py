@@ -45,4 +45,3 @@ class MetricsMethodView(BaseMethodView):
         response = make_response(response_string)
         response.mimetype = 'text/plain; version=0.0.4'
         return response
-

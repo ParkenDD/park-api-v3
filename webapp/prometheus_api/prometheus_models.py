@@ -41,7 +41,6 @@ class Metrics:
     metrics: List[BaseMetric] = field(default_factory=list)
 
     def to_metrics(self) -> List[str]:
-        return (
-            [f'# HELP {self.identifier} {self.help}', f'# TYPE {self.identifier} {self.type.name}']
-            + [metric.to_metric(self.identifier) for metric in self.metrics]
-        )
+        return [f'# HELP {self.identifier} {self.help}', f'# TYPE {self.identifier} {self.type.name}'] + [
+            metric.to_metric(self.identifier) for metric in self.metrics
+        ]

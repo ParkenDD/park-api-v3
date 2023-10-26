@@ -7,6 +7,7 @@ from webapp.common.celery import CeleryHelper
 from webapp.common.config import ConfigHelper
 from webapp.common.logger import Logger
 from webapp.extensions import celery
+
 from .base_task import BaseTask
 from .generic_import_heartbeat_task import RunGenericRealtimeImportTask
 

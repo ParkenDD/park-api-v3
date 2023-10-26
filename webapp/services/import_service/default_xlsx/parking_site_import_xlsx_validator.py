@@ -11,16 +11,17 @@ from validataclass.validators import (
     AnyOfValidator,
     DecimalValidator,
     IntegerValidator,
+    NumericValidator,
     StringValidator,
-    UrlValidator, NumericValidator,
+    UrlValidator,
 )
 
 from webapp.common.validation import (
     ExcelNoneable,
     ExcelTimeValidator,
     ExtendedBooleanValidator,
-    NumberCastingStringValidator,
     GermanDurationIntegerValidator,
+    NumberCastingStringValidator,
 )
 
 

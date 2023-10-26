@@ -23,6 +23,7 @@ from webapp.services.import_service.exceptions import (
     ConverterMissingException,
     ImportDatasetException,
 )
+
 from .parking_site_generic_import_mapper import ParkingSiteGenericImportMapper
 from .parking_site_generic_import_validator import LotDataInput, LotInfoInput
 
@@ -31,7 +32,7 @@ class ParkingSiteGenericImportService(BaseService):
     source_repository: SourceRepository
     parking_site_repository: ParkingSiteRepository
 
-    converters: dict[str, ]
+    converters: dict
 
     lot_info_validator = DataclassValidator(LotInfoInput)
     lot_data_validator = DataclassValidator(LotDataInput)
@@ -100,7 +101,7 @@ class ParkingSiteGenericImportService(BaseService):
             return
 
         if getattr(lot_infos, 'lot_error_count', None) is not None:
-            source.realtime_parking_site_error_count = getattr(lot_infos, 'lot_error_count')
+            source.realtime_parking_site_error_count = lot_infos.lot_error_count
 
         for lot_info in lot_infos:
             try:
@@ -165,7 +166,7 @@ class ParkingSiteGenericImportService(BaseService):
             return
 
         if getattr(lot_datasets, 'lot_error_count', None) is not None:
-            source.realtime_parking_site_error_count = getattr(lot_datasets, 'lot_error_count')
+            source.realtime_parking_site_error_count = lot_datasets.lot_error_count
 
         for lot_data in lot_datasets:
             try:

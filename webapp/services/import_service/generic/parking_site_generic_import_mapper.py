@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 from webapp.models import ParkingSite
 from webapp.models.parking_site import OpeningStatus, ParkingSiteType
+
 from .parking_site_generic_import_validator import LotDataInput, LotInfoInput
 
 

@@ -66,28 +66,38 @@ class PrometheusHandler:
             if source.status in [SourceStatus.DISABLED, SourceStatus.PROVISIONED]:
                 continue
             if source.static_data_updated_at:
-                last_static_update_metrics.metrics.append(SourceMetric(
-                    source=source.uid,
-                    value=int((datetime.now(tz=timezone.utc) - source.static_data_updated_at).total_seconds()),
-                ))
+                last_static_update_metrics.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=int((datetime.now(tz=timezone.utc) - source.static_data_updated_at).total_seconds()),
+                    )
+                )
             if source.realtime_data_updated_at:
-                last_realtime_update_metrics.metrics.append(SourceMetric(
+                last_realtime_update_metrics.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=int((datetime.now(tz=timezone.utc) - source.realtime_data_updated_at).total_seconds()),
+                    )
+                )
+            source_static_parking_site_error_count.metrics.append(
+                SourceMetric(
                     source=source.uid,
-                    value=int((datetime.now(tz=timezone.utc) - source.realtime_data_updated_at).total_seconds()),
-                ))
-            source_static_parking_site_error_count.metrics.append(SourceMetric(
-                source=source.uid,
-                value=source.static_parking_site_error_count,
-            ))
-            source_realtime_parking_site_error_count.metrics.append(SourceMetric(
-                source=source.uid,
-                value=source.realtime_parking_site_error_count,
-            ))
+                    value=source.static_parking_site_error_count,
+                )
+            )
+            source_realtime_parking_site_error_count.metrics.append(
+                SourceMetric(
+                    source=source.uid,
+                    value=source.realtime_parking_site_error_count,
+                )
+            )
             if source.status == SourceStatus.FAILED:
-                failed_sources.metrics.append(SourceMetric(
-                    source=source.uid,
-                    value=1,
-                ))
+                failed_sources.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=1,
+                    )
+                )
 
         metrics = (
             last_static_update_metrics.to_metrics()
@@ -117,17 +127,20 @@ class PrometheusHandler:
         )
 
         for parking_site in parking_sites:
-            parking_site_static_capacity.metrics.append(ParkingSiteMetric(
-                parking_site=parking_site.original_uid,
-                source=parking_site.source.uid,
-                value=parking_site.capacity,
-            ))
-            if parking_site.has_realtime_data:
-                parking_site_realtime_capacity.metrics.append(ParkingSiteMetric(
+            parking_site_static_capacity.metrics.append(
+                ParkingSiteMetric(
                     parking_site=parking_site.original_uid,
                     source=parking_site.source.uid,
-                    value=parking_site.realtime_capacity,
-                ))
+                    value=parking_site.capacity,
+                )
+            )
+            if parking_site.has_realtime_data:
+                parking_site_realtime_capacity.metrics.append(
+                    ParkingSiteMetric(
+                        parking_site=parking_site.original_uid,
+                        source=parking_site.source.uid,
+                        value=parking_site.realtime_capacity,
+                    )
+                )
 
         return parking_site_static_capacity.to_metrics() + parking_site_realtime_capacity.to_metrics()
-
