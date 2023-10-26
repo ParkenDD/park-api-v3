@@ -50,3 +50,7 @@ class BaseConfig:
     OPENAPI_SERVERS = [
         {'url': 'https://binary-butterfly.de', 'description': 'prod'},
     ]
+
+    # Switch parking site metrics to True for metrics on parking site level. Keep in mind that this adds a lot of data to your metrics
+    # endpoint, so the systems using these metrics should have enough power and proper administration.
+    PARKING_SITE_METRICS = False

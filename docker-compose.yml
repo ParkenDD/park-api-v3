@@ -37,6 +37,14 @@ services:
     <<: *flask-defaults
     command: ["python3", "run-celery-dev.py"]
 
+  worker-heartbeat:
+    <<: *flask-defaults
+    command: ["python3", "run-celery-heartbeat-dev.py"]
+
+  flask-init-converters:
+    <<: *flask-defaults
+    command: ["flask", "source", "init-converters"]
+
   postgresql:
     image: postgis/postgis:16-3.4
     volumes:
@@ -63,6 +71,7 @@ services:
       interval: 1s
       timeout: 1s
       retries: 20
+
 
 volumes:
   postgresql:

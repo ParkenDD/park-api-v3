@@ -6,5 +6,5 @@ Use of this source code is governed by an MIT-style license that can be found in
 from .boolean_validators import ExtendedBooleanValidator
 from .integer_validators import GermanDurationIntegerValidator
 from .noneable import ExcelNoneable
-from .string_validators import ExtendedStringValidator
+from .string_validators import NumberCastingStringValidator
 from .time_validators import ExcelTimeValidator

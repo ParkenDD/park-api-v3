@@ -78,10 +78,13 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
 
             lots.append(lot)
 
-        response = {'lots': lots}
-        if source.last_import:
-            response['last_updated'] = source.last_import
-            response['last_downloaded'] = source.last_import
+        response = {
+            'lots': lots,
+            'last_updated': source.combined_updated_at,
+            'last_downloaded': source.combined_updated_at,
+        }
+        response['last_updated'] = source.combined_updated_at
+        response['last_downloaded'] = source.combined_updated_at
         if source.public_url:
             response['data_source'] = source.public_url
 

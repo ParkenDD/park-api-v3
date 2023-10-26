@@ -38,7 +38,7 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
 
         result = {
             'date_created': source.created_at,
-            'date_updated': source.modified_at,  # TODO: maybe use source.last_import here?
+            'date_updated': source.combined_updated_at,
             'pool_id': source.uid,
             'name': source.name or source.uid,
         }

@@ -17,6 +17,7 @@ from webapp.common.rest import RestApiErrorHandler
 from webapp.dependencies import dependencies
 from webapp.event_receiver import event_receivers
 from webapp.extensions import celery, db, migrate, openapi
+from webapp.prometheus_api import PrometheusRestApi
 from webapp.public_rest_api import PublicRestApi
 
 __all__ = ['launch']
@@ -35,6 +36,7 @@ def launch(testing: bool = False) -> App:
     configure_logging(app)
     configure_error_handlers(app)
     configure_events(app)
+    configure_periodic_tasks()
 
     return app
 
@@ -56,6 +58,7 @@ def configure_extensions(app: App) -> None:
 def configure_blueprints(app: App) -> None:
     app.register_blueprint(AdminRestApi())
     app.register_blueprint(PublicRestApi())
+    app.register_blueprint(PrometheusRestApi())
 
     register_cli_to_app(app)
 
@@ -93,3 +96,9 @@ def configure_error_handlers(app: App):
     @app.errorhandler(Exception)
     def handle_exception(error: Exception):
         return error_dispatcher.dispatch_error(error, request)
+
+
+@celery.on_after_configure.connect
+def configure_periodic_tasks(**kwargs):
+    task_runner = dependencies.get_task_runner()
+    task_runner.start()

@@ -10,6 +10,8 @@ MAILS_FROM: 'dev@binary-butterfly.de'
 
 SECRET_KEY: 'random-key'
 SQLALCHEMY_DATABASE_URI: 'postgresql://park-api:development@postgresql/park-api'
+# Alternative: MariaDB / MySQL:
+# SQLALCHEMY_DATABASE_URI: 'mysql+pymysql://root:root@mysql/park-api'
 
 CELERY_BROKER_URL: 'amqp://rabbitmq'
 

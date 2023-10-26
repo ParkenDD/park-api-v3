@@ -1,0 +1,30 @@
+
+services:
+  mysql:
+    image: mariadb:11.1
+    volumes:
+      - .:/app
+      - mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: park-api
+    healthcheck:
+      test: mariadb -h mysql -P 3306 -u root -p$$MYSQL_ROOT_PASSWORD -e "SELECT 1"
+      interval: 1s
+      timeout: 1s
+      retries: 20
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2
+    ports:
+      - "8081:80"
+    environment:
+      PMA_USER: root
+      PMA_PASSWORD: root
+      PMA_HOST: mysql
+      UPLOAD_LIMIT: 512M
+      # Disable spammy logging
+      APACHE_LOG_DIR: /tmp/logs
+
+volumes:
+  mysql:

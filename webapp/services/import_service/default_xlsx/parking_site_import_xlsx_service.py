@@ -5,7 +5,6 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from datetime import datetime, timezone
 from pathlib import Path
-from random import randint
 from typing import List
 
 from openpyxl.cell import Cell
@@ -16,6 +15,7 @@ from validataclass.validators import DataclassValidator
 
 from webapp.models import ParkingSite, Source
 from webapp.models.parking_site import ParkingSiteType
+from webapp.models.source import SourceStatus
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.base_service import BaseService
@@ -23,9 +23,7 @@ from webapp.services.import_service.exceptions import (
     ImportDatasetException,
     ImportException,
 )
-from webapp.services.import_service.parking_site_import_xlsx_validator import (
-    ParkingSiteInput,
-)
+from .parking_site_import_xlsx_validator import ParkingSiteInput
 
 
 class ParkingSiteXlsxImportService(BaseService):
@@ -93,13 +91,15 @@ class ParkingSiteXlsxImportService(BaseService):
 
         mapping = self.get_mapping_by_header(next(worksheet.rows))
 
-        self.import_parking_sites(
+        validation_exceptions = self.import_parking_sites(
             source=source,
             worksheet=worksheet,
             mapping=mapping,
         )
 
-        source.last_import = datetime.now(tz=timezone.utc)
+        source.static_data_updated_at = datetime.now(tz=timezone.utc)
+        source.status = SourceStatus.ACTIVE
+        source.parking_site_error_count = len(validation_exceptions)
         self.source_repository.save_source(source)
 
     @staticmethod

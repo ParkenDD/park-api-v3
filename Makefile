@@ -1,4 +1,4 @@
-DOCKER_COMPOSE = docker compose
+DOCKER_COMPOSE = docker compose -f docker-compose.yml -f docker-compose.override.yml
 FLASK_RUN = $(DOCKER_COMPOSE) run --rm flask
 
 DOCKER_REGISTRY = ghcr.io
@@ -183,6 +183,5 @@ lint-fix:
 
 .PHONY: lint-check
 lint-check:
-
 	$(FLASK_RUN) ruff --exclude webapp/converter ./webapp
 	$(FLASK_RUN) black -S --check --diff webapp

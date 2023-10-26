@@ -22,7 +22,7 @@ class SourceRepository(BaseRepository):
         return self._search_and_paginate(query, search_query)
 
     def fetch_source_by_uid(self, uid: str) -> Source:
-        source = self.session.query(Source).filter(Source.uid == uid).first()
+        source: Source = self.session.query(Source).filter(Source.uid == uid).first()
 
         if not source:
             raise ObjectNotFoundException(message=f'Source with uid {uid} not found')

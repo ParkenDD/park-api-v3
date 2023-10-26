@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, Optional
 from sqlalchemy import (
     BigInteger,
     Boolean,
-    DateTime,
     Integer,
     Numeric,
     String,
@@ -24,6 +23,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import Index
+from sqlalchemy_utc import UtcDateTime
 
 from webapp.common.sqlalchemy.point import Point
 from webapp.extensions import db
@@ -86,8 +86,8 @@ class ParkingSite(BaseModel):
     is_supervised: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
 
     has_realtime_data: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=False, default=False)
-    static_data_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(), nullable=True)
-    realtime_data_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(), nullable=True)
+    static_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
+    realtime_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
     realtime_opening_status: Mapped[OpeningStatus] = mapped_column(
         SqlalchemyEnum(OpeningStatus), nullable=False, default=OpeningStatus.UNKNOWN
     )
