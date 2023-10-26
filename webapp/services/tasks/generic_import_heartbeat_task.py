@@ -10,7 +10,7 @@ from .base_task import BaseTask
 
 
 class RunGenericRealtimeImportTask(BaseTask):
-    run_interval = 5
+    run_interval = 5 * 60  # 5 minutes
 
     @staticmethod
     @celery.task()
