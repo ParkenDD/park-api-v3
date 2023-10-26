@@ -149,13 +149,22 @@ class ParkingSiteGenericImportService(BaseService):
         self.source_repository.save_source(source)
         return source
 
+    def update_sources_realtime(self):
+        for source in self.config_helper.get('PARK_API_CONVERTER'):
+            try:
+                self.update_source_realtime(source)
+            except ConverterMissingException:
+                self.logger.info('converter', f'ignored source {source} because converter is missing')
+                continue
+
     def update_source_realtime(self, source_uid: str):
         if source_uid not in self.converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
         source = self.source_repository.fetch_source_by_uid(source_uid)
 
-        if source.status == SourceStatus.FAILED:
+        # We can't do realtime updates on incomplete or failed base structure
+        if source.status in [SourceStatus.FAILED, SourceStatus.PROVISIONED]:
             return
 
         try:
