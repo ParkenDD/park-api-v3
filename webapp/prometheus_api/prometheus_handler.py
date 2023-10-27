@@ -47,15 +47,15 @@ class PrometheusHandler:
             type=MetricType.gauge,
             identifier='app_park_api_source_last_realtime_update',
         )
-        source_static_parking_site_error_count = Metrics(
-            help='Parking site static error count by source',
+        source_static_parking_site_errors = Metrics(
+            help='Parking site static errors by source',
             type=MetricType.gauge,
-            identifier='app_static_park_api_source_error_count',
+            identifier='app_static_park_api_source_errors',
         )
-        source_realtime_parking_site_error_count = Metrics(
-            help='Parking site realtime error count by source',
+        source_realtime_parking_site_errors = Metrics(
+            help='Parking site realtime error by source',
             type=MetricType.gauge,
-            identifier='app_realtime_park_api_source_error_count',
+            identifier='app_realtime_park_api_source_errors',
         )
         failed_sources = Metrics(
             help='Completely failed sources',
@@ -79,13 +79,13 @@ class PrometheusHandler:
                         value=int((datetime.now(tz=timezone.utc) - source.realtime_data_updated_at).total_seconds()),
                     )
                 )
-            source_static_parking_site_error_count.metrics.append(
+            source_static_parking_site_errors.metrics.append(
                 SourceMetric(
                     source=source.uid,
                     value=source.static_parking_site_error_count,
                 )
             )
-            source_realtime_parking_site_error_count.metrics.append(
+            source_realtime_parking_site_errors.metrics.append(
                 SourceMetric(
                     source=source.uid,
                     value=source.realtime_parking_site_error_count,
@@ -102,8 +102,8 @@ class PrometheusHandler:
         metrics = (
             last_static_update_metrics.to_metrics()
             + last_realtime_update_metrics.to_metrics()
-            + source_static_parking_site_error_count.to_metrics()
-            + source_realtime_parking_site_error_count.to_metrics()
+            + source_static_parking_site_errors.to_metrics()
+            + source_realtime_parking_site_errors.to_metrics()
             + failed_sources.to_metrics()
         )
 
