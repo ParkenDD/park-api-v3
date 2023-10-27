@@ -66,8 +66,8 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
                     continue
                 lot[key] = getattr(parking_site, key)
 
-            if parking_site.has_realtime_data and parking_site.realtime_free_spots is not None:
-                lot['free'] = parking_site.realtime_free_spots
+            if parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None:
+                lot['free'] = parking_site.realtime_free_capacity
             if parking_site.has_realtime_data and parking_site.realtime_opening_status is not None:
                 lot['state'] = parking_site.realtime_opening_status.name.lower()
             elif parking_site.opening_hours:

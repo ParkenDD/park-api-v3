@@ -41,10 +41,10 @@ class ParkingSiteGenericImportMapper:
 
     def map_lot_data_to_parking_site(self, lot_data_input: LotDataInput, parking_site: ParkingSite):
         if lot_data_input.num_free is not None:
-            parking_site.realtime_free_spots = lot_data_input.num_free
+            parking_site.realtime_free_capacity = lot_data_input.num_free
         elif lot_data_input.num_occupied is not None and lot_data_input.capacity is not None:
-            parking_site.realtime_free_spots = lot_data_input.capacity - lot_data_input.num_occupied
+            parking_site.realtime_free_capacity = lot_data_input.capacity - lot_data_input.num_occupied
         else:
-            parking_site.realtime_free_spots = None
+            parking_site.realtime_free_capacity = None
         parking_site.realtime_capacity = lot_data_input.capacity
         parking_site.realtime_opening_status = self.opening_mapping.get(lot_data_input.status, OpeningStatus.UNKNOWN)
