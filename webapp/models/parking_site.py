@@ -76,7 +76,7 @@ class ParkingSite(BaseModel):
     public_url: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
     address: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
-    type: Mapped[ParkingSiteType] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
+    type: Mapped[Optional[ParkingSiteType]] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
 
     max_stay: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     has_lighting: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
@@ -143,7 +143,9 @@ class ParkingSite(BaseModel):
                 'realtime_capacity_bus',
             ]
 
-        return super().to_dict(fields, ignore)
+        result = super().to_dict(fields, ignore)
+
+        return {key: value for key, value in result.items() if value is not None}
 
     @hybrid_property
     def park_and_ride_type(self) -> Mapped[Optional[list[ParkAndRideType]]]:
