@@ -91,11 +91,11 @@ class PrometheusHandler:
                     value=source.realtime_parking_site_error_count,
                 )
             )
-            if source.status == SourceStatus.FAILED:
+            if source.status in [SourceStatus.FAILED, SourceStatus.ACTIVE]:
                 failed_sources.metrics.append(
                     SourceMetric(
                         source=source.uid,
-                        value=1,
+                        value=1 if source.status == SourceStatus.FAILED else 0,
                     )
                 )
 
