@@ -18,7 +18,7 @@ class BaseMetric:
 
     def to_metric(self, identifier: str) -> str:
         data = asdict(self)
-        label_list = [f'{key}:"{value}"' for key, value in data.items() if key != 'value']
+        label_list = [f'{key}="{value}"' for key, value in data.items() if key != 'value']
         return f'{identifier}{{{",".join(label_list)}}} {self.value}'
 
 
