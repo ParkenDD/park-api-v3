@@ -63,11 +63,11 @@ class ParkingSiteRepository(BaseRepository):
 
         if hasattr(search_query, 'location') and hasattr(search_query, 'radius') and search_query.location:
             query = query.filter(
-                func.ST_Distance_Sphere(
+                func.ST_DistanceSphere(
                     ParkingSite.geometry,
                     func.ST_GeomFromText(f'POINT({float(search_query.location[1])} {float(search_query.location[0])})'),
                 )
-                < search_query.radius * 10000
+                < search_query.radius * 1000
             )
 
         return query
