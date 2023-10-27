@@ -35,7 +35,7 @@ class ParkingSiteBlueprint(PublicApiBaseBlueprint):
     park_api_v1_handler: GenericParkingSiteHandler
 
     def __init__(self):
-        super().__init__('parking-sites', __name__, url_prefix='/parking-sites')
+        super().__init__('parking-sites', __name__, url_prefix='/v3/parking-sites')
 
         self.park_api_v1_handler = GenericParkingSiteHandler(
             **self.get_base_handler_dependencies(),

@@ -27,7 +27,7 @@ class ParkApiV2Blueprint(PublicApiBaseBlueprint):
     park_api_v2_handler: ParkApiV2Handler
 
     def __init__(self):
-        super().__init__('park-api-v2', __name__, url_prefix='/park-api-v2')
+        super().__init__('park-api-v2', __name__, url_prefix='/v2')
 
         self.park_api_v2_handler = ParkApiV2Handler(
             **self.get_base_handler_dependencies(),

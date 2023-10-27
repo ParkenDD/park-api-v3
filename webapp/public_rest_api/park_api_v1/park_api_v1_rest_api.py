@@ -34,7 +34,7 @@ class ParkApiV1Blueprint(PublicApiBaseBlueprint):
     park_api_v1_handler: ParkApiV1Handler
 
     def __init__(self):
-        super().__init__('park-api-v1', __name__, url_prefix='/park-api-v1')
+        super().__init__('park-api-v1', __name__, url_prefix='/v1')
 
         self.park_api_v1_handler = ParkApiV1Handler(
             **self.get_base_handler_dependencies(),
