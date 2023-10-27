@@ -21,7 +21,7 @@ class PublicRestApi(Blueprint):
     ]
 
     def __init__(self):
-        super().__init__('public', __name__, url_prefix='/api/public/v1')
+        super().__init__('public', __name__, url_prefix='/api/public')
 
         for blueprint_class in self.blueprints_classes:
             self.register_blueprint(blueprint_class())
