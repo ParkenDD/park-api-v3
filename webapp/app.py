@@ -31,8 +31,8 @@ def launch(testing: bool = False) -> App:
         template_folder=os.path.join(BaseConfig.PROJECT_ROOT, 'templates'),
     )
     configure_app(app, testing=testing)
-    configure_blueprints(app)
     configure_extensions(app)
+    configure_blueprints(app)
     configure_logging(app)
     configure_error_handlers(app)
     configure_events(app)

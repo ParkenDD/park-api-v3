@@ -19,7 +19,7 @@ class ServerAuthRole(Enum):
     Roles a server API user can have.
     """
 
-    USER = 'user'
+    PUSH_CLIENT = 'push-client'
 
 
 @dataclass

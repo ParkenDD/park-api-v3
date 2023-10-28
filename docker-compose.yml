@@ -21,6 +21,8 @@ x-flask-defaults: &flask-defaults
   depends_on:
     postgresql:
       condition: service_healthy
+    mysql:
+      condition: service_healthy
     rabbitmq:
       condition: service_healthy
 

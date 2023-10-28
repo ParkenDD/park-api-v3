@@ -32,7 +32,8 @@ class ParkingSiteGenericImportService(BaseService):
     source_repository: SourceRepository
     parking_site_repository: ParkingSiteRepository
 
-    converters: dict
+    pull_converters: dict
+    push_converters: dict
 
     lot_info_validator = DataclassValidator(LotInfoInput)
     lot_data_validator = DataclassValidator(LotDataInput)
@@ -50,7 +51,8 @@ class ParkingSiteGenericImportService(BaseService):
         self.source_repository = source_repository
         self.parking_site_repository = parking_site_repository
 
-        self.converters = {}
+        self.pull_converters = {}
+        self.push_converters = {}
         self.register_converters()
 
     def register_converters(self):
@@ -59,9 +61,10 @@ class ParkingSiteGenericImportService(BaseService):
         # appending the base package dir gives converters the ability to work within their own module without relative paths
         sys.path.append(str(base_package_dir))
         # This import is based on the additional module path just added to sys
+        from common.base_converter import CsvConverter, JsonConverter, XlsxConverter, XmlConverter
         from util import ScraperBase
 
-        for source_dir in ['original', 'new']:
+        for source_dir in ['original', 'new', 'v3']:
             package_dir = base_package_dir.joinpath(source_dir)
             for _, module_name, _ in iter_modules([str(package_dir)]):
                 # load all modules in converters
@@ -71,10 +74,23 @@ class ParkingSiteGenericImportService(BaseService):
                     attribute = getattr(module, attribute_name)
                     if not isclass(attribute):
                         continue
-                    if not issubclass(attribute, ScraperBase) or attribute is ScraperBase:
-                        continue
-                    # at this point we can be sure that attribute is a ScraperBase child, so we can initialize and register it
-                    self.converters[attribute.POOL.id] = attribute()
+                    if source_dir in ['original', 'new']:
+                        if not issubclass(attribute, ScraperBase) or attribute is ScraperBase:
+                            continue
+                        # at this point we can be sure that attribute is a ScraperBase child, so we can initialize and register it
+                        self.pull_converters[attribute.POOL.id] = attribute()
+                    else:
+                        if (
+                            not issubclass(attribute, XlsxConverter)
+                            and not issubclass(attribute, XmlConverter)
+                            and not issubclass(attribute, CsvConverter)
+                            and not issubclass(attribute, JsonConverter)
+                        ):
+                            continue
+                        if attribute in [XlsxConverter, XmlConverter, CsvConverter, JsonConverter]:
+                            continue
+                        # at this point we can be sure that attribute is a BaseConverter child, so we can initialize and register it
+                        self.push_converters[attribute.source_info.id] = attribute()
 
     def update_sources_static(self):
         for source in self.config_helper.get('PARK_API_CONVERTER'):
@@ -85,7 +101,7 @@ class ParkingSiteGenericImportService(BaseService):
                 continue
 
     def update_source_static(self, source_uid: str):
-        if source_uid not in self.converters:
+        if source_uid not in self.pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
         try:
@@ -94,7 +110,7 @@ class ParkingSiteGenericImportService(BaseService):
             source = self.create_source(source_uid)
 
         try:
-            lot_infos = self.converters[source_uid].get_lot_infos()
+            lot_infos = self.pull_converters[source_uid].get_lot_infos()
         except Exception:
             source.status = SourceStatus.FAILED
             self.source_repository.save_source(source)
@@ -138,7 +154,7 @@ class ParkingSiteGenericImportService(BaseService):
     def create_source(self, source_uid: str) -> Source:
         source = Source()
         source.uid = source_uid
-        park_api_pool = self.converters[source_uid].POOL
+        park_api_pool = self.pull_converters[source_uid].POOL
         for key in [
             'public_url',
             'attribution_license',
@@ -158,7 +174,7 @@ class ParkingSiteGenericImportService(BaseService):
                 continue
 
     def update_source_realtime(self, source_uid: str):
-        if source_uid not in self.converters:
+        if source_uid not in self.pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
         source = self.source_repository.fetch_source_by_uid(source_uid)
@@ -168,7 +184,7 @@ class ParkingSiteGenericImportService(BaseService):
             return
 
         try:
-            lot_datasets = self.converters[source_uid].get_lot_data()
+            lot_datasets = self.pull_converters[source_uid].get_lot_data()
         except Exception:
             source.status = SourceStatus.FAILED
             self.source_repository.save_source(source)

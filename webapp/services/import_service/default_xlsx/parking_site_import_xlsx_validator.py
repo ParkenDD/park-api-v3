@@ -3,13 +3,13 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from datetime import time
 from decimal import Decimal
 from typing import Optional
 
 from validataclass.dataclasses import Default, validataclass
 from validataclass.validators import (
     AnyOfValidator,
-    DecimalValidator,
     IntegerValidator,
     NumericValidator,
     StringValidator,
@@ -53,9 +53,9 @@ class ParkingSiteInput:
     capacity_carsharing: Optional[int] = ExcelNoneable(IntegerValidator()), Default(None)
 
     opening_hours_is_24_7: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)
-    opening_hours_weekday_begin: Optional[str] = ExcelNoneable(ExcelTimeValidator()), Default(None)
-    opening_hours_weekday_end: Optional[str] = ExcelNoneable(ExcelTimeValidator()), Default(None)
-    opening_hours_saturday_begin: Optional[str] = ExcelNoneable(ExcelTimeValidator()), Default(None)
-    opening_hours_saturday_end: Optional[str] = ExcelNoneable(ExcelTimeValidator()), Default(None)
-    opening_hours_sunday_begin: Optional[str] = ExcelNoneable(ExcelTimeValidator()), Default(None)
-    opening_hours_sunday_end: Optional[str] = ExcelNoneable(ExcelTimeValidator()), Default(None)
+    opening_hours_weekday_begin: Optional[time] = ExcelNoneable(ExcelTimeValidator()), Default(None)
+    opening_hours_weekday_end: Optional[time] = ExcelNoneable(ExcelTimeValidator()), Default(None)
+    opening_hours_saturday_begin: Optional[time] = ExcelNoneable(ExcelTimeValidator()), Default(None)
+    opening_hours_saturday_end: Optional[time] = ExcelNoneable(ExcelTimeValidator()), Default(None)
+    opening_hours_sunday_begin: Optional[time] = ExcelNoneable(ExcelTimeValidator()), Default(None)
+    opening_hours_sunday_end: Optional[time] = ExcelNoneable(ExcelTimeValidator()), Default(None)

@@ -62,3 +62,12 @@ class RequestHelper:
 
     def get_request_body(self) -> bytes:
         return self.request.get_data()
+
+    def get_request_body_text(self) -> str:
+        return self.request.get_data(as_text=True)
+
+    def get_basicauth_username(self) -> Optional[str]:
+        if not self.request.authorization:
+            return None
+
+        return self.request.authorization.username
