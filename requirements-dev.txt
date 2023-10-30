@@ -7,4 +7,4 @@ types-PyYAML~=6.0.12.12
 types-requests~=2.31.0.10
 requests-mock~=1.11.0
 mypy-gitlab-code-quality~=1.0.0
-ruff~=0.1.0
+ruff~=0.1.3
