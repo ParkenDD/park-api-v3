@@ -8,8 +8,10 @@ from typing import TYPE_CHECKING, Callable, Optional, Type
 
 from sqlalchemy.orm import scoped_session
 
+from webapp.common.logging.models import LogMessageType
+
 if TYPE_CHECKING:
-    from webapp.common.logger import Logger
+    from webapp.common.logging import Logger
 
 
 class BaseErrorHandler:
@@ -76,4 +78,4 @@ class BaseErrorHandler:
         """
         Helper function to write critical errors to the log.
         """
-        self.logger.critical('app', str(error), traceback.format_exc())
+        self.logger.critical(LogMessageType.EXCEPTION, f'{error}: {traceback.format_exc()}')

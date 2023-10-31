@@ -22,7 +22,7 @@ from .exceptions import InputValidationException
 from .request_helper import RequestHelper
 
 if TYPE_CHECKING:
-    from webapp.common.logger import Logger
+    from webapp.common.logging import Logger
 
 
 class BaseMethodView(MethodView):

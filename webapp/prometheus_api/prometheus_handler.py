@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from webapp.common.config import ConfigHelper
 from webapp.common.events import EventHelper
-from webapp.common.logger import Logger
+from webapp.common.logging import Logger
 from webapp.models.source import SourceStatus
 from webapp.prometheus_api.prometheus_models import Metrics, MetricType, ParkingSiteMetric, SourceMetric
 from webapp.repositories import ParkingSiteRepository, SourceRepository

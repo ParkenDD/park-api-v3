@@ -10,6 +10,7 @@ from lxml import etree
 from openpyxl.reader.excel import load_workbook
 
 from webapp.admin_rest_api import AdminApiBaseHandler
+from webapp.common.logging.models import LogTag
 from webapp.common.rest.exceptions import RestApiNotImplementedException
 from webapp.models import ParkingSite, Source
 from webapp.models.parking_site import ParkingSiteType
@@ -86,6 +87,7 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
             source = Source()
             source.uid = source_uid
             self.source_repository.save_source(source)
+        self.logger.set_tag(LogTag.SOURCE, source_uid)
 
         if source_uid not in self.parking_site_generic_import_service.push_converters:
             raise RestApiNotImplementedException(message='Converter is missing for this source.')

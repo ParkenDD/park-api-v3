@@ -3,8 +3,12 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
+from time import sleep, time
+
 from flask.cli import AppGroup
 
+from webapp.common.logging.models import LogMessageType
 from webapp.dependencies import dependencies
 from webapp.services.import_service import ParkingSiteGenericImportService
 
@@ -20,3 +24,8 @@ def cli_source_init_converters():
     )
     parking_site_import_generic_service.update_sources_static()
     parking_site_import_generic_service.update_sources_realtime()
+
+
+@source_cli.command('test')
+def test():
+    dependencies.get_logger().info(LogMessageType.MISC, 'something')

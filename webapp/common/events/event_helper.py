@@ -7,8 +7,9 @@ from typing import Dict, List, Optional, Sequence
 
 from webapp.common.celery import CeleryHelper
 from webapp.common.contexts import ContextHelper
-from webapp.common.logger import Logger
+from webapp.common.logging import Logger
 
+from ..logging.models import LogMessageType
 from .delayed_events import trigger_delayed_event
 from .enum import EventSource, EventType
 from .event import Event
@@ -100,7 +101,7 @@ class EventHelper:
         for parameter in self.event_receivers[event_type][event_id].required_parameters:
             if parameter not in data:
                 self.logger.error(
-                    'events',
+                    LogMessageType.EXCEPTION,
                     (
                         f'got event {event_type} with missing required parameters: {data}, '
                         f'required: {self.event_receivers[event_type][event_id].required_parameters}'

@@ -4,6 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import sys
+import traceback
 from datetime import datetime, timezone
 from importlib import import_module
 from inspect import isclass
@@ -13,6 +14,7 @@ from pkgutil import iter_modules
 from validataclass.exceptions import ValidationError
 from validataclass.validators import DataclassValidator
 
+from webapp.common.logging.models import LogMessageType, LogTag
 from webapp.converter.util import LotData, LotInfo
 from webapp.models import ParkingSite, Source
 from webapp.models.source import SourceStatus
@@ -97,10 +99,12 @@ class ParkingSiteGenericImportService(BaseService):
             try:
                 self.update_source_static(source)
             except ConverterMissingException:
-                self.logger.info('converter', f'ignored source {source} because converter is missing')
+                self.logger.info(LogMessageType.MISC, f'ignored source {source} because converter is missing')
                 continue
 
     def update_source_static(self, source_uid: str):
+        self.logger.set_tag(LogTag.SOURCE, source_uid)
+
         if source_uid not in self.pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
@@ -111,9 +115,14 @@ class ParkingSiteGenericImportService(BaseService):
 
         try:
             lot_infos = self.pull_converters[source_uid].get_lot_infos()
-        except Exception:
-            source.status = SourceStatus.FAILED
-            self.source_repository.save_source(source)
+        except Exception as e:
+            self.logger.info(
+                message_type=LogMessageType.FAILED_SOURCE_HANDLING,
+                message=f'handling source {source_uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}',
+            )
+            if source.status != SourceStatus.PROVISIONED:
+                source.status = SourceStatus.FAILED
+                self.source_repository.save_source(source)
             return
 
         if getattr(lot_infos, 'lot_error_count', None) is not None:
@@ -124,7 +133,7 @@ class ParkingSiteGenericImportService(BaseService):
                 self.update_parking_site_static(source, lot_info)
             except ImportDatasetException as e:
                 self.logger.info(
-                    'generic-import',
+                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
                     f'source {source.id} {source.uid} dataset {e.dataset} failed to import because of {e.exception.code}',
                 )
 
@@ -137,6 +146,9 @@ class ParkingSiteGenericImportService(BaseService):
             lot_info_input = self.lot_info_validator.validate(lot_info.to_dict())
         except ValidationError as e:
             raise ImportDatasetException(dataset=lot_info.to_dict(), exception=e) from e
+
+        self.logger.set_tag(LogTag.PARKING_SITE, lot_info_input.id)
+
         try:
             parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
                 source_id=source.id,
@@ -170,17 +182,19 @@ class ParkingSiteGenericImportService(BaseService):
             try:
                 self.update_source_realtime(source)
             except ConverterMissingException:
-                self.logger.info('converter', f'ignored source {source} because converter is missing')
+                self.logger.info(LogMessageType.MISC, f'ignored source {source} because converter is missing')
                 continue
 
     def update_source_realtime(self, source_uid: str):
+        self.logger.set_tag(LogTag.SOURCE, source_uid)
+
         if source_uid not in self.pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
         source = self.source_repository.fetch_source_by_uid(source_uid)
 
         # We can't do realtime updates on incomplete or failed base structure
-        if source.status in [SourceStatus.FAILED, SourceStatus.PROVISIONED]:
+        if source.status == SourceStatus.PROVISIONED:
             return
 
         try:
@@ -198,10 +212,11 @@ class ParkingSiteGenericImportService(BaseService):
                 self.update_parking_site_realtime(source, lot_data)
             except ImportDatasetException as e:
                 self.logger.info(
-                    'generic-import',
+                    LogMessageType.MISC,
                     f'source {source.id} {source.uid} dataset {e.dataset} failed to import because of {e.exception.message}',
                 )
         source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
+        source.status = SourceStatus.ACTIVE
         self.source_repository.save_source(source)
 
     def update_parking_site_realtime(self, source: Source, lot_info: LotData):
@@ -209,6 +224,8 @@ class ParkingSiteGenericImportService(BaseService):
             lot_data_input = self.lot_data_validator.validate(lot_info.to_dict())
         except ValidationError as e:
             raise ImportDatasetException(dataset=lot_info.to_dict(), exception=e) from e
+
+        self.logger.set_tag(LogTag.PARKING_SITE, lot_data_input.id)
 
         try:
             parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(

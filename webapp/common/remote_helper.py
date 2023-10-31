@@ -15,9 +15,10 @@ from urllib3.exceptions import NewConnectionError
 
 from webapp.common.config import ConfigHelper
 from webapp.common.json import DefaultJSONEncoder
+from webapp.common.logging.models import LogMessageType
 
 if TYPE_CHECKING:
-    from webapp.common.logger import Logger
+    from webapp.common.logging import Logger
 
 
 class RemoteServerType(Enum):
@@ -78,7 +79,7 @@ class RemoteHelper:
                 log_fragments.append(f'>> {data}')
             if response.text and response.text.strip():
                 log_fragments.append(f'<< {response.text.strip()}')
-            self.logger.info('requests-out-server', '\n'.join(log_fragments))
+            self.logger.info(LogMessageType.REQUEST_OUT, '\n'.join(log_fragments))
 
             try:
                 if response.status_code == 404 and ignore_404:

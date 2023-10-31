@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from webapp.common.config import ConfigHelper
 from webapp.common.events import EventHelper
-from webapp.common.logger import Logger
+from webapp.common.logging import Logger
 
 
 class PublicApiBaseHandler:

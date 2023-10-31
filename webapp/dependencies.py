@@ -12,7 +12,7 @@ from sqlalchemy.orm import scoped_session
 from webapp.common.celery import CeleryHelper
 from webapp.common.config import ConfigHelper
 from webapp.common.contexts import ContextHelper
-from webapp.common.logger import Logger
+from webapp.common.logging import Logger
 from webapp.common.remote_helper import RemoteHelper
 from webapp.common.rest import RequestHelper
 from webapp.repositories import BaseRepository, ParkingSiteRepository, SourceRepository
@@ -68,6 +68,7 @@ class Dependencies:
     @cache_dependency
     def get_logger(self) -> 'Logger':
         return Logger(
+            context_helper=self.get_context_helper(),
             config_helper=self.get_config_helper(),
         )
 
