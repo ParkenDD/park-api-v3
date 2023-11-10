@@ -4,4 +4,3 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from .status_rest_api import StatusRestApi
-
