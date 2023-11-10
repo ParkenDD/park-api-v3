@@ -3,7 +3,6 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import git
 from flask import jsonify
 
 from webapp.common.blueprint import Blueprint
