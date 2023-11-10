@@ -6,6 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from webapp.common.blueprint import Blueprint
 
 from .base_blueprint import PublicApiBaseBlueprint
+from .datex2.datex2_rest_api import Datex2Blueprint
 from .park_api_v1 import ParkApiV1Blueprint
 from .park_api_v2 import ParkApiV2Blueprint
 from .parking_sites import ParkingSiteBlueprint
@@ -18,6 +19,7 @@ class PublicRestApi(Blueprint):
         ParkApiV1Blueprint,
         ParkApiV2Blueprint,
         ParkingSiteBlueprint,
+        Datex2Blueprint,
     ]
 
     def __init__(self):
