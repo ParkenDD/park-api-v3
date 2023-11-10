@@ -4,6 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import sys
+import traceback
 from datetime import datetime, timezone
 from importlib import import_module
 from inspect import isclass
@@ -13,6 +14,7 @@ from pkgutil import iter_modules
 from validataclass.exceptions import ValidationError
 from validataclass.validators import DataclassValidator
 
+from webapp.common.logging.models import LogMessageType, LogTag
 from webapp.converter.util import LotData, LotInfo
 from webapp.models import ParkingSite, Source
 from webapp.models.source import SourceStatus
@@ -32,7 +34,8 @@ class ParkingSiteGenericImportService(BaseService):
     source_repository: SourceRepository
     parking_site_repository: ParkingSiteRepository
 
-    converters: dict
+    pull_converters: dict
+    push_converters: dict
 
     lot_info_validator = DataclassValidator(LotInfoInput)
     lot_data_validator = DataclassValidator(LotDataInput)
@@ -50,7 +53,8 @@ class ParkingSiteGenericImportService(BaseService):
         self.source_repository = source_repository
         self.parking_site_repository = parking_site_repository
 
-        self.converters = {}
+        self.pull_converters = {}
+        self.push_converters = {}
         self.register_converters()
 
     def register_converters(self):
@@ -59,9 +63,10 @@ class ParkingSiteGenericImportService(BaseService):
         # appending the base package dir gives converters the ability to work within their own module without relative paths
         sys.path.append(str(base_package_dir))
         # This import is based on the additional module path just added to sys
+        from common.base_converter import CsvConverter, JsonConverter, XlsxConverter, XmlConverter
         from util import ScraperBase
 
-        for source_dir in ['original', 'new']:
+        for source_dir in ['original', 'new', 'v3']:
             package_dir = base_package_dir.joinpath(source_dir)
             for _, module_name, _ in iter_modules([str(package_dir)]):
                 # load all modules in converters
@@ -71,21 +76,36 @@ class ParkingSiteGenericImportService(BaseService):
                     attribute = getattr(module, attribute_name)
                     if not isclass(attribute):
                         continue
-                    if not issubclass(attribute, ScraperBase) or attribute is ScraperBase:
-                        continue
-                    # at this point we can be sure that attribute is a ScraperBase child, so we can initialize and register it
-                    self.converters[attribute.POOL.id] = attribute()
+                    if source_dir in ['original', 'new']:
+                        if not issubclass(attribute, ScraperBase) or attribute is ScraperBase:
+                            continue
+                        # at this point we can be sure that attribute is a ScraperBase child, so we can initialize and register it
+                        self.pull_converters[attribute.POOL.id] = attribute()
+                    else:
+                        if (
+                            not issubclass(attribute, XlsxConverter)
+                            and not issubclass(attribute, XmlConverter)
+                            and not issubclass(attribute, CsvConverter)
+                            and not issubclass(attribute, JsonConverter)
+                        ):
+                            continue
+                        if attribute in [XlsxConverter, XmlConverter, CsvConverter, JsonConverter]:
+                            continue
+                        # at this point we can be sure that attribute is a BaseConverter child, so we can initialize and register it
+                        self.push_converters[attribute.source_info.id] = attribute()
 
     def update_sources_static(self):
         for source in self.config_helper.get('PARK_API_CONVERTER'):
             try:
                 self.update_source_static(source)
             except ConverterMissingException:
-                self.logger.info('converter', f'ignored source {source} because converter is missing')
+                self.logger.info(LogMessageType.MISC, f'ignored source {source} because converter is missing')
                 continue
 
     def update_source_static(self, source_uid: str):
-        if source_uid not in self.converters:
+        self.logger.set_tag(LogTag.SOURCE, source_uid)
+
+        if source_uid not in self.pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
         try:
@@ -94,10 +114,15 @@ class ParkingSiteGenericImportService(BaseService):
             source = self.create_source(source_uid)
 
         try:
-            lot_infos = self.converters[source_uid].get_lot_infos()
-        except Exception:
-            source.status = SourceStatus.FAILED
-            self.source_repository.save_source(source)
+            lot_infos = self.pull_converters[source_uid].get_lot_infos()
+        except Exception as e:
+            self.logger.info(
+                message_type=LogMessageType.FAILED_SOURCE_HANDLING,
+                message=f'handling source {source_uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}',
+            )
+            if source.status != SourceStatus.PROVISIONED:
+                source.status = SourceStatus.FAILED
+                self.source_repository.save_source(source)
             return
 
         if getattr(lot_infos, 'lot_error_count', None) is not None:
@@ -108,7 +133,7 @@ class ParkingSiteGenericImportService(BaseService):
                 self.update_parking_site_static(source, lot_info)
             except ImportDatasetException as e:
                 self.logger.info(
-                    'generic-import',
+                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
                     f'source {source.id} {source.uid} dataset {e.dataset} failed to import because of {e.exception.code}',
                 )
 
@@ -121,6 +146,9 @@ class ParkingSiteGenericImportService(BaseService):
             lot_info_input = self.lot_info_validator.validate(lot_info.to_dict())
         except ValidationError as e:
             raise ImportDatasetException(dataset=lot_info.to_dict(), exception=e) from e
+
+        self.logger.set_tag(LogTag.PARKING_SITE, lot_info_input.id)
+
         try:
             parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
                 source_id=source.id,
@@ -138,7 +166,7 @@ class ParkingSiteGenericImportService(BaseService):
     def create_source(self, source_uid: str) -> Source:
         source = Source()
         source.uid = source_uid
-        park_api_pool = self.converters[source_uid].POOL
+        park_api_pool = self.pull_converters[source_uid].POOL
         for key in [
             'public_url',
             'attribution_license',
@@ -154,21 +182,23 @@ class ParkingSiteGenericImportService(BaseService):
             try:
                 self.update_source_realtime(source)
             except ConverterMissingException:
-                self.logger.info('converter', f'ignored source {source} because converter is missing')
+                self.logger.info(LogMessageType.MISC, f'ignored source {source} because converter is missing')
                 continue
 
     def update_source_realtime(self, source_uid: str):
-        if source_uid not in self.converters:
+        self.logger.set_tag(LogTag.SOURCE, source_uid)
+
+        if source_uid not in self.pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
         source = self.source_repository.fetch_source_by_uid(source_uid)
 
         # We can't do realtime updates on incomplete or failed base structure
-        if source.status in [SourceStatus.FAILED, SourceStatus.PROVISIONED]:
+        if source.status == SourceStatus.PROVISIONED:
             return
 
         try:
-            lot_datasets = self.converters[source_uid].get_lot_data()
+            lot_datasets = self.pull_converters[source_uid].get_lot_data()
         except Exception:
             source.status = SourceStatus.FAILED
             self.source_repository.save_source(source)
@@ -182,10 +212,11 @@ class ParkingSiteGenericImportService(BaseService):
                 self.update_parking_site_realtime(source, lot_data)
             except ImportDatasetException as e:
                 self.logger.info(
-                    'generic-import',
+                    LogMessageType.MISC,
                     f'source {source.id} {source.uid} dataset {e.dataset} failed to import because of {e.exception.message}',
                 )
         source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
+        source.status = SourceStatus.ACTIVE
         self.source_repository.save_source(source)
 
     def update_parking_site_realtime(self, source: Source, lot_info: LotData):
@@ -193,6 +224,8 @@ class ParkingSiteGenericImportService(BaseService):
             lot_data_input = self.lot_data_validator.validate(lot_info.to_dict())
         except ValidationError as e:
             raise ImportDatasetException(dataset=lot_info.to_dict(), exception=e) from e
+
+        self.logger.set_tag(LogTag.PARKING_SITE, lot_data_input.id)
 
         try:
             parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(

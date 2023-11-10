@@ -11,6 +11,7 @@ from webapp.admin_rest_api.generic_parking_sites.generic_parking_sites_handler i
     GenericParkingSitesHandler,
 )
 from webapp.common.json import empty_json_response
+from webapp.common.server_auth import ServerAuthHelper
 from webapp.dependencies import dependencies
 
 
@@ -25,6 +26,7 @@ class GenericParkingSitesBlueprint(AdminApiBaseBlueprint):
             **self.get_base_handler_dependencies(),
             parking_site_repository=dependencies.get_parking_site_repository(),
             source_repository=dependencies.get_source_repository(),
+            parking_site_generic_import_service=dependencies.get_parking_site_generic_import_service(),
         )
 
         self.add_url_rule(
@@ -78,13 +80,14 @@ class GenericParkingSitesJsonMethodView(GenericParkingSitesMethodView):
                     title='Generic JSON data',
                     properties={},
                     description='Any JSON data',
-                )
-            )
+                ),
+            ),
         ],
         response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
         self.generic_parking_sites_handler.handle_json_data(
+            source_uid=self.request_helper.get_basicauth_username(),
             data=self.request_helper.get_parsed_json(),
         )
 
@@ -98,8 +101,9 @@ class GenericParkingSitesXmlMethodView(GenericParkingSitesMethodView):
         response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
-        self.generic_parking_sites_handler.handle_json_data(
-            data=self.request_helper.get_parsed_json(),
+        self.generic_parking_sites_handler.handle_xml_data(
+            source_uid=self.request_helper.get_basicauth_username(),
+            data=self.request_helper.get_request_body_text(),
         )
 
         return empty_json_response(), 204
@@ -113,7 +117,8 @@ class GenericParkingSitesCsvMethodView(GenericParkingSitesMethodView):
     )
     def post(self):
         self.generic_parking_sites_handler.handle_csv_data(
-            data=self.request_helper.get_request_body(),
+            source_uid=self.request_helper.get_basicauth_username(),
+            data=self.request_helper.get_request_body_text(),
         )
 
         return empty_json_response(), 204
@@ -127,6 +132,7 @@ class GenericParkingSitesXlsxMethodView(GenericParkingSitesMethodView):
     )
     def post(self):
         self.generic_parking_sites_handler.handle_xlsx_data(
+            source_uid=self.request_helper.get_basicauth_username(),
             data=self.request_helper.get_request_body(),
         )
 

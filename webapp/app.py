@@ -7,6 +7,7 @@ import os
 
 from flask import request
 from flask_sqlalchemy.track_modifications import models_committed
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 from webapp.admin_rest_api import AdminRestApi
 from webapp.cli import register_cli_to_app
@@ -30,9 +31,10 @@ def launch(testing: bool = False) -> App:
         instance_relative_config=True,
         template_folder=os.path.join(BaseConfig.PROJECT_ROOT, 'templates'),
     )
+    app.wsgi_app = ProxyFix(app.wsgi_app)
     configure_app(app, testing=testing)
-    configure_blueprints(app)
     configure_extensions(app)
+    configure_blueprints(app)
     configure_logging(app)
     configure_error_handlers(app)
     configure_events(app)
@@ -77,6 +79,7 @@ def configure_events(app: App):
     @app.teardown_appcontext
     def teardown_appcontext(exception: BaseException | None):
         dependencies.get_event_helper().publish_events()
+        dependencies.get_logger().teardown_appcontext()
 
 
 def configure_logging(app: App) -> None:

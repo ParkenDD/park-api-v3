@@ -7,7 +7,7 @@ from abc import ABC
 
 from webapp.common.config import ConfigHelper
 from webapp.common.events import EventHelper
-from webapp.common.logger import Logger
+from webapp.common.logging import Logger
 
 
 class BaseService(ABC):

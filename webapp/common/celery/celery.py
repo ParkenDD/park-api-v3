@@ -13,8 +13,8 @@ from celery import Celery, Task, _state
 from flask import Flask
 from kombu.serialization import register
 
-from webapp.common.config import ConfigHelper
 from webapp.common.json import DefaultJSONEncoder
+from webapp.common.logging.models import LogMessageType, LogTag
 
 
 class CeleryState:
@@ -96,18 +96,19 @@ class LogErrorsCelery(Celery):
         )
 
         class ContextTask(Task, ABC):
-            def __init__(self):
-                from webapp.common.logger import Logger
-
-                self.logger = Logger(config_helper=ConfigHelper())
-
             def __call__(self, *args, **kwargs):
                 with app.app_context():
+                    from webapp.dependencies import dependencies
+
+                    dependencies.get_logger().set_tag(LogTag.INITIATOR, 'celery')
                     return self.run(*args, **kwargs)
 
             def on_failure(self, exc, _task_id, _args, _kwargs, exc_info):
                 with app.app_context():
-                    self.logger.critical('app', str(exc).strip(), str(exc_info).strip())
+                    # late import to avoid import loops
+                    from webapp.dependencies import dependencies
+
+                    dependencies.get_logger().critical(LogMessageType.EXCEPTION, f'{str(exc).strip()}: {str(exc_info).strip()}')
 
         ContextTask.abstract = True
         self.Task = ContextTask

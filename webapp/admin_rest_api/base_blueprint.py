@@ -6,6 +6,9 @@ Use of this source code is governed by an MIT-style license that can be found in
 from flask import current_app, request
 
 from webapp.common.blueprint import Blueprint
+from webapp.common.logging import Logger
+from webapp.common.logging.models import LogTag
+from webapp.common.server_auth import ServerAuthHelper
 from webapp.dependencies import dependencies
 
 
@@ -26,8 +29,11 @@ class AdminApiBaseBlueprint(Blueprint):
                 ):
                     return
                 # Authenticate user via Basic Auth (raises AdminApiUnauthorizedException if unauthenticated)
-                server_auth_helper = dependencies.get_server_auth_helper()
+                server_auth_helper: ServerAuthHelper = dependencies.get_server_auth_helper()
                 server_auth_helper.authenticate_request(request)
+                logger: Logger = dependencies.get_logger()
+                logger.set_tag(LogTag.INITIATOR, 'admin-api')
+                logger.set_tag(LogTag.USER, server_auth_helper.get_current_user().username)
 
     @staticmethod
     def get_base_handler_dependencies() -> dict:
