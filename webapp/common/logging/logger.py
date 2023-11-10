@@ -33,8 +33,8 @@ class Logger:
         self.logger.addHandler(self.local_handler)
 
         if self.config_helper.get('LOKI_ENABLED'):
-            self.logger.addHandler(self.loki_handler)
             self.loki_handler = LokiQueueHandler(config_helper=config_helper)
+            self.logger.addHandler(self.loki_handler)
 
     def set_tag(self, tag: LogTag, value: str):
         app_context = self.context_helper.get_app_context()
