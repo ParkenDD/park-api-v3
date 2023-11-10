@@ -20,6 +20,7 @@ from webapp.event_receiver import event_receivers
 from webapp.extensions import celery, db, migrate, openapi
 from webapp.prometheus_api import PrometheusRestApi
 from webapp.public_rest_api import PublicRestApi
+from webapp.status_rest_api import StatusRestApi
 
 __all__ = ['launch']
 
@@ -61,6 +62,7 @@ def configure_blueprints(app: App) -> None:
     app.register_blueprint(AdminRestApi())
     app.register_blueprint(PublicRestApi())
     app.register_blueprint(PrometheusRestApi())
+    app.register_blueprint(StatusRestApi())
 
     register_cli_to_app(app)
 
