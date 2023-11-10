@@ -27,7 +27,7 @@ class LotInfoInput:
     source_url: Optional[str] = Noneable(UrlValidator(max_length=4096)), Default(None)
     address: Optional[str] = Noneable(StringValidator(max_length=512, multiline=True)), Default(None)
     capacity: Optional[int] = Noneable(IntegerValidator(min_value=0)), Default(None)
-    has_live_capacity: bool = Noneable(BooleanValidator()), Default(None)
+    has_live_capacity: Optional[bool] = Noneable(BooleanValidator()), Default(None)
     latitude: Decimal = FloatToDecimalValidator(allow_strings=True)
     longitude: Decimal = FloatToDecimalValidator(allow_strings=True)
 

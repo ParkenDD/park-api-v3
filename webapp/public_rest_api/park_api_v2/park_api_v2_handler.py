@@ -3,7 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from opening_hours import OpeningHours
+from opening_hours import OpeningHours  # noqa
 
 from webapp.models.parking_site import ParkingSiteType
 from webapp.repositories import SourceRepository

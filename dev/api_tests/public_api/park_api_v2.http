@@ -1,14 +1,14 @@
 ### List park api v2 detail data
-GET {{api_host}}/api/public/v1/park-api-v2/lots/
+GET {{api_host}}/api/public/v2/lots/
 
 
 ### List park api v2 detail data with location filter
-GET {{api_host}}/api/public/v1/park-api-v2/lots/?location=12,50&radius=1000
+GET {{api_host}}/api/public/v2/lots/?location=12,50&radius=1000
 
 
 ### List park api v2 detail data with name filter
-GET {{api_host}}/api/public/v1/park-api-v2/lots/?name=Bahnhof
+GET {{api_host}}/api/public/v2/lots/?name=Bahnhof
 
 
 ### List park api v2 pool data
-GET {{api_host}}/api/public/v1/park-api-v2/pools/example-source/
+GET {{api_host}}/api/public/v2/pools/example-source/
