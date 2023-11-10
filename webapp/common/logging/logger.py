@@ -26,13 +26,15 @@ class Logger:
         self.config_helper = config_helper
         self.context_helper = context_helper
 
-        self.loki_handler = LokiQueueHandler(config_helper=config_helper)
-        self.local_handler = LocalFileHandler(config_helper=config_helper)
-
         self.logger = logging.getLogger('app')
         self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(self.loki_handler)
+
+        self.local_handler = LocalFileHandler(config_helper=config_helper)
         self.logger.addHandler(self.local_handler)
+
+        if self.config_helper.get('LOKI_ENABLED'):
+            self.logger.addHandler(self.loki_handler)
+            self.loki_handler = LokiQueueHandler(config_helper=config_helper)
 
     def set_tag(self, tag: LogTag, value: str):
         app_context = self.context_helper.get_app_context()
@@ -67,4 +69,5 @@ class Logger:
         self._log('debug', message_type, message)
 
     def teardown_appcontext(self):
-        self.loki_handler.teardown_appcontext()
+        if self.config_helper.get('LOKI_ENABLED'):
+            self.loki_handler.teardown_appcontext()
