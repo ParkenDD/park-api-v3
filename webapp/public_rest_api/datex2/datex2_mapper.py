@@ -5,12 +5,17 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from webapp.models import ParkingSite
 from webapp.models.parking_site import OpeningStatus, ParkingSiteType
-from webapp.public_rest_api.datex2.datex2_models import Datex2ParkingSite, Datex2LocationAndDimension, Datex2Coordinate, \
-    Datex2ParkingSiteType, Datex2Publication, Datex2ParkingPublicationLight
+from webapp.public_rest_api.datex2.datex2_models import (
+    Datex2Coordinate,
+    Datex2LocationAndDimension,
+    Datex2ParkingPublicationLight,
+    Datex2ParkingSite,
+    Datex2ParkingSiteType,
+    Datex2Publication,
+)
 
 
 class Datex2Mapper:
-
     def map_parking_sites(self, name: str, parking_sites: list[ParkingSite]) -> Datex2Publication:
         publication = Datex2Publication(
             parkingPublicationLight=Datex2ParkingPublicationLight(
@@ -66,5 +71,4 @@ class Datex2Mapper:
             ParkingSiteType.ON_STREET: Datex2ParkingSiteType.onStreet,
             ParkingSiteType.UNDERGROUND: Datex2ParkingSiteType.carPark,
             ParkingSiteType.OFF_STREET_PARKING_GROUND: Datex2ParkingSiteType.offStreetParkingGround,
-
         }.get(parking_site_type, Datex2ParkingSiteType.other)

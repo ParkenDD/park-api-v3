@@ -3,24 +3,33 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from flask_openapi.schema import JsonSchema, StringField, ObjectField, ArrayField, DateTimeField, IntegerField, EnumField, BooleanField, \
-    UriField, NumericField
+from flask_openapi.schema import (
+    ArrayField,
+    BooleanField,
+    DateTimeField,
+    EnumField,
+    IntegerField,
+    JsonSchema,
+    NumericField,
+    ObjectField,
+    StringField,
+    UriField,
+)
 
 from webapp.public_rest_api.datex2.datex2_models import (
-    Datex2Availability,
     Datex2Accessibility,
+    Datex2AssignmentType,
+    Datex2Availability,
+    Datex2FuelType,
     Datex2ParkingOccupancyTrend,
     Datex2ParkingSiteType,
-    Datex2FuelType,
-    Datex2AssignmentType,
     Datex2UserType,
     Datex2VehicleType,
 )
 
-
 datex2_coordinate_schema = ObjectField(
     description='A pair of planar coordinates defining the geodetic position of a single point using the European Terrestrial Reference '
-                'System 1989 (ETRS89).',
+    'System 1989 (ETRS89).',
     properties={
         'latitude': NumericField(description='Latitude in decimal degrees using the European Terrestrial Reference System 1989 (ETRS89).'),
         'longitude': NumericField(
@@ -36,14 +45,14 @@ datex2_gml_linear_ring = ObjectField(
 
 datex2_dimension = ObjectField(
     description='A component that provides dimension information. The product of width and height must not be necessarily be the square '
-                'footage (e.g. in multi-storey buildings or when some zones are not part of the square footage).',
+    'footage (e.g. in multi-storey buildings or when some zones are not part of the square footage).',
     properties={
         'height': NumericField(required=False, description='Height in meters.'),
         'length': NumericField(required=False, description='Length in meters.'),
         'orientationOfLengthAxis': NumericField(
             required=False,
             description='The orientation of the length axis in degree. In the case of a parking space, this corresponds to the direction,'
-                        ' in which a vehicle is parked.',
+            ' in which a vehicle is parked.',
         ),
         'usableArea': NumericField(
             required=False,
@@ -61,7 +70,7 @@ datex2_assignment_schema = ObjectField(
             minimum=0,
             required=False,
             description='The total number of currently vacant parking spaces within this site for the given assignment. (e.g. for lorries).'
-                        ' Use only with type of assignment = "optimised" or "allowed". Do not use when describing a single parking space.',
+            ' Use only with type of assignment = "optimised" or "allowed". Do not use when describing a single parking space.',
         ),
         'fuelType': EnumField(enum=Datex2FuelType, required=False, description='The type of fuel this assignment refers to.'),
         'typeOfAssignment': EnumField(
@@ -82,7 +91,7 @@ datex2_location_and_dimension_schema = ObjectField(
         'level': IntegerField(
             required=False,
             description='The level of the parking space (0 = ground etc.), or the first level of the entire parking site (for example, if '
-                        'a parking site is located on the roof of a building).',
+            'a parking site is located on the roof of a building).',
         ),
         'locationDescriptor': StringField(required=False, description='Supplementary human-readable description of the location'),
         'roadName': StringField(required=False, description='Information on a road'),
@@ -91,14 +100,14 @@ datex2_location_and_dimension_schema = ObjectField(
             items=StringField(),
             required=False,
             description='Information on one specific access (entrance or exit) in human readable text, for example the corresponding road '
-                        'where it is located.',
+            'where it is located.',
         ),
     },
 )
 
 datex_2_parking_site_schema = ObjectField(
     description='A collection of parking spaces within a building, an open ground or some on street area. Usually seen as one entity and'
-                ' manged as such.',
+    ' manged as such.',
     properties={
         '_id': StringField(),
         'assignedFor': ArrayField(items=datex2_assignment_schema, required=False),
@@ -156,13 +165,13 @@ datex_2_parking_site_schema = ObjectField(
         'temporaryClosed': BooleanField(
             required=False,
             description='True, if the parking site is closed ignoring its regular opening times, for example due to maintenance or '
-                        'constructions.',
+            'constructions.',
         ),
         'type': EnumField(enum=Datex2ParkingSiteType, description='Type of this parking site.'),
         'urlLinkAddress': UriField(
             required=False,
             description='A Uniform Resource Locator (URL) address pointing to a resource available on the Internet from where further '
-                        'relevant information may be obtained.',
+            'relevant information may be obtained.',
         ),
         'zoneDescription': ArrayField(
             items=StringField(),
@@ -223,6 +232,4 @@ datex2_parking_sites_schema = JsonSchema(
     },
 )
 
-datex2_parking_sites_example = {
-
-}
+datex2_parking_sites_example = {}

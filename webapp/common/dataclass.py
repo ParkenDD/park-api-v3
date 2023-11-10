@@ -3,7 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from dataclasses import is_dataclass, asdict
+from dataclasses import asdict, is_dataclass
 from typing import Any
 
 from validataclass.helpers import UnsetValue
@@ -26,6 +26,5 @@ def filter_unset_value(data: Any) -> Any:
 
 
 class DataclassMixin:
-
     def to_dict(self):
         return filter_unset_value(recursive_to_dict(self))
