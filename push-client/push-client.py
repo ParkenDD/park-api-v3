@@ -55,8 +55,11 @@ def main():
         headers={'Content-Type': DATA_TYPES[file_ending]},
     )
 
-    if requests_response.status_code == 204:
-        sys.exit('Upload successful.')
+    if requests_response.status_code == 200:
+        sys.exit(f'Upload successful. Result: {requests_response.json()}')
+
+    if requests_response.status_code == 400:
+        sys.exit(f'Invalid input data: {requests_response.json()}')
 
     if requests_response.status_code == 401:
         sys.exit('Access denied.')

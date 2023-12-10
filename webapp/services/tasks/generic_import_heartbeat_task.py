@@ -22,3 +22,17 @@ class RunGenericRealtimeImportTask(BaseTask):
             **dependencies.get_base_service_dependencies(),
         )
         parking_site_import_generic_service.update_source_realtime(source)
+
+
+class RunGenericStaticImportTask(BaseTask):
+    run_interval = 60 * 60 * 24  # 24 hours
+
+    @staticmethod
+    @celery.task()
+    def task(source: str):
+        parking_site_import_generic_service = ParkingSiteGenericImportService(
+            parking_site_repository=dependencies.get_parking_site_repository(),
+            source_repository=dependencies.get_source_repository(),
+            **dependencies.get_base_service_dependencies(),
+        )
+        parking_site_import_generic_service.update_source_static(source)

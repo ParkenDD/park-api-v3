@@ -23,6 +23,16 @@ class ImportDatasetException(AppException):
         self.dataset = dataset
         self.exception = exception
 
+    @property
+    def exception_message(self) -> str:
+        if hasattr(self.exception, 'to_dict'):
+            return str(self.exception.to_dict())
+
+        if hasattr(self.exception, 'message'):
+            return self.exception.message
+
+        return str(self.exception)
+
 
 class ConverterMissingException(AppException):
     code = 'converter_missing'

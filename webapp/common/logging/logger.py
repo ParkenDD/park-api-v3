@@ -6,21 +6,24 @@ Use of this source code is governed by an MIT-style license that can be found in
 import logging
 import os
 from logging import Logger as PythonLogger
+from typing import Optional
 
 from webapp.common.config import ConfigHelper
 from webapp.common.contexts import ContextHelper
 
-from .local_handler import LocalFileHandler
+from .local_file_handler import LocalFileHandler
 from .loki_handler import LokiQueueHandler
 from .models import LogMessageType, LogTag
+from .stdout_handler import StdoutHandler
 
 
 class Logger:
     config_helper: ConfigHelper
     context_helper: ContextHelper
     logger: PythonLogger
-    loki_handler: LokiQueueHandler
-    local_handler: LocalFileHandler
+    local_file_handler: Optional[LocalFileHandler] = None
+    stdout_handler: Optional[StdoutHandler] = None
+    loki_handler: Optional[LokiQueueHandler] = None
 
     def __init__(self, config_helper: ConfigHelper, context_helper: ContextHelper):
         self.config_helper = config_helper
@@ -35,6 +38,10 @@ class Logger:
         if self.config_helper.get('LOKI_ENABLED'):
             self.loki_handler = LokiQueueHandler(config_helper=config_helper)
             self.logger.addHandler(self.loki_handler)
+
+        if self.config_helper.get('STDOUT_LOGGING_ENABLED'):
+            self.stdout_handler = StdoutHandler()
+            self.logger.addHandler(self.stdout_handler)
 
     def set_tag(self, tag: LogTag, value: str):
         app_context = self.context_helper.get_app_context()

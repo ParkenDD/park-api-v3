@@ -42,3 +42,8 @@ class InputValidationException(RestApiException):
 class UnauthorizedException(RestApiException):
     code = 'unauthorized'
     http_status = 401
+
+
+class InvalidInputException(RestApiException):
+    code = 'invalid_input'
+    http_status = 400

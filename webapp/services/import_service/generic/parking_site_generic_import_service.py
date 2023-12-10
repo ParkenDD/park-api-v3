@@ -10,6 +10,7 @@ from importlib import import_module
 from inspect import isclass
 from pathlib import Path
 from pkgutil import iter_modules
+from typing import TYPE_CHECKING
 
 from validataclass.exceptions import ValidationError
 from validataclass.validators import DataclassValidator
@@ -28,6 +29,9 @@ from webapp.services.import_service.exceptions import (
 
 from .parking_site_generic_import_mapper import ParkingSiteGenericImportMapper
 from .parking_site_generic_import_validator import LotDataInput, LotInfoInput
+
+if TYPE_CHECKING:
+    from webapp.converter.util import LotDataList, LotInfoList
 
 
 class ParkingSiteGenericImportService(BaseService):
@@ -114,19 +118,34 @@ class ParkingSiteGenericImportService(BaseService):
             source = self.create_source(source_uid)
 
         try:
-            lot_infos = self.pull_converters[source_uid].get_lot_infos()
+            lot_infos: LotInfoList | list = self.pull_converters[source_uid].get_lot_infos()
         except Exception as e:
             self.logger.info(
                 message_type=LogMessageType.FAILED_SOURCE_HANDLING,
-                message=f'handling source {source_uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}',
+                message=f'handling static source {source_uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}',
             )
-            if source.status != SourceStatus.PROVISIONED:
-                source.status = SourceStatus.FAILED
-                self.source_repository.save_source(source)
+            source.static_status = SourceStatus.FAILED
+            self.source_repository.save_source(source)
             return
 
-        if getattr(lot_infos, 'lot_error_count', None) is not None:
-            source.realtime_parking_site_error_count = lot_infos.lot_error_count
+        if len(lot_infos) == 0:
+            self.logger.info(
+                message_type=LogMessageType.FAILED_SOURCE_HANDLING,
+                message=f'handling static source {source_uid} has no entries',
+            )
+            source.static_status = SourceStatus.FAILED
+            self.source_repository.save_source(source)
+            return
+
+        if getattr(lot_infos, 'errors', None) is not None:
+            for error in lot_infos.errors:
+                self.logger.info(
+                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                    f'source {source.id} {source.uid} static dataset failed: {error}',
+                )
+            source.static_parking_site_error_count = lot_infos.error_count or 0
+        else:
+            source.static_parking_site_error_count = 0
 
         for lot_info in lot_infos:
             try:
@@ -134,11 +153,12 @@ class ParkingSiteGenericImportService(BaseService):
             except ImportDatasetException as e:
                 self.logger.info(
                     LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                    f'source {source.id} {source.uid} dataset {e.dataset} failed to import because of {e.exception.code}',
+                    f'source {source.id} {source.uid} static dataset {e.dataset} failed to import because of {e.exception.code}',
                 )
+                source.static_parking_site_error_count += 1
 
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
-        source.status = SourceStatus.ACTIVE
+        source.static_status = SourceStatus.ACTIVE
         self.source_repository.save_source(source)
 
     def update_parking_site_static(self, source: Source, lot_info: LotInfo):
@@ -193,19 +213,34 @@ class ParkingSiteGenericImportService(BaseService):
 
         source = self.source_repository.fetch_source_by_uid(source_uid)
 
-        # We can't do realtime updates on incomplete or failed base structure
-        if source.status == SourceStatus.PROVISIONED:
+        # We can't do realtime updates when static data is not active
+        if source.static_status != SourceStatus.ACTIVE:
+            return
+
+        # We don't do realtime updates if it's disabled
+        if source.realtime_status == SourceStatus.DISABLED:
             return
 
         try:
-            lot_datasets = self.pull_converters[source_uid].get_lot_data()
-        except Exception:
-            source.status = SourceStatus.FAILED
+            lot_datasets: LotDataList | list = self.pull_converters[source_uid].get_lot_data()
+        except Exception as e:
+            self.logger.info(
+                message_type=LogMessageType.FAILED_SOURCE_HANDLING,
+                message=f'handling realtime source {source_uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}',
+            )
+            source.realtime_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
 
-        if getattr(lot_datasets, 'lot_error_count', None) is not None:
-            source.realtime_parking_site_error_count = lot_datasets.lot_error_count
+        if getattr(lot_datasets, 'error', None) is not None:
+            for error in lot_datasets.errors:
+                self.logger.info(
+                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                    f'source {source.id} {source.uid} realtime dataset failed: {error}',
+                )
+            source.realtime_parking_site_error_count = lot_datasets.error_count or 0
+        else:
+            source.realtime_parking_site_error_count = 0
 
         for lot_data in lot_datasets:
             try:
@@ -213,10 +248,11 @@ class ParkingSiteGenericImportService(BaseService):
             except ImportDatasetException as e:
                 self.logger.info(
                     LogMessageType.MISC,
-                    f'source {source.id} {source.uid} dataset {e.dataset} failed to import because of {e.exception.message}',
+                    f'source {source.id} {source.uid} realtime dataset {e.dataset} failed to import because of {e.exception.message}',
                 )
+                source.realtime_parking_site_error_count += 1
         source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
-        source.status = SourceStatus.ACTIVE
+        source.realtime_status = SourceStatus.ACTIVE
         self.source_repository.save_source(source)
 
     def update_parking_site_realtime(self, source: Source, lot_info: LotData):

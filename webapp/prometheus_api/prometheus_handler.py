@@ -57,26 +57,25 @@ class PrometheusHandler:
             type=MetricType.gauge,
             identifier='app_realtime_park_api_source_errors',
         )
-        failed_sources = Metrics(
-            help='Completely failed sources',
+        failed_static_sources = Metrics(
+            help='Completely failed static sources',
             type=MetricType.gauge,
-            identifier='app_park_api_source_failed',
+            identifier='app_park_api_static_source_failed',
+        )
+        failed_realtime_sources = Metrics(
+            help='Completely failed realtime sources',
+            type=MetricType.gauge,
+            identifier='app_park_api_realtime_source_failed',
         )
         for source in sources:
-            if source.status in [SourceStatus.DISABLED, SourceStatus.PROVISIONED]:
+            if source.static_status in [SourceStatus.DISABLED, SourceStatus.PROVISIONED]:
                 continue
+
             if source.static_data_updated_at:
                 last_static_update_metrics.metrics.append(
                     SourceMetric(
                         source=source.uid,
                         value=int((datetime.now(tz=timezone.utc) - source.static_data_updated_at).total_seconds()),
-                    )
-                )
-            if source.realtime_data_updated_at:
-                last_realtime_update_metrics.metrics.append(
-                    SourceMetric(
-                        source=source.uid,
-                        value=int((datetime.now(tz=timezone.utc) - source.realtime_data_updated_at).total_seconds()),
                     )
                 )
             source_static_parking_site_errors.metrics.append(
@@ -85,26 +84,42 @@ class PrometheusHandler:
                     value=source.static_parking_site_error_count,
                 )
             )
+            failed_static_sources.metrics.append(
+                SourceMetric(
+                    source=source.uid,
+                    value=1 if source.static_status == SourceStatus.FAILED else 0,
+                )
+            )
+
+            if source.realtime_status in [SourceStatus.DISABLED, SourceStatus.PROVISIONED]:
+                continue
+
+            last_realtime_update_metrics.metrics.append(
+                SourceMetric(
+                    source=source.uid,
+                    value=int((datetime.now(tz=timezone.utc) - source.realtime_data_updated_at).total_seconds()),
+                )
+            )
             source_realtime_parking_site_errors.metrics.append(
                 SourceMetric(
                     source=source.uid,
                     value=source.realtime_parking_site_error_count,
                 )
             )
-            if source.status in [SourceStatus.FAILED, SourceStatus.ACTIVE]:
-                failed_sources.metrics.append(
-                    SourceMetric(
-                        source=source.uid,
-                        value=1 if source.status == SourceStatus.FAILED else 0,
-                    )
+            failed_realtime_sources.metrics.append(
+                SourceMetric(
+                    source=source.uid,
+                    value=1 if source.realtime_status == SourceStatus.FAILED else 0,
                 )
+            )
 
         metrics = (
-            last_static_update_metrics.to_metrics()
-            + last_realtime_update_metrics.to_metrics()
+            failed_static_sources.to_metrics()
+            + last_static_update_metrics.to_metrics()
             + source_static_parking_site_errors.to_metrics()
+            + failed_realtime_sources.to_metrics()
+            + last_realtime_update_metrics.to_metrics()
             + source_realtime_parking_site_errors.to_metrics()
-            + failed_sources.to_metrics()
         )
 
         if self.config_helper.get('PARKING_SITE_METRICS', False):

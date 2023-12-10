@@ -99,7 +99,7 @@ class ParkingSiteXlsxImportService(BaseService):
         )
 
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
-        source.status = SourceStatus.ACTIVE
+        source.static_status = SourceStatus.ACTIVE
         source.parking_site_error_count = len(validation_exceptions)
         self.source_repository.save_source(source)
 
