@@ -26,9 +26,9 @@ beautifulsoup4~=4.12.2
 jsonschema~=4.20.0
 python-dateutil~=2.8.2
 python-decouple~=3.8.0
-feedparser~=6.0.10
+feedparser~=6.0.11
 utm~=0.7.0
-
+pyproj~=3.6.1
 
 # binary butterfly shared libraries (https://git.sectio-aurea.org/public_libraries)
 --extra-index-url https://git.sectio-aurea.org/api/v4/groups/262/-/packages/pypi/simple

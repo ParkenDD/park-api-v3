@@ -91,7 +91,7 @@ class GenericParkingSitesMethodView(AdminApiBaseMethodView):
         if import_result.realtime_parking_site_errors is not None:
             result['summary']['realtime_error_count'] = len(import_result.realtime_parking_site_errors)
             result['errors']['realtime'] = [
-                {'message': error.message, 'uid': error.uid} for error in import_result.static_parking_site_errors
+                {'message': error.message, 'uid': error.uid} for error in import_result.realtime_parking_site_errors
             ]
         return result
 
