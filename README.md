@@ -65,7 +65,7 @@ ParkAPI v1 and v2 converters (so far).
 
 Data pulling is done every five minutes. It uses
 [Celery's beat system](https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html) which creates tasks per source
-regularly, the Celery workers actually do the work then. If you decide to run a subset of ParkAPIv2s services or
+regularly, the Celery workers actually do the work then. If you decide to run a subset of ParkAPIv3s services or
 build your own infrastructure (eg run ParkAPIv3 per systemd services), please keep in mind that both, heartbeat and
 worker, are required to run.
 
@@ -94,8 +94,8 @@ happens at bash quite easy).
 Additionally, there should be a suitable ParkAPI v3 converter at ParkAPI-sources to convert pushed data in ParkAPI v3's 
 internal format. It has to have the same source UID as the one configured in the `SERVER_AUTH_USERS` config.
 
-Push services have four different entrypoints for common data formats: XML, JSON, CSV and XLSX. The endpoints do some
-basic file loading and then hand it over to ParkAPI-sources.
+Push services have four different entrypoints for common data formats: XML, JSON, CSV and XLSX which are all different endpoints. The 
+endpoints do some basic file loading and then hand it over to ParkAPI-sources.
 
 If you want to create new data sources, please have a look at
 [ParkAPI-sources' README.md](https://github.com/ParkenDD/ParkAPI2-sources#pushed-data-1).
@@ -109,6 +109,7 @@ installed at your system, or you create a virtual environment for that:
 ```bash
 cd push-client
 virtalenv venv
+pip install "requests~=2.31.0"
 source venv/bin/activate
 python push-client.py
 ```
@@ -122,8 +123,12 @@ Afterward, the password will be asked in a secure way, then the upload progress 
 ## Configuration
 
 Besides `PARK_API_CONVERTER` and `SERVER_AUTH_USERS`, there are a few other configuration options to set, you will find
-example values in `config_dist_dev.yaml`. You can set any config value by env var too, but you have to prefix the config
-name with `PARKAPI_` then. For example, you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`.
+valid config keys in `config_dist_dev.yaml`. You can set config values by two different approaches (or even mix them):
+
+1) You can create a config file called `config.yaml` in your root folder.
+2) You can set any config value by env var, but you have to prefix the config name with `PARKAPI_` then. For example, 
+   you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`. ENV vars overwrite 
+
 
 ## Monitoring: Loki and Prometheus
 
