@@ -31,7 +31,7 @@ searches in order not to rely on a city as a query parameter.
 
 ### Parking Site
 
-The Parking Site represents a location where multiple parking spaces are located as a defined area or building. Every
+`ParkingSite` represents a location where multiple parking spaces are located as a defined area or building. Every
 parking site has a data source where it comes from. It also has all the relevant data which describes the parking site:
 a name, an address, a url and other meta information. Additionally, it has static and, if the data source provides it,
 realtime data for capacities. It also has opening times in OSM format and also, if available, a realtime opening status.
