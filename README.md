@@ -79,7 +79,7 @@ publishing realtime data, because if the client knows best when it gets an updat
 best realtime experience using push services. Push-services can also be used for pushing data which comes by other
 data transport channels, eg per mail client.
 
-Each source uid which should be used for pushing requires an entry at config value `SERVER_AUTH_USERS` in order to
+Each source uid used for pushing requires an entry in config value `SERVER_AUTH_USERS`, mapping the uid to the basic auth credentials that clients must provide to push to this source.
 have basic auth credentials. Other auth methods are not supported so far. The `hash` is a `sha256` hash. You can create
 such a hash by
 
