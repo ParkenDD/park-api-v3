@@ -92,7 +92,7 @@ You can create sha256 hashes by other tools, too, but keep in mind not to hash n
 happens at bash quite easy).
 
 Additionally, there should be a suitable ParkAPI v3 converter at ParkAPI-sources to convert pushed data in ParkAPI v3's 
-internal format. It has to have the same source UID which was also used at the BasicAuth setup.
+internal format. It has to have the same source UID as the one configured in the `SERVER_AUTH_USERS` config.
 
 Push services have four different entrypoints for common data formats: XML, JSON, CSV and XLSX. The endpoints do some
 basic file loading and then hand it over to ParkAPI-sources.
