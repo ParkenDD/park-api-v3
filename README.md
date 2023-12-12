@@ -2,7 +2,7 @@
 
 ParkAPI v3 is a web service which collects and provides access to parking data. It uses
 [ParkAPI-sources](https://github.com/ParkenDD/ParkAPI2-sources) as a
-[Git Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to collect data in different data structures.
+[Git Submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules) at `webapp/converter` to collect data in different data structures.
 
 ## Data model
 
