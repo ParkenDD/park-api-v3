@@ -36,7 +36,7 @@ parking site has a data source where it comes from. It also has all the relevant
 a name, an address, a url and other meta information. Additionally, it has static and, if the data source provides it,
 realtime data for capacities. It also has opening times in OSM format and also, if available, a realtime opening status.
 For a complete overview, please have a look at the
-[OpenAPI documentation](https://dev-ipl.mobidata-bw.de/park-api/documentation/public.html#/schemas/ParkingSite).
+[OpenAPI documentation](webapp/models/parking_site.py).
 
 This data model has it's limits for on-street parking, where there is no user-visible area which creates the
 borders of a specific parking site. Usually, there are definitions for areas like parts of streets, which also apply
