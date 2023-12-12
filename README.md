@@ -22,7 +22,7 @@ Additionally, every source has a human-readable name and a public URL where the 
 
 There are a few other fields at source, mostly related to import status including error counters and licence
 information. For a complete overview, please have a look at the
-[OpenAPI documentation](https://dev-ipl.mobidata-bw.de/park-api/documentation/public.html#/schemas/Source).
+[OpenAPI documentation](webapp/models/source.py).
 
 If, until now, you used the ParkAPI v1 model, you might recognize that there is a change of perspective: at v1, the
 main object for collecting data was city, not source. This turned out not to be very realistic, because often there are
