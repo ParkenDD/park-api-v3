@@ -123,7 +123,7 @@ Afterward, the password will be asked in a secure way, then the upload progress 
 
 Besides `PARK_API_CONVERTER` and `SERVER_AUTH_USERS`, there are a few other configuration options to set, you will find
 example values in `config_dist_dev.yaml`. You can set any config value by env var too, but you have to prefix the config
-value with `PARKAPI_` then. E.g. `SECRET_KEY` gets `PARKAPI_SECRET_KEY` as an env var.
+name with `PARKAPI_` then. For example, you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`.
 
 ## Monitoring: Loki and Prometheus
 
