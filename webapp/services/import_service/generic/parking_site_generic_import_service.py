@@ -153,7 +153,8 @@ class ParkingSiteGenericImportService(BaseService):
             except ImportDatasetException as e:
                 self.logger.info(
                     LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                    f'source {source.id} {source.uid} static dataset {e.dataset} failed to import because of {e.exception.code}',
+                    f'source {source.id} {source.uid} static dataset {e.dataset} failed to import because of {e.exception.code}: '
+                    f'{e.exception_message}',
                 )
                 source.static_parking_site_error_count += 1
 
@@ -248,7 +249,8 @@ class ParkingSiteGenericImportService(BaseService):
             except ImportDatasetException as e:
                 self.logger.info(
                     LogMessageType.MISC,
-                    f'source {source.id} {source.uid} realtime dataset {e.dataset} failed to import because of {e.exception.message}',
+                    f'source {source.id} {source.uid} realtime dataset {e.dataset} failed to import because of {e.exception.code}: '
+                    f'{e.exception_message}',
                 )
                 source.realtime_parking_site_error_count += 1
         source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
