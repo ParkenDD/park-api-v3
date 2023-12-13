@@ -16,14 +16,14 @@ from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.common.logging.models import LogTag
 from webapp.common.rest.exceptions import InvalidInputException, RestApiNotImplementedException
 from webapp.models import ParkingSite, Source
-from webapp.models.parking_site import ParkingSiteType, OpeningStatus
+from webapp.models.parking_site import OpeningStatus, ParkingSiteType
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.import_service import ParkingSiteGenericImportService
 
 if TYPE_CHECKING:
     from webapp.converter.common.models import ImportSourceResult
-    from webapp.converter.common.validators import StaticParkingSiteInput, RealtimeParkingSiteInput
+    from webapp.converter.common.validators import RealtimeParkingSiteInput, StaticParkingSiteInput
 
 
 class GenericParkingSitesHandler(AdminApiBaseHandler):
@@ -162,4 +162,3 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
             setattr(parking_site, key, value)
 
         self.parking_site_repository.save_parking_site(parking_site)
-
