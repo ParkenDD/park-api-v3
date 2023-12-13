@@ -128,7 +128,7 @@ class GenericParkingSitesXmlMethodView(GenericParkingSitesMethodView):
     def post(self):
         result = self.generic_parking_sites_handler.handle_xml_data(
             source_uid=self.request_helper.get_basicauth_username(),
-            data=self.request_helper.get_request_body_text(),
+            data=self.request_helper.get_request_body(),
         )
 
         return jsonify(self._generate_response(result))

@@ -54,7 +54,7 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
 
         return import_results
 
-    def handle_xml_data(self, source_uid: str, data: str) -> 'ImportSourceResult':
+    def handle_xml_data(self, source_uid: str, data: bytes) -> 'ImportSourceResult':
         source = self._get_source(source_uid)
         import_service = self.parking_site_generic_import_service.push_converters[source_uid]
 
