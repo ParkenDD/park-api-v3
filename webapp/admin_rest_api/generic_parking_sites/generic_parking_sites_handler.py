@@ -5,18 +5,24 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 import csv
 from io import BytesIO, StringIO
+from typing import TYPE_CHECKING
+from zipfile import BadZipFile
 
 from lxml import etree
+from lxml.etree import ParseError
 from openpyxl.reader.excel import load_workbook
 
 from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.common.logging.models import LogTag
-from webapp.common.rest.exceptions import RestApiNotImplementedException
+from webapp.common.rest.exceptions import InvalidInputException, RestApiNotImplementedException
 from webapp.models import ParkingSite, Source
 from webapp.models.parking_site import ParkingSiteType
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.import_service import ParkingSiteGenericImportService
+
+if TYPE_CHECKING:
+    from webapp.converter.common.models import ImportSourceResult, StaticParkingSiteInput
 
 
 class GenericParkingSitesHandler(AdminApiBaseHandler):
@@ -37,7 +43,7 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         self.parking_site_repository = parking_site_repository
         self.parking_site_generic_import_service = parking_site_generic_import_service
 
-    def handle_json_data(self, source_uid: str, data: dict | list):
+    def handle_json_data(self, source_uid: str, data: dict | list) -> 'ImportSourceResult':
         source = self._get_source(source_uid)
         import_service = self.parking_site_generic_import_service.push_converters[source_uid]
 
@@ -47,38 +53,63 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         for static_parking_site_input in static_parking_site_inputs:
             self._save_parking_site_input(source, static_parking_site_input)
 
-    def handle_xml_data(self, source_uid: str, data: str):
+        return import_results
+
+    def handle_xml_data(self, source_uid: str, data: str) -> 'ImportSourceResult':
         source = self._get_source(source_uid)
         import_service = self.parking_site_generic_import_service.push_converters[source_uid]
 
-        root_element = etree.parse(StringIO(data), parser=etree.XMLParser(resolve_entities=False))  # noqa: S320
+        try:
+            root_element = etree.fromstring(data, parser=etree.XMLParser(resolve_entities=False))  # noqa: S320
+        except ParseError as e:
+            raise InvalidInputException(message='Invalid XML file') from e
         import_results = import_service.handle_xml(root_element)
         static_parking_site_inputs = import_results.static_parking_site_inputs
 
         for static_parking_site_input in static_parking_site_inputs:
             self._save_parking_site_input(source, static_parking_site_input)
 
-    def handle_csv_data(self, source_uid: str, data: str):
+        return import_results
+
+    def handle_csv_data(self, source_uid: str, data: str) -> 'ImportSourceResult':
         source = self._get_source(source_uid)
         import_service = self.parking_site_generic_import_service.push_converters[source_uid]
 
-        rows = list(csv.reader(StringIO(data)))
-        import_results = import_service.handle_csv(rows)
+        try:
+            rows = list(csv.reader(StringIO(data)))
+        except csv.Error as e:
+            raise InvalidInputException(message='Invalid CSV file') from e
+        try:
+            import_results = import_service.handle_csv(rows)
+        except Exception as e:
+            raise InvalidInputException(message=f'Invalid input: {getattr(e, "message", "unknown reason")}') from e
         static_parking_site_inputs = import_results.static_parking_site_inputs
 
         for static_parking_site_input in static_parking_site_inputs:
             self._save_parking_site_input(source, static_parking_site_input)
 
-    def handle_xlsx_data(self, source_uid: str, data: bytes):
+        return import_results
+
+    def handle_xlsx_data(self, source_uid: str, data: bytes) -> 'ImportSourceResult':
         source = self._get_source(source_uid)
         import_service = self.parking_site_generic_import_service.push_converters[source_uid]
 
-        workbook = load_workbook(filename=BytesIO(data))
-        import_results = import_service.handle_xlsx(workbook)
+        try:
+            workbook = load_workbook(filename=BytesIO(data))
+        # Sadly, there is no generic parent exception load_workbook throws, so this list might be incomplete
+        except (BadZipFile, KeyError, ValueError) as e:
+            raise InvalidInputException(message='Invalid XLSX file') from e
+
+        try:
+            import_results = import_service.handle_xlsx(workbook)
+        except Exception as e:
+            raise InvalidInputException(message=f'Invalid input: {getattr(e, "message", "unknown reason")}') from e
         static_parking_site_inputs = import_results.static_parking_site_inputs
 
         for static_parking_site_input in static_parking_site_inputs:
             self._save_parking_site_input(source, static_parking_site_input)
+
+        return import_results
 
     def _get_source(self, source_uid: str) -> Source:
         try:
@@ -94,7 +125,7 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
 
         return source
 
-    def _save_parking_site_input(self, source: Source, static_parking_site_input):
+    def _save_parking_site_input(self, source: Source, static_parking_site_input: 'StaticParkingSiteInput'):
         try:
             parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
                 source_id=source.id,

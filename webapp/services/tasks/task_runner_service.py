@@ -9,11 +9,12 @@ from webapp.common.logging import Logger
 from webapp.extensions import celery
 
 from .base_task import BaseTask
-from .generic_import_heartbeat_task import RunGenericRealtimeImportTask
+from .generic_import_heartbeat_task import RunGenericRealtimeImportTask, RunGenericStaticImportTask
 
 
 class TaskRunner:
     tasks: list[type[BaseTask]] = []
+    generic_static_import_task: RunGenericStaticImportTask
     generic_realtime_import_task: RunGenericRealtimeImportTask
     task_instances: list[BaseTask]
 
@@ -29,6 +30,7 @@ class TaskRunner:
 
         for task in self.tasks:
             self.task_instances.append(task())
+        self.generic_static_import_task = RunGenericStaticImportTask()
         self.generic_realtime_import_task = RunGenericRealtimeImportTask()
 
     def start(self):
@@ -37,6 +39,11 @@ class TaskRunner:
 
         # Add parameterized tasks
         for source in self.config_helper.get('PARK_API_CONVERTER'):
+            celery.add_periodic_task(
+                self.generic_static_import_task.run_interval,
+                self.generic_static_import_task.task,
+                kwargs={'source': source},
+            )
             celery.add_periodic_task(
                 self.generic_realtime_import_task.run_interval,
                 self.generic_realtime_import_task.task,
