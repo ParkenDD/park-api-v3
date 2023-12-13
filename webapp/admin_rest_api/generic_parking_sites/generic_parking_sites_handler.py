@@ -16,13 +16,14 @@ from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.common.logging.models import LogTag
 from webapp.common.rest.exceptions import InvalidInputException, RestApiNotImplementedException
 from webapp.models import ParkingSite, Source
-from webapp.models.parking_site import ParkingSiteType
+from webapp.models.parking_site import ParkingSiteType, OpeningStatus
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.import_service import ParkingSiteGenericImportService
 
 if TYPE_CHECKING:
-    from webapp.converter.common.models import ImportSourceResult, StaticParkingSiteInput
+    from webapp.converter.common.models import ImportSourceResult
+    from webapp.converter.common.validators import StaticParkingSiteInput, RealtimeParkingSiteInput
 
 
 class GenericParkingSitesHandler(AdminApiBaseHandler):
@@ -48,14 +49,12 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         import_service = self.parking_site_generic_import_service.push_converters[source_uid]
 
         import_results = import_service.handle_json(data)
-        static_parking_site_inputs = import_results.static_parking_site_inputs
 
-        for static_parking_site_input in static_parking_site_inputs:
-            self._save_parking_site_input(source, static_parking_site_input)
+        self._handle_import_results(source, import_results)
 
         return import_results
 
-    def handle_xml_data(self, source_uid: str, data: str) -> 'ImportSourceResult':
+    def handle_xml_data(self, source_uid: str, data: bytes) -> 'ImportSourceResult':
         source = self._get_source(source_uid)
         import_service = self.parking_site_generic_import_service.push_converters[source_uid]
 
@@ -63,11 +62,10 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
             root_element = etree.fromstring(data, parser=etree.XMLParser(resolve_entities=False))  # noqa: S320
         except ParseError as e:
             raise InvalidInputException(message='Invalid XML file') from e
-        import_results = import_service.handle_xml(root_element)
-        static_parking_site_inputs = import_results.static_parking_site_inputs
 
-        for static_parking_site_input in static_parking_site_inputs:
-            self._save_parking_site_input(source, static_parking_site_input)
+        import_results = import_service.handle_xml(root_element)
+
+        self._handle_import_results(source, import_results)
 
         return import_results
 
@@ -83,10 +81,8 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
             import_results = import_service.handle_csv(rows)
         except Exception as e:
             raise InvalidInputException(message=f'Invalid input: {getattr(e, "message", "unknown reason")}') from e
-        static_parking_site_inputs = import_results.static_parking_site_inputs
 
-        for static_parking_site_input in static_parking_site_inputs:
-            self._save_parking_site_input(source, static_parking_site_input)
+        self._handle_import_results(source, import_results)
 
         return import_results
 
@@ -104,10 +100,8 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
             import_results = import_service.handle_xlsx(workbook)
         except Exception as e:
             raise InvalidInputException(message=f'Invalid input: {getattr(e, "message", "unknown reason")}') from e
-        static_parking_site_inputs = import_results.static_parking_site_inputs
 
-        for static_parking_site_input in static_parking_site_inputs:
-            self._save_parking_site_input(source, static_parking_site_input)
+        self._handle_import_results(source, import_results)
 
         return import_results
 
@@ -125,7 +119,16 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
 
         return source
 
-    def _save_parking_site_input(self, source: Source, static_parking_site_input: 'StaticParkingSiteInput'):
+    def _handle_import_results(self, source: Source, import_results: 'ImportSourceResult'):
+        if import_results.static_parking_site_inputs:
+            for static_parking_site_input in import_results.static_parking_site_inputs:
+                self._save_static_parking_site_input(source, static_parking_site_input)
+
+        if import_results.realtime_parking_site_inputs:
+            for realtime_parking_site_inputs in import_results.realtime_parking_site_inputs:
+                self._save_realtime_parking_site_input(source, realtime_parking_site_inputs)
+
+    def _save_static_parking_site_input(self, source: Source, static_parking_site_input: 'StaticParkingSiteInput'):
         try:
             parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
                 source_id=source.id,
@@ -144,3 +147,19 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
             setattr(parking_site, key, value)
 
         self.parking_site_repository.save_parking_site(parking_site)
+
+    def _save_realtime_parking_site_input(self, source: Source, realtime_parking_site_input: 'RealtimeParkingSiteInput'):
+        parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
+            source_id=source.id,
+            original_uid=realtime_parking_site_input.uid,
+        )
+
+        for key, value in realtime_parking_site_input.to_dict().items():
+            if key in ['uid']:
+                continue
+            if key == 'realtime_opening_status' and value:
+                value = OpeningStatus[value.name]
+            setattr(parking_site, key, value)
+
+        self.parking_site_repository.save_parking_site(parking_site)
+

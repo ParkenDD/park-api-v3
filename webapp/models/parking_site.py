@@ -79,6 +79,7 @@ class ParkingSite(BaseModel):
     type: Mapped[Optional[ParkingSiteType]] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
 
     max_stay: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
+    max_height: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     has_lighting: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
     fee_description: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
     has_fee: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
