@@ -2,7 +2,7 @@ Flask~=3.0.0
 Flask-Failsafe~=0.2
 Flask-Migrate~=4.0.5
 Flask-SQLAlchemy~=3.1.1
-SQLAlchemy~=2.0.22
+SQLAlchemy~=2.0.23
 SQLAlchemy-Utc~=0.14.0
 pytz~=2023.3.post1
 psycopg2-binary~=2.9.9
@@ -18,7 +18,7 @@ python-dotenv~=1.0.0
 click~=8.1.7
 openpyxl~=3.1.2
 opening-hours-py~=0.6.17
-kombu~=5.3.2
+kombu~=5.3.4
 lxml~=4.9.3
 
 # required for converters
