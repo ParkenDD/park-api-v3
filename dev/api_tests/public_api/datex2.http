@@ -1,0 +1,2 @@
+### List datex2 parking sites
+GET {{api_host}}/api/public/datex2/json
