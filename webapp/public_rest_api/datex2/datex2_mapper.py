@@ -17,14 +17,12 @@ from webapp.public_rest_api.datex2.datex2_models import (
 
 class Datex2Mapper:
     def map_parking_sites(self, name: str, parking_sites: list[ParkingSite]) -> Datex2Publication:
-        publication = Datex2Publication(
+        return Datex2Publication(
             parkingPublicationLight=Datex2ParkingPublicationLight(
                 name=name,
                 parkingSite=[self.map_parking_site(parking_site) for parking_site in parking_sites],
             ),
         )
-
-        return publication
 
     def map_parking_site(self, parking_site: ParkingSite) -> Datex2ParkingSite:
         datex2_parking_site = Datex2ParkingSite(

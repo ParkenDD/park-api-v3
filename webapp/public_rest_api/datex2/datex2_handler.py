@@ -27,9 +27,7 @@ class Datex2Handler(GenericParkingSiteHandler):
             source = self.source_repository.fetch_source_by_uid(search_query.source_uid)
             name = source.name
 
-        datex_2_publication = self.datex2_mapper.map_parking_sites(
+        return self.datex2_mapper.map_parking_sites(
             parking_sites=parking_sites,
             name=name,
         )
-
-        return datex_2_publication
