@@ -17,7 +17,9 @@ DATA_TYPES = {
     'json': 'application/json',
 }
 
-PUSH_BASE_URL = 'http://localhost:5000/api/admin/v1/generic-parking-sites'
+DEFAULT_BASE_URL = 'https://api.mobidata-bw.de/park-api'
+PUSH_BASE_PATH = '/api/admin/v1/generic-parking-sites'
+USER_AGENT = 'ParkAPIv3 Push Client v1.0.0'
 
 
 def main():
@@ -27,9 +29,11 @@ def main():
     )
     parser.add_argument('source_uid')
     parser.add_argument('file_path')
+    parser.add_argument('-u', '--url', default=DEFAULT_BASE_URL, help='Base URL')
     args = parser.parse_args()
     source_uid: str = args.source_uid
     file_path: Path = Path(args.file_path)
+    base_url: str = args.url
 
     if not file_path.is_file():
         sys.exit('Error: please add a file as second argument.')
@@ -47,16 +51,20 @@ def main():
     with file_path.open('rb') as file:
         file_data = file.read()
 
-    endpoint = f'{PUSH_BASE_URL}/{file_ending}'
+    endpoint = f'{base_url}{PUSH_BASE_PATH}/{file_ending}'
     requests_response = requests.post(
         url=endpoint,
         data=file_data,
         auth=(source_uid, password),
-        headers={'Content-Type': DATA_TYPES[file_ending]},
+        headers={
+            'Content-Type': DATA_TYPES[file_ending],
+            'User-Agent': USER_AGENT,
+        },
     )
 
     if requests_response.status_code == 200:
-        sys.exit(f'Upload successful. Result: {requests_response.json()}')
+        print(f'Upload successful. Result: {requests_response.json()}')
+        return
 
     if requests_response.status_code == 400:
         sys.exit(f'Invalid input data: {requests_response.json()}')
