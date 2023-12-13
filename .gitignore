@@ -19,6 +19,7 @@ __pycache__/
 !/**/.gitkeep
 
 /config.yaml
+/config.secrets.yaml
 /dev/api_tests/http-client.env.json
 
 /Makefile.env
