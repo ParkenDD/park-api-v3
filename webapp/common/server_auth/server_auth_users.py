@@ -45,7 +45,7 @@ class ServerAuthUser:
         """
         # Convert roles from strings to enum members
         valid_roles = [role.value for role in ServerAuthRole]
-        roles = [ServerAuthRole(role) for role in data.get('roles') if role in valid_roles]
+        roles = [ServerAuthRole(role) for role in data.get('roles', []) if role in valid_roles]
 
         # Construct object
         return cls(username=username, password_hash=data.get('hash'), roles=roles)
