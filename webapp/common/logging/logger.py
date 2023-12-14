@@ -73,7 +73,7 @@ class Logger:
         self._log('exception', message_type, message)
 
     def critical(self, message_type: LogMessageType, message: str):
-        self._log('debug', message_type, message)
+        self._log('exception', message_type, message)
 
     def teardown_appcontext(self):
         if self.config_helper.get('LOKI_ENABLED'):
