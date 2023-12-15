@@ -46,6 +46,7 @@ parking_site_schema = JsonSchema(
         'description': StringField(maxLength=4096, required=False),
         'type': EnumField(enum=ParkingSiteType),
         'max_stay': IntegerField(minimum=0, required=False),
+        'max_height': IntegerField(minimum=0, required=False),
         'has_lighting': BooleanField(required=False),
         'park_and_ride_type': ArrayField(items=EnumField(enum=ParkAndRideType), required=False),
         'is_supervised': BooleanField(required=False),
