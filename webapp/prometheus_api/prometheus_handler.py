@@ -94,12 +94,13 @@ class PrometheusHandler:
             if source.realtime_status in [SourceStatus.DISABLED, SourceStatus.PROVISIONED]:
                 continue
 
-            last_realtime_update_metrics.metrics.append(
-                SourceMetric(
-                    source=source.uid,
-                    value=int((datetime.now(tz=timezone.utc) - source.realtime_data_updated_at).total_seconds()),
+            if source.realtime_data_updated_at:
+                last_realtime_update_metrics.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=int((datetime.now(tz=timezone.utc) - source.realtime_data_updated_at).total_seconds()),
+                    )
                 )
-            )
             source_realtime_parking_site_errors.metrics.append(
                 SourceMetric(
                     source=source.uid,
