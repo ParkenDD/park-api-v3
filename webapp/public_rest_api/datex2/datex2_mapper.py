@@ -36,8 +36,13 @@ class Datex2Mapper:
             ),
         )
 
+        if parking_site.realtime_free_capacity is not None:
+            datex2_parking_site.availableSpaces = parking_site.realtime_free_capacity
+
         if parking_site.realtime_capacity is not None:
             datex2_parking_site.availableSpaces = parking_site.realtime_capacity
+        else:
+            datex2_parking_site.availableSpaces = parking_site.capacity
 
         if parking_site.realtime_opening_status == OpeningStatus.OPEN:
             datex2_parking_site.isOpenNow = True
@@ -49,7 +54,6 @@ class Datex2Mapper:
             'modified': 'lastUpdate',
             'max_stay': 'maximumParkingDuration',
             'name': 'name',
-            'capacity': 'numberOfSpaces',
             'fee_description': 'tariffDescription',
             'public_url': 'urlLinkAddress',
         }
