@@ -36,14 +36,13 @@ class Datex2Mapper:
             ),
         )
 
-        if parking_site.has_realtime_data:
-            if parking_site.realtime_capacity is not None:
-                datex2_parking_site.availableSpaces = parking_site.realtime_capacity
+        if parking_site.realtime_capacity is not None:
+            datex2_parking_site.availableSpaces = parking_site.realtime_capacity
 
-            if parking_site.realtime_opening_status == OpeningStatus.OPEN:
-                datex2_parking_site.isOpenNow = True
-            elif parking_site.realtime_opening_status == OpeningStatus.CLOSED:
-                datex2_parking_site.isOpenNow = False
+        if parking_site.realtime_opening_status == OpeningStatus.OPEN:
+            datex2_parking_site.isOpenNow = True
+        elif parking_site.realtime_opening_status == OpeningStatus.CLOSED:
+            datex2_parking_site.isOpenNow = False
 
         field_mapping = {
             'description': 'description',
