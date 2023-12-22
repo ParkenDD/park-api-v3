@@ -45,7 +45,7 @@ class ParkApiV2Blueprint(PublicApiBaseBlueprint):
         )
 
         self.add_url_rule(
-            '/pools/<source_uid>/',
+            '/pools/<pool_id>/',
             view_func=ParkApiV2PoolsMethodView.as_view(
                 'sources',
                 **self.get_base_method_view_dependencies(),
@@ -64,11 +64,22 @@ class ParkApiV2BaseMethodView(PublicApiBaseMethodView):
 
 class ParkApiV2PoolsMethodView(ParkApiV2BaseMethodView):
     @document(
-        description='Get ParkApi V2 Source.',
+        description='Get ParkApi V2 Pool.',
+        path=[
+            Parameter(
+                'source_uid',
+                schema=StringField(
+                    minLength=1,
+                    maxLength=256,
+                    example='example-city',
+                    description='In ParkAPIv2, this field is called pool_id',
+                ),
+            )
+        ],
         response=[Response(ResponseData(park_api_v2_source_schema, park_api_v2_source_example))],
     )
-    def get(self, source_uid: str):
-        response = self.park_api_v2_handler.get_source_as_dict(source_uid)
+    def get(self, pool_id: str):
+        response = self.park_api_v2_handler.get_source_as_dict(pool_id)
 
         return jsonify(response)
 
