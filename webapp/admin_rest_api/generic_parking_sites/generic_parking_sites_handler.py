@@ -4,6 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import csv
+from datetime import datetime, timezone
 from io import BytesIO, StringIO
 from typing import TYPE_CHECKING
 from zipfile import BadZipFile
@@ -17,6 +18,7 @@ from webapp.common.logging.models import LogTag
 from webapp.common.rest.exceptions import InvalidInputException, RestApiNotImplementedException
 from webapp.models import ParkingSite, Source
 from webapp.models.parking_site import OpeningStatus, ParkingSiteType
+from webapp.models.source import SourceStatus
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.import_service import ParkingSiteGenericImportService
@@ -120,13 +122,38 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         return source
 
     def _handle_import_results(self, source: Source, import_results: 'ImportSourceResult'):
+        # set source data
+        for key in ['name', 'public_url', 'attribution_license', 'attribution_contributor', 'attribution_url']:
+            setattr(source, key, getattr(import_results, key, None))
+
+        # static data
         if import_results.static_parking_site_inputs:
             for static_parking_site_input in import_results.static_parking_site_inputs:
                 self._save_static_parking_site_input(source, static_parking_site_input)
 
-        if import_results.realtime_parking_site_inputs:
+            if len(import_results.static_parking_site_inputs):
+                source.static_status = SourceStatus.ACTIVE
+            elif import_results.static_parking_site_error_count:
+                source.static_status = SourceStatus.FAILED
+
+            source.static_data_updated_at = datetime.now(tz=timezone.utc)
+            source.static_parking_site_error_count = import_results.static_parking_site_error_count
+
+        # realtime data
+        if import_results.realtime_parking_site_inputs and source.static_status == SourceStatus.ACTIVE:
             for realtime_parking_site_inputs in import_results.realtime_parking_site_inputs:
                 self._save_realtime_parking_site_input(source, realtime_parking_site_inputs)
+
+            if len(import_results.realtime_parking_site_inputs):
+                source.realtime_status = SourceStatus.ACTIVE
+            elif import_results.realtime_parking_site_error_count:
+                source.realtime_status = SourceStatus.FAILED
+
+            source.realtime_status = SourceStatus.ACTIVE
+            source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
+            source.realtime_parking_site_error_count = import_results.realtime_parking_site_error_count
+
+        self.source_repository.save_source(source)
 
     def _save_static_parking_site_input(self, source: Source, static_parking_site_input: 'StaticParkingSiteInput'):
         try:
