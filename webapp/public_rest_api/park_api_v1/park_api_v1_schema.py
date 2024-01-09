@@ -32,7 +32,7 @@ park_api_v1_sources_schema = JsonSchema(
 park_api_v1_sources_example = {
     'api_version': '1.0',
     'server_version': '1.0.0',
-    'reference': 'https://github.com/offenesdresden/ParkAPI',
+    'reference': 'https://github.com/ParkenDD/park-api-v3',
     'cities': {
         'City 1': 'city1id',
         'City 2': 'city2id',

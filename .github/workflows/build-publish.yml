@@ -22,12 +22,18 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ github.token }}
 
+    - name: lowercase repo name
+      id: lower-repo
+      uses: ASzc/change-string-case-action@v6
+      with:
+        string: ${{ github.repository }}
+
     - name: build and push Docker image
       uses: docker/build-push-action@v5
       with:
         push: true
         tags: |
-          ghcr.io/${{ github.repository }}:latest
+          ghcr.io/${{ steps.lower-repo.outputs.lowercase }}:latest
         platforms: linux/amd64,linux/arm64
         # https://docs.docker.com/build/ci/github-actions/cache/#cache-backend-api
         cache-from: type=gha
