@@ -67,3 +67,9 @@ class ConfigLoader:
 
         if testing:
             app.config['TESTING'] = True
+
+        # Load env vars for converters in os environment
+        os.environ['PARK_API_V3_MODE'] = '1'
+        if app.config.get('CONVERTER_ENVIRONMENT'):
+            for key, value in app.config['CONVERTER_ENVIRONMENT'].items():
+                os.environ[key] = value
