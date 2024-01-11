@@ -67,12 +67,11 @@ class ParkApiV2PoolsMethodView(ParkApiV2BaseMethodView):
         description='Get ParkApi V2 Pool.',
         path=[
             Parameter(
-                'source_uid',
+                'pool_id',
                 schema=StringField(
                     minLength=1,
                     maxLength=256,
                     example='example-city',
-                    description='In ParkAPIv2, this field is called pool_id',
                 ),
             )
         ],
