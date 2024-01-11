@@ -39,7 +39,7 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
         result = {
             'api_version': '1.0',
             'server_version': '3.0.0',
-            'reference': 'https://github.com/binary-butterfly/park-api',
+            'reference': 'https://github.com/ParkenDD/park-api-v3',
             'cities': {},
         }
 
