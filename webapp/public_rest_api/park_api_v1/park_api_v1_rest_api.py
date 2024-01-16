@@ -52,7 +52,7 @@ class ParkApiV1Blueprint(PublicApiBaseBlueprint):
         )
 
         self.add_url_rule(
-            '/<source_uid>',
+            '/<pool_id>',
             view_func=ParkApiV1ParkingSiteMethodView.as_view(
                 'parking-sites-by-source',
                 **self.get_base_method_view_dependencies(),
@@ -87,17 +87,17 @@ class ParkApiV1ParkingSiteMethodView(ParkApiV1BaseMethodView):
         description='Get ParkApi V1 Parking Sites.',
         path=[
             Parameter(
-                'source_uid',
+                'pool_id',
                 schema=StringField(minLength=1, maxLength=256, example='example-city'),
             )
         ],
         response=[Response(ResponseData(park_api_v1_parking_site_schema, park_api_v1_parking_site_example))],
     )
-    def get(self, source_uid: str):
+    def get(self, pool_id: str):
         search_query = self.parking_site_search_query_validator.validate(
             {
                 **self.request_helper.get_query_args(),
-                'source_uid': source_uid,
+                'source_uid': pool_id,
             },
         )
 
