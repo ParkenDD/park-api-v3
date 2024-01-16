@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING
 from validataclass.exceptions import ValidationError
 from validataclass.validators import DataclassValidator
 
+from webapp.common.error_handling.exceptions import AppException
 from webapp.common.logging.models import LogMessageType, LogTag
 from webapp.converter.util import LotData, LotInfo
 from webapp.models import ParkingSite, Source
@@ -26,15 +27,21 @@ from webapp.services.import_service.exceptions import (
     ConverterMissingException,
     ImportDatasetException,
 )
+from webapp.shared.source import HandleConverterImportResultMixin
 
 from .parking_site_generic_import_mapper import ParkingSiteGenericImportMapper
 from .parking_site_generic_import_validator import LotDataInput, LotInfoInput
 
 if TYPE_CHECKING:
+    from webapp.converter.common.models import ImportSourceResult
     from webapp.converter.util import LotDataList, LotInfoList
 
 
-class ParkingSiteGenericImportService(BaseService):
+class SourceFailedException(AppException):
+    pass
+
+
+class ParkingSiteGenericImportService(BaseService, HandleConverterImportResultMixin):
     source_repository: SourceRepository
     parking_site_repository: ParkingSiteRepository
 
@@ -58,6 +65,7 @@ class ParkingSiteGenericImportService(BaseService):
         self.parking_site_repository = parking_site_repository
 
         self.pull_converters = {}
+        self.legacy_pull_converters = {}
         self.push_converters = {}
         self.register_converters()
 
@@ -67,7 +75,7 @@ class ParkingSiteGenericImportService(BaseService):
         # appending the base package dir gives converters the ability to work within their own module without relative paths
         sys.path.append(str(base_package_dir))
         # This import is based on the additional module path just added to sys
-        from common.base_converter import CsvConverter, JsonConverter, XlsxConverter, XmlConverter
+        from common.base_converter import CsvConverter, JsonConverter, PullConverter, XlsxConverter, XmlConverter
         from util import ScraperBase
 
         for source_dir in ['original', 'new', 'v3']:
@@ -84,18 +92,24 @@ class ParkingSiteGenericImportService(BaseService):
                         if not issubclass(attribute, ScraperBase) or attribute is ScraperBase:
                             continue
                         # at this point we can be sure that attribute is a ScraperBase child, so we can initialize and register it
-                        self.pull_converters[attribute.POOL.id] = attribute()
+                        self.legacy_pull_converters[attribute.POOL.id] = attribute()
+                        continue
+
+                    if (
+                        not issubclass(attribute, XlsxConverter)
+                        and not issubclass(attribute, XmlConverter)
+                        and not issubclass(attribute, CsvConverter)
+                        and not issubclass(attribute, JsonConverter)
+                        and not issubclass(attribute, PullConverter)
+                    ):
+                        continue
+                    if attribute in [XlsxConverter, XmlConverter, CsvConverter, JsonConverter, PullConverter]:
+                        continue
+                    # at this point we can be sure that attribute is a BaseConverter or PullConverter child, so we can initialize and
+                    # register it
+                    if issubclass(attribute, PullConverter):
+                        self.pull_converters[attribute.source_info.id] = attribute()
                     else:
-                        if (
-                            not issubclass(attribute, XlsxConverter)
-                            and not issubclass(attribute, XmlConverter)
-                            and not issubclass(attribute, CsvConverter)
-                            and not issubclass(attribute, JsonConverter)
-                        ):
-                            continue
-                        if attribute in [XlsxConverter, XmlConverter, CsvConverter, JsonConverter]:
-                            continue
-                        # at this point we can be sure that attribute is a BaseConverter child, so we can initialize and register it
                         self.push_converters[attribute.source_info.id] = attribute()
 
     def update_sources_static(self):
@@ -109,33 +123,49 @@ class ParkingSiteGenericImportService(BaseService):
     def update_source_static(self, source_uid: str):
         self.logger.set_tag(LogTag.SOURCE, source_uid)
 
-        if source_uid not in self.pull_converters:
+        if source_uid not in self.pull_converters and source_uid not in self.legacy_pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
         try:
             source = self.source_repository.fetch_source_by_uid(source_uid)
         except ObjectNotFoundException:
-            source = self.create_source(source_uid)
+            source = self._create_source(source_uid)
 
         try:
-            lot_infos: LotInfoList | list = self.pull_converters[source_uid].get_lot_infos()
-        except Exception as e:
-            self.logger.info(
-                message_type=LogMessageType.FAILED_SOURCE_HANDLING,
-                message=f'handling static source {source_uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}',
-            )
+            if source_uid in self.legacy_pull_converters:
+                self._update_legacy_source_static(source)
+            else:
+                self._update_source_static(source)
+
+            source.static_data_updated_at = datetime.now(tz=timezone.utc)
+            source.static_status = SourceStatus.ACTIVE
+            self.source_repository.save_source(source)
+
+        except SourceFailedException as e:
+            self.logger.info(message_type=LogMessageType.FAILED_SOURCE_HANDLING, message=e.message)
             source.static_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
 
+    def _update_source_static(self, source: Source):
+        try:
+            import_source_result: 'ImportSourceResult' = self.pull_converters[source.uid].get_static_parking_sites()
+        except Exception as e:
+            raise SourceFailedException(
+                message=f'handling static source {source.uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}'
+            ) from e
+        self._handle_import_results(source, import_source_result)
+
+    def _update_legacy_source_static(self, source: Source):
+        try:
+            lot_infos: LotInfoList | list = self.legacy_pull_converters[source.uid].get_lot_infos()
+        except Exception as e:
+            raise SourceFailedException(
+                message=f'handling static source {source.uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}'
+            ) from e
+
         if len(lot_infos) == 0:
-            self.logger.info(
-                message_type=LogMessageType.FAILED_SOURCE_HANDLING,
-                message=f'handling static source {source_uid} has no entries',
-            )
-            source.static_status = SourceStatus.FAILED
-            self.source_repository.save_source(source)
-            return
+            raise SourceFailedException(message=f'handling static source {source.uid} has no entries')
 
         if getattr(lot_infos, 'errors', None) is not None:
             for error in lot_infos.errors:
@@ -149,7 +179,7 @@ class ParkingSiteGenericImportService(BaseService):
 
         for lot_info in lot_infos:
             try:
-                self.update_parking_site_static(source, lot_info)
+                self._legacy_update_parking_site_static(source, lot_info)
             except ImportDatasetException as e:
                 self.logger.info(
                     LogMessageType.FAILED_PARKING_SITE_HANDLING,
@@ -158,11 +188,7 @@ class ParkingSiteGenericImportService(BaseService):
                 )
                 source.static_parking_site_error_count += 1
 
-        source.static_data_updated_at = datetime.now(tz=timezone.utc)
-        source.static_status = SourceStatus.ACTIVE
-        self.source_repository.save_source(source)
-
-    def update_parking_site_static(self, source: Source, lot_info: LotInfo):
+    def _legacy_update_parking_site_static(self, source: Source, lot_info: LotInfo):
         try:
             lot_info_input = self.lot_info_validator.validate(lot_info.to_dict())
         except ValidationError as e:
@@ -184,17 +210,20 @@ class ParkingSiteGenericImportService(BaseService):
         self.import_mapper.map_lot_info_to_parking_site(lot_info_input, parking_site)
         self.parking_site_repository.save_parking_site(parking_site)
 
-    def create_source(self, source_uid: str) -> Source:
+    def _create_source(self, source_uid: str) -> Source:
         source = Source()
         source.uid = source_uid
-        park_api_pool = self.pull_converters[source_uid].POOL
+        if source_uid in self.legacy_pull_converters:
+            source_info = self.legacy_pull_converters[source_uid].POOL
+        else:
+            source_info = self.pull_converters[source_uid].source_info
         for key in [
             'public_url',
             'attribution_license',
             'attribution_url',
             'attribution_contributor',
         ]:
-            setattr(source, key, getattr(park_api_pool, key))
+            setattr(source, key, getattr(source_info, key))
         self.source_repository.save_source(source)
         return source
 
@@ -209,7 +238,7 @@ class ParkingSiteGenericImportService(BaseService):
     def update_source_realtime(self, source_uid: str):
         self.logger.set_tag(LogTag.SOURCE, source_uid)
 
-        if source_uid not in self.pull_converters:
+        if source_uid not in self.pull_converters and source_uid not in self.legacy_pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
         source = self.source_repository.fetch_source_by_uid(source_uid)
@@ -223,15 +252,37 @@ class ParkingSiteGenericImportService(BaseService):
             return
 
         try:
-            lot_datasets: LotDataList | list = self.pull_converters[source_uid].get_lot_data()
-        except Exception as e:
-            self.logger.info(
-                message_type=LogMessageType.FAILED_SOURCE_HANDLING,
-                message=f'handling realtime source {source_uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}',
-            )
+            if source_uid in self.legacy_pull_converters:
+                self._update_legacy_source_realtime(source)
+            else:
+                self._update_source_realtime(source)
+
+            source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
+            source.realtime_status = SourceStatus.ACTIVE
+            self.source_repository.save_source(source)
+
+        except SourceFailedException as e:
+            self.logger.info(message_type=LogMessageType.FAILED_SOURCE_HANDLING, message=e.message)
             source.realtime_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
+
+    def _update_source_realtime(self, source: Source):
+        try:
+            import_source_result: 'ImportSourceResult' = self.pull_converters[source.uid].get_realtime_parking_sites()
+        except Exception as e:
+            raise SourceFailedException(
+                message=f'handling realtime source {source.uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}'
+            ) from e
+        self._handle_import_results(source, import_source_result)
+
+    def _update_legacy_source_realtime(self, source: Source):
+        try:
+            lot_datasets: LotDataList | list = self.legacy_pull_converters[source.uid].get_lot_data()
+        except Exception as e:
+            raise SourceFailedException(
+                message=f'handling realtime source {source.uid} failed: {repr(e)}:\n{traceback.format_exc().splitlines()}',
+            ) from e
 
         if getattr(lot_datasets, 'error', None) is not None:
             for error in lot_datasets.errors:
@@ -253,9 +304,6 @@ class ParkingSiteGenericImportService(BaseService):
                     f'{e.exception_message}',
                 )
                 source.realtime_parking_site_error_count += 1
-        source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
-        source.realtime_status = SourceStatus.ACTIVE
-        self.source_repository.save_source(source)
 
     def update_parking_site_realtime(self, source: Source, lot_info: LotData):
         try:
