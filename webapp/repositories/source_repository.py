@@ -31,3 +31,6 @@ class SourceRepository(BaseRepository):
 
     def save_source(self, source: Source, *, commit: bool = True):
         return self._save_resources(source, commit=commit)
+
+    def delete_source(self, source: Source):
+        self._delete_resources(source)

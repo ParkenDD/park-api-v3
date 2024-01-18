@@ -9,9 +9,18 @@ import click
 from flask.cli import AppGroup
 
 from webapp.dependencies import dependencies
+from webapp.repositories import SourceRepository
 from webapp.services.import_service import ParkingSiteGenericImportService, ParkingSiteXlsxImportService
 
 source_cli = AppGroup('source', help='Source related commands')
+
+
+@source_cli.command('delete', help='deletes source and all parking sites of this source')
+@click.argument('source_uid')
+def delete_source(source_uid: str):
+    source_repository: SourceRepository = dependencies.get_source_repository()
+    source = source_repository.fetch_source_by_uid(source_uid)
+    source_repository.delete_source(source)
 
 
 @source_cli.command('init-converters', help='init converters')

@@ -51,6 +51,9 @@ class ParkingSiteRepository(BaseRepository):
     def save_parking_site(self, parking_site: ParkingSite, *, commit: bool = True):
         self._save_resources(parking_site, commit=commit)
 
+    def delete_parking_site(self, parking_site: ParkingSite):
+        self._delete_resources(parking_site)
+
     def _filter_by_search_query(self, query: Query, search_query: Optional[BaseSearchQuery]) -> Query:
         if search_query is None:
             return query
