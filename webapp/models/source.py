@@ -27,7 +27,11 @@ class SourceStatus(PythonEnum):
 class Source(BaseModel):
     __tablename__ = 'source'
 
-    parking_sites: Mapped['ParkingSite'] = relationship('ParkingSite', back_populates='source')
+    parking_sites: Mapped[list['ParkingSite']] = relationship(
+        'ParkingSite',
+        back_populates='source',
+        cascade='all, delete, delete-orphan',
+    )
 
     uid: Mapped[str] = mapped_column(String(256), nullable=False)
     name: Mapped[str] = mapped_column(String(256), nullable=True)
