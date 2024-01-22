@@ -10,16 +10,18 @@ from .datex2 import Datex2Blueprint
 from .park_api_v1 import ParkApiV1Blueprint
 from .park_api_v2 import ParkApiV2Blueprint
 from .parking_sites import ParkingSiteBlueprint
+from .sources import SourceBlueprint
 
 
 class PublicRestApi(Blueprint):
     documentation_base = True
 
     blueprints_classes: list[type[PublicApiBaseBlueprint]] = [
+        Datex2Blueprint,
         ParkApiV1Blueprint,
         ParkApiV2Blueprint,
         ParkingSiteBlueprint,
-        Datex2Blueprint,
+        SourceBlueprint,
     ]
 
     def __init__(self):
