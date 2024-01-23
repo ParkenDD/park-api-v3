@@ -3,11 +3,14 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from flask_openapi.schema import DateTimeField, JsonSchema, StringField, UriField
+from flask_openapi.schema import DateTimeField, JsonSchema, StringField, UriField, IntegerField
 
 source_schema = JsonSchema(
     title='Source',
     properties={
+        "id": IntegerField(),
+        'created_at': DateTimeField(),
+        'modified_at': DateTimeField(),
         'uid': StringField(minLength=1, maxLength=256),
         'name': StringField(maxLength=256, required=False),
         'public_url': UriField(maxLength=4096),

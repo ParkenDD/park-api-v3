@@ -20,6 +20,9 @@ from webapp.models.parking_site import ParkAndRideType, ParkingSiteType
 parking_site_schema = JsonSchema(
     title='ParkingSite',
     properties={
+        "id": IntegerField(),
+        'created_at': DateTimeField(),
+        'modified_at': DateTimeField(),
         'source_id': IntegerField(minimum=1),
         'original_uid': StringField(maxLength=256),
         'name': StringField(maxLength=256),
