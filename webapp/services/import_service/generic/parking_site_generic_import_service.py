@@ -96,7 +96,7 @@ class ParkingSiteGenericImportService(BaseService, HandleConverterImportResultMi
                         continue
 
                     # source_info is just set at actual final classes, so we ignore anything else
-                    if not hasattr(attribute, 'source_info') or not isinstance(getattr(attribute, 'source_info'), SourceInfo):
+                    if not hasattr(attribute, 'source_info') or not isinstance(attribute.source_info, SourceInfo):
                         continue
 
                     # at this point we can be sure that attribute is a BaseConverter or PullConverter child, so we can initialize and
