@@ -17,26 +17,12 @@ from flask_openapi.schema import (
 
 from webapp.models.parking_site import ParkAndRideType, ParkingSiteType
 
-source_schema = JsonSchema(
-    title='Source',
-    properties={
-        'uid': StringField(minLength=1, maxLength=256),
-        'name': StringField(maxLength=256, required=False),
-        'public_url': UriField(maxLength=4096),
-        'last_import': DateTimeField(required=False),
-        'attribution_license': StringField(required=False),
-        'attribution_contributor': StringField(maxLength=256, required=False),
-        'attribution_url': StringField(maxLength=256, required=False),
-    },
-)
-
-
-source_example = {}
-
-
 parking_site_schema = JsonSchema(
     title='ParkingSite',
     properties={
+        'id': IntegerField(),
+        'created_at': DateTimeField(),
+        'modified_at': DateTimeField(),
         'source_id': IntegerField(minimum=1),
         'original_uid': StringField(maxLength=256),
         'name': StringField(maxLength=256),
