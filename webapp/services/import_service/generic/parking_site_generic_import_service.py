@@ -75,8 +75,8 @@ class ParkingSiteGenericImportService(BaseService, HandleConverterImportResultMi
         # appending the base package dir gives converters the ability to work within their own module without relative paths
         sys.path.append(str(base_package_dir))
         # This import is based on the additional module path just added to sys
-        from common.base_converter import CsvConverter, JsonConverter, PullConverter, XlsxConverter, XmlConverter
-        from util import ScraperBase
+        from common.base_converter import PullConverter
+        from util import ScraperBase, SourceInfo
 
         for source_dir in ['original', 'new', 'v3']:
             package_dir = base_package_dir.joinpath(source_dir)
@@ -95,16 +95,10 @@ class ParkingSiteGenericImportService(BaseService, HandleConverterImportResultMi
                         self.legacy_pull_converters[attribute.POOL.id] = attribute()
                         continue
 
-                    if (
-                        not issubclass(attribute, XlsxConverter)
-                        and not issubclass(attribute, XmlConverter)
-                        and not issubclass(attribute, CsvConverter)
-                        and not issubclass(attribute, JsonConverter)
-                        and not issubclass(attribute, PullConverter)
-                    ):
+                    # source_info is just set at actual final classes, so we ignore anything else
+                    if not hasattr(attribute, 'source_info') or not isinstance(attribute.source_info, SourceInfo):
                         continue
-                    if attribute in [XlsxConverter, XmlConverter, CsvConverter, JsonConverter, PullConverter]:
-                        continue
+
                     # at this point we can be sure that attribute is a BaseConverter or PullConverter child, so we can initialize and
                     # register it
                     if issubclass(attribute, PullConverter):
