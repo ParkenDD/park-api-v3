@@ -37,6 +37,8 @@ parking_site_schema = JsonSchema(
         'park_and_ride_type': ArrayField(items=EnumField(enum=ParkAndRideType), required=False),
         'is_supervised': BooleanField(required=False),
         'has_realtime_data': BooleanField(default=False),
+        'fee_description': StringField(required=False),
+        'has_fee': BooleanField(required=False),
         'static_data_updated_at': DateTimeField(),
         'realtime_opening_status': DateTimeField(required=False),
         'lat': DecimalField(precision=10, scale=7),
