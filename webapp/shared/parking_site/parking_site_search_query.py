@@ -7,22 +7,14 @@ from decimal import Decimal
 from typing import Optional
 
 from validataclass.dataclasses import Default
-from validataclass.validators import (
-    DecimalValidator,
-    IntegerValidator,
-    ListValidator,
-    StringValidator,
-)
+from validataclass.validators import DecimalValidator, ListValidator, StringValidator
 from validataclass_search_queries.filters import (
     SearchParamContains,
     SearchParamCustom,
     SearchParamEquals,
     SearchParamMultiSelect,
 )
-from validataclass_search_queries.search_queries import (
-    BaseSearchQuery,
-    search_query_dataclass,
-)
+from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
 
 from webapp.common.validation.list_validators import CommaSeparatedListValidator
 
@@ -33,8 +25,8 @@ class ParkingSiteSearchInput(BaseSearchQuery):
     source_uids: Optional[str] = SearchParamMultiSelect(), ListValidator(StringValidator())
     name: Optional[str] = SearchParamContains(), StringValidator()
     location: Optional[list[Decimal, Decimal]] = SearchParamCustom(), CommaSeparatedListValidator(DecimalValidator())
-    radius: Optional[int] = (
+    radius: Optional[Decimal] = (
         SearchParamCustom(),
-        IntegerValidator(allow_strings=True),
-        Default(100),
+        DecimalValidator(),
+        Default(Decimal(100)),
     )
