@@ -36,7 +36,7 @@ class ParkingSiteRepository(BaseRepository):
         return self.fetch_resource_by_id(parking_site_id)
 
     def fetch_parking_site_by_source_id_and_external_uid(self, source_id: int, original_uid: str) -> ParkingSite:
-        parking_site = (
+        parking_site: Optional[ParkingSite] = (
             self.session.query(ParkingSite)
             .filter(ParkingSite.source_id == source_id)
             .filter(ParkingSite.original_uid == original_uid)
@@ -65,13 +65,23 @@ class ParkingSiteRepository(BaseRepository):
             query = self._apply_bound_search_filter(query, bound_filter)
 
         if hasattr(search_query, 'location') and hasattr(search_query, 'radius') and search_query.location:
-            query = query.filter(
-                func.ST_DistanceSphere(
+            engine_name = self.session.connection().dialect.name
+            if engine_name == 'postgresql':
+                distance_function = func.ST_DistanceSphere(
                     ParkingSite.geometry,
-                    func.ST_GeomFromText(f'POINT({float(search_query.location[1])} {float(search_query.location[0])})'),
+                    func.ST_SetSRID(
+                        func.ST_MakePoint(float(search_query.location[0]), float(search_query.location[1])),
+                        4326,
+                    ),
                 )
-                < search_query.radius * 1000
-            )
+            elif engine_name == 'mysql':
+                distance_function = func.ST_DISTANCE_SPHERE(
+                    ParkingSite.geometry,
+                    func.ST_GeomFromText(f'POINT({float(search_query.location[1])} {float(search_query.location[0])})', 4326),
+                )
+            else:
+                raise NotImplementedError('The application just supports mysql, mariadb and postgresql.')
+            query = query.filter(distance_function < int(search_query.radius * 1000))
 
         return query
 

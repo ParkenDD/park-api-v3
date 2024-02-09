@@ -182,6 +182,6 @@ def set_geometry(mapper, connection, parking_site: ParkingSite):
                 4326,
             )
         elif engine_name == 'mysql':
-            parking_site.geometry = func.GeomFromText('POINT(%s %s)' % (float(parking_site.lat), float(parking_site.lon)))
+            parking_site.geometry = func.ST_GeomFromText(f'POINT({float(parking_site.lat)} {float(parking_site.lon)})', 4326)
         else:
             raise NotImplementedError('The application just supports mysql, mariadb and postgresql.')
