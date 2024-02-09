@@ -120,10 +120,7 @@ class ParkingSiteGenericImportService(BaseService, HandleConverterImportResultMi
         if source_uid not in self.pull_converters and source_uid not in self.legacy_pull_converters:
             raise ConverterMissingException(f'converter {source_uid} is missing')
 
-        try:
-            source = self.source_repository.fetch_source_by_uid(source_uid)
-        except ObjectNotFoundException:
-            source = self._create_source(source_uid)
+        source = self._get_upserted_source(source_uid)
 
         try:
             if source_uid in self.legacy_pull_converters:
@@ -204,14 +201,19 @@ class ParkingSiteGenericImportService(BaseService, HandleConverterImportResultMi
         self.import_mapper.map_lot_info_to_parking_site(lot_info_input, parking_site)
         self.parking_site_repository.save_parking_site(parking_site)
 
-    def _create_source(self, source_uid: str) -> Source:
-        source = Source()
-        source.uid = source_uid
+    def _get_upserted_source(self, source_uid: str) -> Source:
+        try:
+            source = self.source_repository.fetch_source_by_uid(source_uid)
+        except ObjectNotFoundException:
+            source = Source()
+            source.uid = source_uid
+
         if source_uid in self.legacy_pull_converters:
             source_info = self.legacy_pull_converters[source_uid].POOL
         else:
             source_info = self.pull_converters[source_uid].source_info
         for key in [
+            'name',
             'public_url',
             'attribution_license',
             'attribution_url',
