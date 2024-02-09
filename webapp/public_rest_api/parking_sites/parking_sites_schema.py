@@ -15,7 +15,7 @@ from flask_openapi.schema import (
     UriField,
 )
 
-from webapp.models.parking_site import ParkAndRideType, ParkingSiteType
+from webapp.models.parking_site import ParkAndRideType, ParkingSiteType, OpeningStatus
 
 parking_site_schema = JsonSchema(
     title='ParkingSite',
@@ -40,7 +40,7 @@ parking_site_schema = JsonSchema(
         'fee_description': StringField(required=False),
         'has_fee': BooleanField(required=False),
         'static_data_updated_at': DateTimeField(),
-        'realtime_opening_status': DateTimeField(required=False),
+        'realtime_opening_status': EnumField(enum=OpeningStatus, default=OpeningStatus.UNKNOWN),
         'lat': DecimalField(precision=10, scale=7),
         'lon': DecimalField(precision=10, scale=7),
         'capacity': IntegerField(minimum=0),
