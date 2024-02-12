@@ -3,8 +3,6 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import csv
-from datetime import datetime, timezone
 from io import BytesIO, StringIO
 from typing import TYPE_CHECKING
 from zipfile import BadZipFile
@@ -16,9 +14,7 @@ from openpyxl.reader.excel import load_workbook
 from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.common.logging.models import LogTag
 from webapp.common.rest.exceptions import InvalidInputException, RestApiNotImplementedException
-from webapp.models import ParkingSite, Source
-from webapp.models.parking_site import OpeningStatus, ParkingSiteType
-from webapp.models.source import SourceStatus
+from webapp.models import Source
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.import_service import ParkingSiteGenericImportService
@@ -26,7 +22,6 @@ from webapp.shared.source import HandleConverterImportResultMixin
 
 if TYPE_CHECKING:
     from webapp.converter.common.models import ImportSourceResult
-    from webapp.converter.common.validators import RealtimeParkingSiteInput, StaticParkingSiteInput
 
 
 class GenericParkingSitesHandler(AdminApiBaseHandler, HandleConverterImportResultMixin):
@@ -77,11 +72,7 @@ class GenericParkingSitesHandler(AdminApiBaseHandler, HandleConverterImportResul
         import_service = self.parking_site_generic_import_service.push_converters[source_uid]
 
         try:
-            rows = list(csv.reader(StringIO(data)))
-        except csv.Error as e:
-            raise InvalidInputException(message='Invalid CSV file') from e
-        try:
-            import_results = import_service.handle_csv(rows)
+            import_results = import_service.handle_csv_string(StringIO(data))
         except Exception as e:
             raise InvalidInputException(message=f'Invalid input: {getattr(e, "message", "unknown reason")}') from e
 
