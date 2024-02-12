@@ -70,7 +70,7 @@ class ServerAuthDatabase:
         """
         Parses the "SERVER_AUTH_USERS" dictionary from the application config and creates a ServerAuthDatabase from it.
         """
-        users_from_config = config.get('SERVER_AUTH_USERS', None)
+        users_from_config = config.get('SERVER_AUTH_USERS')
         users_parsed = {username: ServerAuthUser.create_from_dict(username, userdata) for username, userdata in users_from_config.items()}
         return cls(server_auth_users=users_parsed)
 
