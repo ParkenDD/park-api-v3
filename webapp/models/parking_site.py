@@ -132,21 +132,12 @@ class ParkingSite(BaseModel):
             ignore = []
         # Geometry is an internal geo-indexed field, so it should not be part of the default output
         ignore.append('geometry')
-        # If we don't have realtime support, we don't need realtime capacities
-        if self.has_realtime_data:
-            ignore += [
-                'realtime_capacity',
-                'realtime_capacity_disabled',
-                'realtime_capacity_woman',
-                'realtime_capacity_charging',
-                'realtime_capacity_carsharing',
-                'realtime_capacity_truck',
-                'realtime_capacity_bus',
-            ]
 
         result = super().to_dict(fields, ignore)
+        result = {key: value for key, value in result.items() if value is not None}
 
-        return {key: value for key, value in result.items() if value is not None}
+        # If we don't have realtime support, we don't need realtime data
+        return {key: value for key, value in result.items() if not key.startswith('realtime_')}
 
     @hybrid_property
     def park_and_ride_type(self) -> Mapped[Optional[list[ParkAndRideType]]]:
