@@ -136,8 +136,11 @@ class ParkingSite(BaseModel):
         result = super().to_dict(fields, ignore)
         result = {key: value for key, value in result.items() if value is not None}
 
+        if not self.has_realtime_data:
+            return {key: value for key, value in result.items() if not key.startswith('realtime_')}
+
         # If we don't have realtime support, we don't need realtime data
-        return {key: value for key, value in result.items() if not key.startswith('realtime_')}
+        return result
 
     @hybrid_property
     def park_and_ride_type(self) -> Mapped[Optional[list[ParkAndRideType]]]:
