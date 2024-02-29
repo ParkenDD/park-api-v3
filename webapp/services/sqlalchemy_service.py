@@ -11,7 +11,6 @@ from .base_service import BaseService
 
 
 class SqlalchemyService(BaseService):
-
     """
     This Service gets all Model changes ('insert', 'update', and 'delete') and generates Events based on these. This
     just works for simple redirections without SQL requests.
