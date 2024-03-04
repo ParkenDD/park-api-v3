@@ -24,7 +24,7 @@ lxml~=5.1.0
 # required for converters
 beautifulsoup4~=4.12.3
 jsonschema~=4.21.1
-python-dateutil~=2.8.2
+python-dateutil~=2.9.0
 python-decouple~=3.8.0
 feedparser~=6.0.11
 utm~=0.7.0
