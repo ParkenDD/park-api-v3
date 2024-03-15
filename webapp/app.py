@@ -56,6 +56,7 @@ def configure_extensions(app: App) -> None:
     celery.init_app(app)
     openapi.init_app(app)
     dependencies.get_config_helper().init_app(app)
+    dependencies.get_parking_site_generic_import_service().init_app(app)
 
 
 def configure_blueprints(app: App) -> None:

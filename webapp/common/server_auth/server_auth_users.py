@@ -68,10 +68,22 @@ class ServerAuthDatabase:
     @classmethod
     def create_from_config(cls, config: Config) -> 'ServerAuthDatabase':
         """
-        Parses the "SERVER_AUTH_USERS" dictionary from the application config and creates a ServerAuthDatabase from it.
+        Parses the "SERVER_AUTH_USERS" and "PARK_API_CONVERTER" dictionary from the app config and creates a ServerAuthDatabase from it.
         """
         users_from_config = config.get('SERVER_AUTH_USERS')
         users_parsed = {username: ServerAuthUser.create_from_dict(username, userdata) for username, userdata in users_from_config.items()}
+
+        # Add additional users from converters
+        converters_from_config = config.get('PARK_API_CONVERTER')
+        for converter in converters_from_config:
+            # Just converters with hash are push converters which can be used as credentials
+            if not converter.get('hash'):
+                continue
+            users_parsed[converter['uid']] = ServerAuthUser(
+                username=converter['uid'],
+                password_hash=converter['hash'],
+                roles=[ServerAuthRole.PUSH_CLIENT],
+            )
         return cls(server_auth_users=users_parsed)
 
     def get_user_by_name(self, username: str) -> ServerAuthUser:
