@@ -3,18 +3,15 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from typing import TYPE_CHECKING
-
 from flask import jsonify
 from flask_openapi.decorator import EmptyResponse, ErrorResponse, Request, document
 from flask_openapi.schema import JsonSchema
+from parkapi_sources.exceptions import ImportParkingSiteException
+from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
 from webapp.admin_rest_api.generic_parking_sites.generic_parking_sites_handler import GenericParkingSitesHandler
 from webapp.dependencies import dependencies
-
-if TYPE_CHECKING:
-    from webapp.converter.common.models import ImportSourceResult
 
 
 class GenericParkingSitesBlueprint(AdminApiBaseBlueprint):
@@ -73,27 +70,21 @@ class GenericParkingSitesMethodView(AdminApiBaseMethodView):
         self.generic_parking_sites_handler = generic_parking_sites_handler
 
     @staticmethod
-    def _generate_response(import_result: 'ImportSourceResult') -> dict[str, dict[str, list[str]]]:
-        result = {'summary': {}}
-        if import_result.static_parking_site_inputs is not None:
-            result['summary']['static_success_count'] = len(import_result.static_parking_site_inputs)
-        if import_result.realtime_parking_site_inputs is not None:
-            result['summary']['realtime_success_count'] = len(import_result.realtime_parking_site_inputs)
+    def _generate_response(
+        parking_site_inputs: list[StaticParkingSiteInput | RealtimeParkingSiteInput],
+        parking_site_errors: list[ImportParkingSiteException],
+    ) -> dict:
+        static_parking_site_inputs = [item for item in parking_site_inputs if isinstance(parking_site_inputs, StaticParkingSiteInput)]
+        realtime_parking_site_inputs = [item for item in parking_site_inputs if isinstance(parking_site_inputs, RealtimeParkingSiteInput)]
 
-        if import_result.static_parking_site_errors is not None or import_result.realtime_parking_site_errors is not None:
-            result['errors'] = {}
-
-        if import_result.static_parking_site_errors is not None:
-            result['summary']['static_error_count'] = len(import_result.static_parking_site_errors)
-            result['errors']['static'] = [
-                {'message': error.message, 'uid': error.uid} for error in import_result.static_parking_site_errors
-            ]
-        if import_result.realtime_parking_site_errors is not None:
-            result['summary']['realtime_error_count'] = len(import_result.realtime_parking_site_errors)
-            result['errors']['realtime'] = [
-                {'message': error.message, 'uid': error.uid} for error in import_result.realtime_parking_site_errors
-            ]
-        return result
+        return {
+            'summary': {
+                'static_success_count': len(static_parking_site_inputs),
+                'realtime_success_count': len(realtime_parking_site_inputs),
+                'error_count': len(parking_site_errors),
+            },
+            'errors': [{'message': error.message, 'parking_site_uid': error.parking_site_uid} for error in parking_site_errors],
+        }
 
 
 class GenericParkingSitesJsonMethodView(GenericParkingSitesMethodView):
@@ -111,12 +102,12 @@ class GenericParkingSitesJsonMethodView(GenericParkingSitesMethodView):
         response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
-        result = self.generic_parking_sites_handler.handle_json_data(
+        parking_site_inputs, parking_site_errors = self.generic_parking_sites_handler.handle_json_data(
             source_uid=self.request_helper.get_basicauth_username(),
             data=self.request_helper.get_parsed_json(),
         )
 
-        return jsonify(self._generate_response(result))
+        return jsonify(self._generate_response(parking_site_inputs, parking_site_errors))
 
 
 class GenericParkingSitesXmlMethodView(GenericParkingSitesMethodView):
@@ -126,12 +117,12 @@ class GenericParkingSitesXmlMethodView(GenericParkingSitesMethodView):
         response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
-        result = self.generic_parking_sites_handler.handle_xml_data(
+        parking_site_inputs, parking_site_errors = self.generic_parking_sites_handler.handle_xml_data(
             source_uid=self.request_helper.get_basicauth_username(),
             data=self.request_helper.get_request_body(),
         )
 
-        return jsonify(self._generate_response(result))
+        return jsonify(self._generate_response(parking_site_inputs, parking_site_errors))
 
 
 class GenericParkingSitesCsvMethodView(GenericParkingSitesMethodView):
@@ -141,12 +132,12 @@ class GenericParkingSitesCsvMethodView(GenericParkingSitesMethodView):
         response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
-        result = self.generic_parking_sites_handler.handle_csv_data(
+        parking_site_inputs, parking_site_errors = self.generic_parking_sites_handler.handle_csv_data(
             source_uid=self.request_helper.get_basicauth_username(),
             data=self.request_helper.get_request_body_text(),
         )
 
-        return jsonify(self._generate_response(result))
+        return jsonify(self._generate_response(parking_site_inputs, parking_site_errors))
 
 
 class GenericParkingSitesXlsxMethodView(GenericParkingSitesMethodView):
@@ -156,9 +147,9 @@ class GenericParkingSitesXlsxMethodView(GenericParkingSitesMethodView):
         response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
-        result = self.generic_parking_sites_handler.handle_xlsx_data(
+        parking_site_inputs, parking_site_errors = self.generic_parking_sites_handler.handle_xlsx_data(
             source_uid=self.request_helper.get_basicauth_username(),
             data=self.request_helper.get_request_body(),
         )
 
-        return jsonify(self._generate_response(result))
+        return jsonify(self._generate_response(parking_site_inputs, parking_site_errors))

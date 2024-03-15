@@ -16,11 +16,7 @@ class RunGenericRealtimeImportTask(BaseTask):
     @staticmethod
     @celery.task()
     def task(source: str):
-        parking_site_import_generic_service = ParkingSiteGenericImportService(
-            parking_site_repository=dependencies.get_parking_site_repository(),
-            source_repository=dependencies.get_source_repository(),
-            **dependencies.get_base_service_dependencies(),
-        )
+        parking_site_import_generic_service = dependencies.get_parking_site_generic_import_service()
         parking_site_import_generic_service.update_source_realtime(source)
 
 
@@ -30,9 +26,5 @@ class RunGenericStaticImportTask(BaseTask):
     @staticmethod
     @celery.task()
     def task(source: str):
-        parking_site_import_generic_service = ParkingSiteGenericImportService(
-            parking_site_repository=dependencies.get_parking_site_repository(),
-            source_repository=dependencies.get_source_repository(),
-            **dependencies.get_base_service_dependencies(),
-        )
+        parking_site_import_generic_service = dependencies.get_parking_site_generic_import_service()
         parking_site_import_generic_service.update_source_static(source)
