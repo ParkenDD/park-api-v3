@@ -5,9 +5,9 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from datetime import datetime
 from decimal import Decimal
-from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
+from parkapi_sources.models.enums import OpeningStatus, ParkAndRideType, ParkingSiteType, PurposeType, SupervisionType
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -31,28 +31,8 @@ from webapp.extensions import db
 from .base import BaseModel
 
 if TYPE_CHECKING:
+    from .external_identifier import ExternalIdentifier
     from .source import Source
-
-
-class ParkingSiteType(Enum):
-    ON_STREET = 'ON_STREET'
-    OFF_STREET_PARKING_GROUND = 'OFF_STREET_PARKING_GROUND'
-    UNDERGROUND = 'UNDERGROUND'
-    CAR_PARK = 'CAR_PARK'
-    OTHER = 'OTHER'
-
-
-class ParkAndRideType(Enum):
-    CARPOOL = 'CARPOOL'
-    TRAIN = 'TRAIN'
-    BUS = 'BUS'
-    TRAM = 'TRAM'
-
-
-class OpeningStatus(Enum):
-    OPEN = 'OPEN'
-    CLOSED = 'CLOSED'
-    UNKNOWN = 'UNKNOWN'
 
 
 class ParkingSite(BaseModel):
@@ -68,6 +48,11 @@ class ParkingSite(BaseModel):
     )
 
     source: Mapped['Source'] = relationship('Source', back_populates='parking_sites')
+    external_identifiers: Mapped[list['ExternalIdentifier']] = relationship(
+        'ExternalIdentifier',
+        back_populates='parking_site',
+        cascade='all, delete, delete-orphan',
+    )
 
     source_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('source.id'), nullable=False)
     original_uid: Mapped[str] = mapped_column(String(256), index=True, nullable=False)
@@ -77,14 +62,17 @@ class ParkingSite(BaseModel):
     address: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
     type: Mapped[Optional[ParkingSiteType]] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
+    purpose: Mapped[PurposeType] = mapped_column(SqlalchemyEnum(PurposeType), nullable=False)
 
     max_stay: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     max_height: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     has_lighting: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
+    is_covered: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
     fee_description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
     has_fee: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
     _park_and_ride_type: Mapped[Optional[str]] = mapped_column('park_and_ride_type', String(256), nullable=True)
-    is_supervised: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
+    supervision_type: Mapped[Optional[SupervisionType]] = mapped_column(SqlalchemyEnum(SupervisionType), nullable=True)
+    related_location: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
 
     has_realtime_data: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=False, default=False)
     static_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
@@ -135,6 +123,10 @@ class ParkingSite(BaseModel):
 
         result = super().to_dict(fields, ignore)
         result = {key: value for key, value in result.items() if value is not None}
+
+        # Add legacy field is_supervised
+        if self.supervision_type is not None:
+            result['is_supervised'] = self.supervision_type != SupervisionType.NO
 
         if not self.has_realtime_data:
             return {key: value for key, value in result.items() if not key.startswith('realtime_')}

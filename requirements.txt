@@ -34,3 +34,6 @@ pyproj~=3.6.1
 --extra-index-url https://git.sectio-aurea.org/api/v4/groups/262/-/packages/pypi/simple
 validataclass-search-queries~=0.4.2
 flask-openapi~=2.0.3
+
+--extra-index-url https://test.pypi.org/simple
+parkapi-sources~=0.1.4

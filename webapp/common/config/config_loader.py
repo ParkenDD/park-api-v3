@@ -46,9 +46,6 @@ class ConfigLoader:
         config_secrets_path = Path(app.config['PROJECT_ROOT']).parent.joinpath(os.getenv('CONFIG_SECRETS_FILE', 'config.secrets.yaml'))
         if config_secrets_path.exists():
             app.config.from_file(config_secrets_path, safe_load)
-        for key, value in app.config.items():
-            if key.startswith('PARK_API_') and 'API' in key[9:]:
-                os.environ[key] = value
 
         app.config['MODE'] = os.getenv('APPLICATION_MODE', 'DEVELOPMENT')
 
@@ -70,9 +67,3 @@ class ConfigLoader:
 
         if testing:
             app.config['TESTING'] = True
-
-        # Load env vars for converters in os environment
-        os.environ['PARK_API_V3_MODE'] = '1'
-        if app.config.get('CONVERTER_ENVIRONMENT'):
-            for key, value in app.config['CONVERTER_ENVIRONMENT'].items():
-                os.environ[key] = value
