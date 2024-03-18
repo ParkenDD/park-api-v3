@@ -81,7 +81,7 @@ class ParkingSite(BaseModel):
     max_stay: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     max_height: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     has_lighting: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
-    fee_description: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
+    fee_description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
     has_fee: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
     _park_and_ride_type: Mapped[Optional[str]] = mapped_column('park_and_ride_type', String(256), nullable=True)
     is_supervised: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
