@@ -19,7 +19,7 @@ click~=8.1.7
 openpyxl~=3.1.2
 opening-hours-py~=0.6.18
 kombu~=5.3.5
-lxml~=5.1.0
+lxml~=5.2.0
 
 # required for converters
 beautifulsoup4~=4.12.3
