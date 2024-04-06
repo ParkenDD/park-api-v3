@@ -1,8 +1,8 @@
 """more fields, biking support
 
 Revision ID: 6be2c2aa3637
-Revises: ccd3da2086d3
-Create Date: 2024-03-12 18:26:42.617665
+Revises: 2dd84bdad484
+Create Date: 2024-03-22 18:26:42.617665
 
 """
 import sqlalchemy as sa
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
 revision = '6be2c2aa3637'
-down_revision = 'ccd3da2086d3'
+down_revision = '2dd84bdad484'
 branch_labels = None
 depends_on = None
 
