@@ -6,7 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from typing import Optional
 
 from sqlalchemy import func
-from sqlalchemy.orm import Query, joinedload
+from sqlalchemy.orm import Query, joinedload, selectinload
 from validataclass_search_queries.filters import BoundSearchFilter
 from validataclass_search_queries.pagination import PaginatedResult
 from validataclass_search_queries.search_queries import BaseSearchQuery
@@ -23,12 +23,15 @@ class ParkingSiteRepository(BaseRepository):
         self,
         *,
         search_query: Optional[BaseSearchQuery] = None,
+        include_external_identifiers: bool = False,
         include_source: bool = True,
     ) -> PaginatedResult[ParkingSite]:
         query = self.session.query(ParkingSite)
 
         if include_source:
             query.options(joinedload(ParkingSite.source))
+        if include_external_identifiers:
+            query.options(selectinload(ParkingSite.external_identifiers))
 
         return self._search_and_paginate(query, search_query)
 

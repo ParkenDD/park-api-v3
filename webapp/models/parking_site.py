@@ -115,7 +115,12 @@ class ParkingSite(BaseModel):
 
     geometry: Mapped[bytes] = mapped_column(Point(), nullable=False)
 
-    def to_dict(self, fields: Optional[list[str]] = None, ignore: Optional[list[str]] = None) -> dict:
+    def to_dict(
+        self,
+        fields: Optional[list[str]] = None,
+        ignore: Optional[list[str]] = None,
+        include_external_identifiers: bool = False,
+    ) -> dict:
         if ignore is None:
             ignore = []
         # Geometry is an internal geo-indexed field, so it should not be part of the default output
@@ -127,6 +132,16 @@ class ParkingSite(BaseModel):
         # Add legacy field is_supervised
         if self.supervision_type is not None:
             result['is_supervised'] = self.supervision_type != SupervisionType.NO
+
+        if include_external_identifiers:
+            result['external_identifiers'] = []
+            for external_identifier in self.external_identifiers:
+                result['external_identifiers'].append(
+                    {
+                        'type': external_identifier.type,
+                        'value': external_identifier.value,
+                    }
+                )
 
         if not self.has_realtime_data:
             return {key: value for key, value in result.items() if not key.startswith('realtime_')}
