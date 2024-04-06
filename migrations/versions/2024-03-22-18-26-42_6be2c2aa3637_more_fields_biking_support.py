@@ -43,7 +43,7 @@ def upgrade():
         sa.Enum('YES', 'NO', 'VIDEO', 'ATTENDED', name='supervisiontype').create(op.get_bind())
 
     with op.batch_alter_table('parking_site', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('purpose', sa.Enum('CAR', 'BIKE', 'ITEM', name='purposetype', server_default='CAR'), nullable=False))
+        batch_op.add_column(sa.Column('purpose', sa.Enum('CAR', 'BIKE', 'ITEM', name='purposetype'), server_default='CAR', nullable=False))
         batch_op.add_column(sa.Column('is_covered', sa.Boolean(), nullable=True))
         batch_op.add_column(sa.Column('supervision_type', sa.Enum('YES', 'NO', 'VIDEO', 'ATTENDED', name='supervisiontype'), nullable=True))
         batch_op.add_column(sa.Column('related_location', sa.String(length=256), nullable=True))
