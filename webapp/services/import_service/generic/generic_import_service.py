@@ -13,7 +13,7 @@ from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteIn
 from parkapi_sources.models.enums import OpeningStatus, ParkingSiteType
 
 from webapp.common.logging.models import LogMessageType, LogTag
-from webapp.models import ParkingSite, Source
+from webapp.models import ExternalIdentifier, ParkingSite, Source
 from webapp.models.source import SourceStatus
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
@@ -147,11 +147,23 @@ class ParkingSiteGenericImportService(BaseService):
             parking_site.original_uid = static_parking_site_input.uid
 
         for key, value in static_parking_site_input.to_dict().items():
-            if key in ['uid']:
+            if key in ['uid', 'external_identifiers']:
                 continue
             if key == 'type' and value:
                 value = ParkingSiteType[value.name]
             setattr(parking_site, key, value)
+
+        if static_parking_site_input.external_identifiers:
+            external_identifiers: list[ExternalIdentifier] = []
+            for i, external_identifier_input in enumerate(static_parking_site_input.external_identifiers):
+                if len(static_parking_site_input.external_identifiers) < len(parking_site.external_identifiers):
+                    external_identifier = parking_site.external_identifiers[i]
+                else:
+                    external_identifier = ExternalIdentifier()
+                external_identifier.type = external_identifier_input.type
+                external_identifier.value = external_identifier_input.value
+                external_identifiers.append(external_identifier)
+            parking_site.external_identifiers = external_identifiers
 
         self.parking_site_repository.save_parking_site(parking_site)
 
