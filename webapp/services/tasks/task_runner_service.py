@@ -39,6 +39,10 @@ class TaskRunner:
 
         # Add parameterized tasks
         for source in self.config_helper.get('PARK_API_CONVERTER'):
+            # Don't try to pull push-endpoints
+            if 'hash' in source:
+                continue
+
             celery.add_periodic_task(
                 self.generic_static_import_task.run_interval,
                 self.generic_static_import_task.task,
