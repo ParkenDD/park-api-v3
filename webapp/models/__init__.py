@@ -4,5 +4,6 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from .base import BaseModel
+from .external_identifier import ExternalIdentifier
 from .parking_site import ParkingSite
 from .source import Source

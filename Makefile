@@ -48,12 +48,12 @@ docker-login:
 # Builds and starts all docker containers
 .PHONY: docker-up
 docker-up: config docker-build
-	$(DOCKER_COMPOSE) up
+	$(DOCKER_COMPOSE) up $(SERVICE)
 
 # Start containers in background (or recreate containers while they are running attached to another terminal)
 .PHONY: docker-up-detached
 docker-up-detached: config docker-build
-	$(DOCKER_COMPOSE) up --detach
+	$(DOCKER_COMPOSE) up --detach $(SERVICE)
 
 .PHONY: docker-down
 docker-down: .env

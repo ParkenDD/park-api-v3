@@ -2,7 +2,7 @@ Flask~=3.0.2
 Flask-Failsafe~=0.2
 Flask-Migrate~=4.0.5
 Flask-SQLAlchemy~=3.1.1
-SQLAlchemy~=2.0.27
+SQLAlchemy~=2.0.29
 SQLAlchemy-Utc~=0.14.0
 pytz~=2024.1
 psycopg2-binary~=2.9.9
@@ -12,25 +12,23 @@ alembic~=1.13.1
 gunicorn~=21.2.0
 pyyaml~=6.0.1
 celery~=5.3.6
-werkzeug~=3.0.1
+werkzeug~=3.0.2
 validataclass~=0.9.0
 python-dotenv~=1.0.1
 click~=8.1.7
 openpyxl~=3.1.2
 opening-hours-py~=0.6.18
-kombu~=5.3.5
-lxml~=5.1.0
+kombu~=5.3.6
+lxml~=5.2.1
 
 # required for converters
 beautifulsoup4~=4.12.3
-jsonschema~=4.21.1
-python-dateutil~=2.8.2
-python-decouple~=3.8.0
-feedparser~=6.0.11
-utm~=0.7.0
 pyproj~=3.6.1
 
 # binary butterfly shared libraries (https://git.sectio-aurea.org/public_libraries)
 --extra-index-url https://git.sectio-aurea.org/api/v4/groups/262/-/packages/pypi/simple
 validataclass-search-queries~=0.4.2
 flask-openapi~=2.0.3
+
+--extra-index-url https://test.pypi.org/simple
+parkapi-sources~=0.1.8

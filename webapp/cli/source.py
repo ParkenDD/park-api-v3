@@ -25,11 +25,7 @@ def delete_source(source_uid: str):
 
 @source_cli.command('init-converters', help='init converters')
 def cli_source_init_converters():
-    parking_site_import_generic_service = ParkingSiteGenericImportService(
-        parking_site_repository=dependencies.get_parking_site_repository(),
-        source_repository=dependencies.get_source_repository(),
-        **dependencies.get_base_service_dependencies(),
-    )
+    parking_site_import_generic_service = dependencies.get_parking_site_generic_import_service()
     parking_site_import_generic_service.update_sources_static()
     parking_site_import_generic_service.update_sources_realtime()
 
@@ -46,13 +42,9 @@ def cli_import_parking_sites_xlsx(source: str, import_file_path: Path):
     parking_site_xlsx_import_service.load_and_import_parking_sites(source, import_file_path)
 
 
-@source_cli.command('generic-import', help='import parking sites from generic source')
+@source_cli.command('pull', help='import parking sites from generic source')
 @click.argument('source')
 def cli_import_parking_sites_generic(source: str):
-    parking_site_import_generic_service = ParkingSiteGenericImportService(
-        parking_site_repository=dependencies.get_parking_site_repository(),
-        source_repository=dependencies.get_source_repository(),
-        **dependencies.get_base_service_dependencies(),
-    )
+    parking_site_import_generic_service = dependencies.get_parking_site_generic_import_service()
     parking_site_import_generic_service.update_source_static(source)
     parking_site_import_generic_service.update_source_realtime(source)

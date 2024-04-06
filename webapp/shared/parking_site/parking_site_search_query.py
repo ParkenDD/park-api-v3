@@ -6,8 +6,9 @@ Use of this source code is governed by an MIT-style license that can be found in
 from decimal import Decimal
 from typing import Optional
 
+from parkapi_sources.models.enums import PurposeType
 from validataclass.dataclasses import Default
-from validataclass.validators import DecimalValidator, ListValidator, StringValidator
+from validataclass.validators import DecimalValidator, EnumValidator, ListValidator, StringValidator
 from validataclass_search_queries.filters import (
     SearchParamContains,
     SearchParamCustom,
@@ -24,6 +25,7 @@ class ParkingSiteSearchInput(BaseSearchQuery):
     source_uid: Optional[str] = SearchParamEquals(), StringValidator()
     source_uids: Optional[str] = SearchParamMultiSelect(), ListValidator(StringValidator())
     name: Optional[str] = SearchParamContains(), StringValidator()
+    purpose: Optional[PurposeType] = SearchParamEquals(), EnumValidator(PurposeType)
     location: Optional[list[Decimal, Decimal]] = SearchParamCustom(), CommaSeparatedListValidator(DecimalValidator())
     radius: Optional[Decimal] = (
         SearchParamCustom(),
