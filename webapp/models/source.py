@@ -33,7 +33,7 @@ class Source(BaseModel):
         cascade='all, delete, delete-orphan',
     )
 
-    uid: Mapped[str] = mapped_column(String(256), nullable=False)
+    uid: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(256), nullable=True)
     public_url: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
 

@@ -55,3 +55,6 @@ class BaseConfig:
     # Switch parking site metrics to True for metrics on parking site level. Keep in mind that this adds a lot of data to your metrics
     # endpoint, so the systems using these metrics should have enough power and proper administration.
     PARKING_SITE_METRICS = False
+
+    # set
+    STATIC_GEOJSON_BASE_URL = 'https://raw.githubusercontent.com/ParkenDD/parkapi-sources-v3/main/data/'
