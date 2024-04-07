@@ -32,7 +32,9 @@ class ParkingSiteGenericImportService(BaseService):
 
     def init_app(self, app: Flask):
         park_api_source_uids: list[str] = []
-        park_api_sources_config: dict[str, str] = {}
+        park_api_sources_config: dict[str, str] = {
+            'STATIC_GEOJSON_BASE_URL': app.config['STATIC_GEOJSON_BASE_URL'],
+        }
         for source_dict in app.config.get('PARK_API_CONVERTER', {}):
             park_api_source_uids.append(source_dict['uid'])
             if 'env' in source_dict:

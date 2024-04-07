@@ -62,7 +62,7 @@ class ParkingSite(BaseModel):
     address: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
     description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
     type: Mapped[Optional[ParkingSiteType]] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
-    purpose: Mapped[PurposeType] = mapped_column(SqlalchemyEnum(PurposeType), nullable=False)
+    purpose: Mapped[PurposeType] = mapped_column(SqlalchemyEnum(PurposeType), nullable=False, index=True)
 
     max_stay: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     max_height: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
