@@ -83,8 +83,6 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
             'last_updated': source.combined_updated_at,
             'last_downloaded': source.combined_updated_at,
         }
-        response['last_updated'] = source.combined_updated_at
-        response['last_downloaded'] = source.combined_updated_at
         if source.public_url:
             response['data_source'] = source.public_url
 
