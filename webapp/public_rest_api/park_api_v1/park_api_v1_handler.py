@@ -61,10 +61,10 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
                 },
                 'lot_type': self.type_mapping.get(parking_site.type, 'unknown'),
             }
-            for key in self.key_mapping:
-                if getattr(parking_site, key) is None or getattr(parking_site, key) == '':
+            for source_key, target_key in self.key_mapping.items():
+                if getattr(parking_site, source_key) is None or getattr(parking_site, source_key) == '':
                     continue
-                lot[key] = getattr(parking_site, key)
+                lot[target_key] = getattr(parking_site, source_key)
 
             if parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None:
                 lot['free'] = parking_site.realtime_free_capacity
@@ -83,8 +83,6 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
             'last_updated': source.combined_updated_at,
             'last_downloaded': source.combined_updated_at,
         }
-        response['last_updated'] = source.combined_updated_at
-        response['last_downloaded'] = source.combined_updated_at
         if source.public_url:
             response['data_source'] = source.public_url
 
