@@ -168,6 +168,7 @@ class Dependencies:
             celery_helper=self.get_celery_helper(),
             logger=self.get_logger(),
             config_helper=self.get_config_helper(),
+            parking_site_generic_import_service=self.get_parking_site_generic_import_service(),
         )
 
 
