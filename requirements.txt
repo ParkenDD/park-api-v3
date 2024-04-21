@@ -1,6 +1,6 @@
-Flask~=3.0.2
+Flask~=3.0.3
 Flask-Failsafe~=0.2
-Flask-Migrate~=4.0.5
+Flask-Migrate~=4.0.7
 Flask-SQLAlchemy~=3.1.1
 SQLAlchemy~=2.0.29
 SQLAlchemy-Utc~=0.14.0
@@ -9,7 +9,7 @@ psycopg2-binary~=2.9.9
 pymysql~=1.1.0
 requests~=2.31.0
 alembic~=1.13.1
-gunicorn~=21.2.0
+gunicorn~=22.0.0
 pyyaml~=6.0.1
 celery~=5.3.6
 werkzeug~=3.0.2
@@ -18,7 +18,7 @@ python-dotenv~=1.0.1
 click~=8.1.7
 openpyxl~=3.1.2
 opening-hours-py~=0.6.18
-kombu~=5.3.6
+kombu~=5.3.7
 lxml~=5.2.1
 parkapi-sources~=0.2.0
 
