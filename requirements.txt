@@ -20,6 +20,7 @@ openpyxl~=3.1.2
 opening-hours-py~=0.6.18
 kombu~=5.3.6
 lxml~=5.2.1
+parkapi-sources~=0.2.0
 
 # required for converters
 beautifulsoup4~=4.12.3
@@ -30,5 +31,3 @@ pyproj~=3.6.1
 validataclass-search-queries~=0.4.2
 flask-openapi~=2.0.3
 
---extra-index-url https://test.pypi.org/simple
-parkapi-sources~=0.1.10
