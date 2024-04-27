@@ -57,7 +57,7 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
             lot = {
                 'coords': {
                     'lat': float(parking_site.lat),
-                    'lon': float(parking_site.lon),
+                    'lng': float(parking_site.lon),
                 },
                 'lot_type': self.type_mapping.get(parking_site.type, 'unknown'),
             }
