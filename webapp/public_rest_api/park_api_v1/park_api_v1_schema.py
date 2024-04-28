@@ -50,7 +50,7 @@ park_api_v1_parking_site_schema = JsonSchema(
                     'coords': ObjectField(
                         properties={
                             'lat': NumericField(),
-                            'lon': NumericField(),
+                            'lng': NumericField(),
                         },
                     ),
                     'forecast': BooleanField(
