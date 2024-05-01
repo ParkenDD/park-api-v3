@@ -26,7 +26,7 @@ from webapp.public_rest_api.park_api_v1.park_api_v1_schema import (
     park_api_v1_sources_example,
     park_api_v1_sources_schema,
 )
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
 
 
 class ParkApiV1Blueprint(PublicApiBaseBlueprint):
@@ -81,7 +81,7 @@ class ParkApiV1SourceMethodView(ParkApiV1BaseMethodView):
 
 
 class ParkApiV1ParkingSiteMethodView(ParkApiV1BaseMethodView):
-    parking_site_search_query_validator = DataclassValidator(ParkingSiteSearchInput)
+    parking_site_search_query_validator = DataclassValidator(ParkingSiteBaseSearchInput)
 
     @document(
         description='Get ParkApi V1 Parking Sites.',
