@@ -14,10 +14,7 @@ from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 from .datex2_handler import Datex2Handler
-from .datex2_schema import (
-    datex2_parking_sites_example,
-    datex2_parking_sites_schema,
-)
+from .datex2_schema import datex2_parking_sites_example, datex2_parking_sites_schema
 
 
 class Datex2Blueprint(PublicApiBaseBlueprint):

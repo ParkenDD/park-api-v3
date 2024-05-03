@@ -15,11 +15,10 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, DecimalField, NumericField, StringField
+from flask_openapi.schema import ArrayField, NumericField, StringField
 from validataclass.validators import DataclassValidator
 
 from webapp.dependencies import dependencies
-from webapp.models import ParkingSite
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.parking_sites.parking_sites_schema import parking_site_example, parking_site_schema
@@ -80,13 +79,9 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
                 example='source-uid-1,source-uid-2',
             ),
             Parameter('name', schema=StringField(), example='Bahnhof'),
-            Parameter(
-                'location',
-                schema=ArrayField(items=DecimalField(precision=10, scale=7), minItems=2, maxItems=2),
-                example='6.5,50.5',
-                description='Comma separated lon and lat.',
-            ),
-            Parameter('radius', schema=NumericField(), description='Radius, in km', example='3.5'),
+            Parameter('lat', schema=NumericField(), example=55.5),
+            Parameter('lon', schema=NumericField(), example=55.5),
+            Parameter('radius', schema=NumericField(), description='Radius, in m', example='3500'),
         ],
         response=[
             Response(

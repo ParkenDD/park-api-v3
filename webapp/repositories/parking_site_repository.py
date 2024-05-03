@@ -63,28 +63,39 @@ class ParkingSiteRepository(BaseRepository):
 
         # Apply all search filters one-by-one
         for _param_name, bound_filter in search_query.get_search_filters():
-            if _param_name in ['location', 'radius']:
+            if _param_name in ['location', 'radius', 'lat', 'lon']:
                 continue
             query = self._apply_bound_search_filter(query, bound_filter)
 
-        if hasattr(search_query, 'location') and hasattr(search_query, 'radius') and search_query.location:
+        # Support old (unit: km, location field) and new (unit: m, dedicated lat/lon fields) radius search
+        lat = None
+        lon = None
+        radius = None
+        if hasattr(search_query, 'radius') and search_query.radius:
+            radius = float(search_query.radius)
+        if hasattr(search_query, 'location') and search_query.location:
+            lat = float(search_query.location[1])
+            lon = float(search_query.location[0])
+            radius = radius * 1000
+        elif hasattr(search_query, 'lat') and search_query.lat and hasattr(search_query, 'lon') and search_query.lon:
+            lat = float(search_query.lat)
+            lon = float(search_query.lon)
+
+        if lat is not None and lon is not None and radius is not None:
             engine_name = self.session.connection().dialect.name
             if engine_name == 'postgresql':
                 distance_function = func.ST_DistanceSphere(
                     ParkingSite.geometry,
-                    func.ST_SetSRID(
-                        func.ST_MakePoint(float(search_query.location[0]), float(search_query.location[1])),
-                        4326,
-                    ),
+                    func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326),
                 )
             elif engine_name == 'mysql':
                 distance_function = func.ST_DISTANCE_SPHERE(
                     ParkingSite.geometry,
-                    func.ST_GeomFromText(f'POINT({float(search_query.location[1])} {float(search_query.location[0])})', 4326),
+                    func.ST_GeomFromText(f'POINT({lon} {lat})', 4326),
                 )
             else:
                 raise NotImplementedError('The application just supports mysql, mariadb and postgresql.')
-            query = query.filter(distance_function < int(search_query.radius * 1000))
+            query = query.filter(distance_function < int(radius))
 
         return query
 
