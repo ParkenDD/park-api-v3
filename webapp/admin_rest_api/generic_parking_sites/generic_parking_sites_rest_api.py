@@ -10,6 +10,7 @@ from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
+from webapp.admin_rest_api.generic_parking_sites.generic_parking_site_schema import generic_parking_site_response
 from webapp.admin_rest_api.generic_parking_sites.generic_parking_sites_handler import GenericParkingSitesHandler
 from webapp.dependencies import dependencies
 
@@ -83,7 +84,14 @@ class GenericParkingSitesMethodView(AdminApiBaseMethodView):
                 'realtime_success_count': len(realtime_parking_site_inputs),
                 'error_count': len(parking_site_errors),
             },
-            'errors': [{'message': error.message, 'parking_site_uid': error.parking_site_uid} for error in parking_site_errors],
+            'errors': [
+                {
+                    'message': error.message,
+                    'parking_site_uid': error.parking_site_uid,
+                    'source_uid': error.source_uid,
+                }
+                for error in parking_site_errors
+            ],
         }
 
 
@@ -99,7 +107,7 @@ class GenericParkingSitesJsonMethodView(GenericParkingSitesMethodView):
                 ),
             ),
         ],
-        response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
+        response=[generic_parking_site_response, ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
         parking_site_inputs, parking_site_errors = self.generic_parking_sites_handler.handle_json_data(
@@ -114,7 +122,7 @@ class GenericParkingSitesXmlMethodView(GenericParkingSitesMethodView):
     @document(
         description='POST update.',
         request=[Request(mimetype='application/xml')],
-        response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
+        response=[generic_parking_site_response, ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
         parking_site_inputs, parking_site_errors = self.generic_parking_sites_handler.handle_xml_data(
@@ -129,7 +137,7 @@ class GenericParkingSitesCsvMethodView(GenericParkingSitesMethodView):
     @document(
         description='POST update.',
         request=[Request(mimetype='text/csv')],
-        response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
+        response=[generic_parking_site_response, ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
         parking_site_inputs, parking_site_errors = self.generic_parking_sites_handler.handle_csv_data(
@@ -144,7 +152,7 @@ class GenericParkingSitesXlsxMethodView(GenericParkingSitesMethodView):
     @document(
         description='POST update.',
         request=[Request(mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')],
-        response=[EmptyResponse(), ErrorResponse(error_codes=[400, 403])],
+        response=[generic_parking_site_response, ErrorResponse(error_codes=[400, 403])],
     )
     def post(self):
         parking_site_inputs, parking_site_errors = self.generic_parking_sites_handler.handle_xlsx_data(
