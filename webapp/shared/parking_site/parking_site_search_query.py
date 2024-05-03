@@ -17,6 +17,8 @@ from validataclass_search_queries.filters import (
 )
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
 
+from webapp.common.validation.list_validators import CommaSeparatedListValidator
+
 
 @search_query_dataclass
 class ParkingSiteBaseSearchInput(BaseSearchQuery):
@@ -30,8 +32,14 @@ class ParkingSiteBaseSearchInput(BaseSearchQuery):
 class ParkingSiteSearchInput(ParkingSiteBaseSearchInput):
     lat: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon: Optional[Decimal] = SearchParamCustom(), NumericValidator()
-    radius: Optional[Decimal] = SearchParamCustom(), IntegerValidator(allow_strings=True)
+    # radius: Optional[Decimal] = SearchParamCustom(), IntegerValidator(allow_strings=True)
+
+    # TODO: delete these two compatibility fields and enable radius above after a few weeks of adaption time: issue #134
+    location: Optional[list[Decimal, Decimal]] = SearchParamCustom(), CommaSeparatedListValidator(NumericValidator())
+    radius: Optional[Decimal] = SearchParamCustom(), NumericValidator()
 
     def __post_init__(self):
-        if (self.lat is not None or self.lon is not None or self.radius is not None) and not (self.lat and self.lon and self.radius):
+        if (self.lat is not None or self.lon is not None or self.radius is not None or self.location) and not (
+            ((self.lat and self.lon) or self.location) and self.radius
+        ):
             raise ValidationError(reason='lat, lon and radius have all to be set if one is set')

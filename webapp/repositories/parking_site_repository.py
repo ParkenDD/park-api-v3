@@ -67,14 +67,15 @@ class ParkingSiteRepository(BaseRepository):
                 continue
             query = self._apply_bound_search_filter(query, bound_filter)
 
+        # Support old (unit: km, location field) and new (unit: m, dedicated lat/lon fields) radius search
         lat = None
         lon = None
         radius = None
         if hasattr(search_query, 'radius') and search_query.radius:
-            radius = int(search_query.radius)
+            radius = float(search_query.radius)
         if hasattr(search_query, 'location') and search_query.location:
-            lat = float(search_query.location[0])
-            lon = float(search_query.location[1])
+            lat = float(search_query.location[1])
+            lon = float(search_query.location[0])
             radius = radius * 1000
         elif hasattr(search_query, 'lat') and search_query.lat and hasattr(search_query, 'lon') and search_query.lon:
             lat = float(search_query.lat)
@@ -94,7 +95,7 @@ class ParkingSiteRepository(BaseRepository):
                 )
             else:
                 raise NotImplementedError('The application just supports mysql, mariadb and postgresql.')
-            query = query.filter(distance_function < radius)
+            query = query.filter(distance_function < int(radius))
 
         return query
 
