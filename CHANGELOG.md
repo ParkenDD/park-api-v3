@@ -1,11 +1,29 @@
 # Changelog
 
+## Version 0.2.0
+
+Released 2024-05-03
+
+### Features
+
+* [New ParkAPI sources](https://github.com/ParkenDD/parkapi-sources-v3/blob/main/CHANGELOG.md#030)
+* [Normalizes radius search](https://github.com/ParkenDD/park-api-v3/pull/133)
+
+### Fixes and Maintenance
+
+* [Fixes OpenAPI response schema at generic parking site endpoints](https://github.com/ParkenDD/park-api-v3/pull/135)
+* Dependency updates
+
+
 ## Version 0.1.1
 
 Released 2024-04-21
 
-- Update dependencies, include fixing CVE-2024-1135 at gunicorn
-- Fix issue with heartbeat and new python module approach
+### Fixes
+
+* Update dependencies, include fixing CVE-2024-1135 at gunicorn
+* Fix issue with heartbeat and new python module approach
+
 
 ## Version 0.1.0
 
