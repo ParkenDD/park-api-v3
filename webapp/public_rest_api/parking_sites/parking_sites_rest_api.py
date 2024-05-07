@@ -15,7 +15,7 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, NumericField, StringField
+from flask_openapi.schema import ArrayField, NumericField, StringField, IntegerField
 from validataclass.validators import DataclassValidator
 
 from webapp.dependencies import dependencies
@@ -82,6 +82,8 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
             Parameter('lat', schema=NumericField(), example=55.5),
             Parameter('lon', schema=NumericField(), example=55.5),
             Parameter('radius', schema=NumericField(), description='Radius, in m', example='3500'),
+            Parameter('limit', schema=IntegerField(), description='Limit results'),
+            Parameter('start', schema=IntegerField(), description='Start of search query.'),
         ],
         response=[
             Response(
