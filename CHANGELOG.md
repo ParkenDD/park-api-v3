@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 0.3.0
+
+Released 2024-05-07
+
+### Features
+
+* Parking-Site endpoints now support optional cursor-pagination
+
+
 ## Version 0.2.0
 
 Released 2024-05-03
