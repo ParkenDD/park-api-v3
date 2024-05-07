@@ -70,7 +70,9 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
     parking_site_search_query_validator = DataclassValidator(ParkingSiteSearchInput)
 
     @document(
-        description='Get Parking Sites.',
+        description='Get Parking Sites. This endpoint is paginated, which means that you can set a limit and iterate over pages. To '
+        'maintain consistency at all situations, especially if datasets get deleted, we decided to do cursor pagination '
+        'instead of offset pagination.',
         query=[
             Parameter('source_uid', schema=StringField(), example='source-uid'),
             Parameter(
