@@ -15,7 +15,7 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, NumericField, StringField, IntegerField
+from flask_openapi.schema import ArrayField, IntegerField, NumericField, StringField
 from validataclass.validators import DataclassValidator
 
 from webapp.dependencies import dependencies
