@@ -2,7 +2,7 @@
 
 ## Version 0.3.0
 
-Released 2024-05-07
+Released 2024-05-08
 
 ### Features
 
