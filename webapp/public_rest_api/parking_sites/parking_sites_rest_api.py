@@ -15,7 +15,7 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, NumericField, StringField
+from flask_openapi.schema import ArrayField, IntegerField, NumericField, StringField
 from validataclass.validators import DataclassValidator
 
 from webapp.dependencies import dependencies
@@ -70,7 +70,9 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
     parking_site_search_query_validator = DataclassValidator(ParkingSiteSearchInput)
 
     @document(
-        description='Get Parking Sites.',
+        description='Get Parking Sites. This endpoint is paginated, which means that you can set a limit and iterate over pages. To '
+        'maintain consistency at all situations, especially if datasets get deleted, we decided to do cursor pagination '
+        'instead of offset pagination.',
         query=[
             Parameter('source_uid', schema=StringField(), example='source-uid'),
             Parameter(
@@ -82,6 +84,8 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
             Parameter('lat', schema=NumericField(), example=55.5),
             Parameter('lon', schema=NumericField(), example=55.5),
             Parameter('radius', schema=NumericField(), description='Radius, in m', example='3500'),
+            Parameter('limit', schema=IntegerField(), description='Limit results'),
+            Parameter('start', schema=IntegerField(), description='Start of search query.'),
         ],
         response=[
             Response(

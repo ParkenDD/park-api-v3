@@ -7,25 +7,28 @@ from decimal import Decimal
 from typing import Optional
 
 from parkapi_sources.models.enums import PurposeType
+from validataclass.dataclasses import Default
 from validataclass.exceptions import ValidationError
-from validataclass.validators import EnumValidator, IntegerValidator, ListValidator, NumericValidator, StringValidator
+from validataclass.validators import EnumValidator, ListValidator, NumericValidator, StringValidator
 from validataclass_search_queries.filters import (
     SearchParamContains,
     SearchParamCustom,
     SearchParamEquals,
     SearchParamMultiSelect,
 )
+from validataclass_search_queries.pagination import CursorPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
 
 from webapp.common.validation.list_validators import CommaSeparatedListValidator
 
 
 @search_query_dataclass
-class ParkingSiteBaseSearchInput(BaseSearchQuery):
+class ParkingSiteBaseSearchInput(CursorPaginationMixin, BaseSearchQuery):
     source_uid: Optional[str] = SearchParamEquals(), StringValidator()
     source_uids: Optional[str] = SearchParamMultiSelect(), ListValidator(StringValidator())
     name: Optional[str] = SearchParamContains(), StringValidator()
     purpose: Optional[PurposeType] = SearchParamEquals(), EnumValidator(PurposeType)
+    limit: Optional[int] = PaginationLimitValidator(max_value=1000), Default(None)
 
 
 @search_query_dataclass
