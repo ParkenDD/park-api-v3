@@ -102,15 +102,11 @@ If you want to create new data sources, please have a look at
 ### Using the push command line interface
 
 In order to test push tasks or to upload files you got per e-mail, there is an upload script included in this
-repository. It's located at `/push-client/push-client.py`. It requires python requests, so either, you have that
-installed at your system, or you create a virtual environment for that:
+repository. It's located at `/push-client/push-client.py`. You need python requests for this, please have a look at
+"Prepare scripts environment" for preparations. You can use the script using:
 
 ```bash
-cd push-client
-virtalenv venv
-pip install "requests~=2.31.0"
-source venv/bin/activate
-python push-client.py
+python push-client.py source_uid some/file.csv
 ```
 
 If you have requests, you can run the script with two arguments:
@@ -122,6 +118,67 @@ It also accepts the parameter -u for overwriting the URL the data should be push
 
 Afterward, the password will be asked in a secure way, then the upload progress begins.
 
+
+## Flag duplicates via command line interface
+
+ParkAPI provides a mechanism to flag dataset as duplicates. There are two endpoints to do this, which are used by two 
+helper scripts. For both scripts you need python requests, please have a look at "Prepare scripts environment" for 
+preparations. Additionally, you will have to set up an admin user and password using at config using the config
+key `SERVER_AUTH_USERS`. Please have a look at `config_dist_dev.yaml` for an example.
+
+
+### Get possible duplicates
+
+In order to get possible duplicates, you have to use the endpoint `/api/admin/v1/parking-sites/duplicates`. To use this
+endpoint, there is a helper script in `scripts`. You can use it by:
+
+```
+python get-new-duplicates.py username
+```
+
+Per default, the scripts outputs the possible duplicates on stdout. You can modify this behaviour and other settings
+using following optional options:
+- `-o` for an old duplicate file path. These duplicates are sent to the server, and the result will not contain the old  
+  duplicates. This helps to just append new duplicates.
+- `-n` for a new duplicate file path. The script saves an CSV to this file path instead of using stdout for results.
+  If it's the same file path as the old duplicate file, the script will append the new duplicates to the old file.
+- `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For 
+  example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
+
+  
+### Apply duplicates
+
+The CSV file from the step before will have the following format:
+
+```csv
+parking_site_id;duplicate_parking_site_id;status;more columns for better decision making
+```
+
+`status` can be `KEEP` or `IGNORE`. Per default, it will be set to `KEEP` to keep all datasets active. If you want to
+flag a `ParkingSite` as duplicate, please set the status to `IGNORE`. Example, if you want to flag the `ParkingSite`
+with ID `10` as duplicates and keep the `ParkingSite` ID 11 active, it will look like this:
+
+```csv
+10;11;IGNORE;...
+11;10;KEEP;...
+```
+
+Please keep in mind that Excel will most likely break your CSV files. Please use a proper CSV editing tool like
+[LibreOffice Calc](https://www.libreoffice.org/discover/calc/).
+
+If you finished your file, you can apply this file using 
+
+```
+python apply-duplicates.py username your/duplicate-file.csv
+```
+
+Please keep in mind that you will have to apply all duplicates at this command, because the server cannot un-flag
+duplicates without a full list of duplicates.
+
+There is again `-u` as option for a custom URL. If you cant to use this script for another environment, you will have 
+to set the url. For example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
+
+
 ## Configuration
 
 Besides `PARK_API_CONVERTER`, there are a few other configuration options to set, you will find valid config keys in 
@@ -130,6 +187,19 @@ Besides `PARK_API_CONVERTER`, there are a few other configuration options to set
 1) You can create a config file called `config.yaml` in your root folder.
 2) You can set any config value by env var, but you have to prefix the config name with `PARKAPI_` then. For example, 
    you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`. ENV vars overwrite 
+
+
+## Prepare scripts environment
+
+In order to use the scripts located in `scripts`, you will need [python requests](https://pypi.org/project/requests/). 
+You can use a system-installed version of requests, or you can create a virtual environment for this:
+
+```bash
+cd scripts
+virtalenv venv
+pip install "requests~=2.31.0"
+source venv/bin/activate
+```
 
 
 ## Monitoring: Loki and Prometheus

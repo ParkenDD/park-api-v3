@@ -23,7 +23,7 @@ from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.parking_sites.parking_sites_schema import parking_site_example, parking_site_schema
 from webapp.public_rest_api.sources.source_schema import source_example, source_schema
-from webapp.shared.parking_site import GenericParkingSiteHandler
+from webapp.shared.parking_site.generic_parking_site_handler import GenericParkingSiteHandler
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 

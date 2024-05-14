@@ -10,16 +10,7 @@ from pathlib import Path
 
 import requests
 
-DATA_TYPES = {
-    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'csv': 'text/csv',
-    'xml': 'application/xml',
-    'json': 'application/json',
-}
-
-DEFAULT_BASE_URL = 'https://api.mobidata-bw.de/park-api'
-PUSH_BASE_PATH = '/api/admin/v1/generic-parking-sites'
-USER_AGENT = 'ParkAPIv3 Push Client v1.0.0'
+from _constants import DEFAULT_BASE_URL, DATA_TYPES, PUSH_BASE_PATH, USER_AGENT
 
 
 def main():

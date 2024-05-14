@@ -17,6 +17,7 @@ from webapp.common.remote_helper import RemoteHelper
 from webapp.common.rest import RequestHelper
 from webapp.repositories import BaseRepository, ParkingSiteRepository, SourceRepository
 from webapp.services.import_service import ParkingSiteGenericImportService
+from webapp.services.matching_service import MatchingService
 from webapp.services.sqlalchemy_service import SqlalchemyService
 
 if TYPE_CHECKING:
@@ -156,6 +157,13 @@ class Dependencies:
     def get_parking_site_generic_import_service(self) -> ParkingSiteGenericImportService:
         return ParkingSiteGenericImportService(
             source_repository=self.get_source_repository(),
+            parking_site_repository=self.get_parking_site_repository(),
+            **self.get_base_service_dependencies(),
+        )
+
+    @cache_dependency
+    def get_matching_service(self) -> MatchingService:
+        return MatchingService(
             parking_site_repository=self.get_parking_site_repository(),
             **self.get_base_service_dependencies(),
         )

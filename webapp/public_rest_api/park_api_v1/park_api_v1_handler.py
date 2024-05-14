@@ -7,7 +7,7 @@ from opening_hours import OpeningHours
 
 from webapp.models.parking_site import ParkingSiteType
 from webapp.repositories import SourceRepository
-from webapp.shared.parking_site import GenericParkingSiteHandler
+from webapp.shared.parking_site.generic_parking_site_handler import GenericParkingSiteHandler
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
 
 

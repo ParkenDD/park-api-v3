@@ -9,7 +9,7 @@ from typing import Optional
 from parkapi_sources.models.enums import PurposeType
 from validataclass.dataclasses import Default
 from validataclass.exceptions import ValidationError
-from validataclass.validators import EnumValidator, ListValidator, NumericValidator, StringValidator
+from validataclass.validators import BooleanValidator, EnumValidator, IntegerValidator, ListValidator, NumericValidator, StringValidator
 from validataclass_search_queries.filters import (
     SearchParamContains,
     SearchParamCustom,
@@ -24,9 +24,12 @@ from webapp.common.validation.list_validators import CommaSeparatedListValidator
 
 @search_query_dataclass
 class ParkingSiteBaseSearchInput(CursorPaginationMixin, BaseSearchQuery):
+    source_id: Optional[int] = SearchParamEquals(), IntegerValidator()
+    not_source_ids: Optional[list[int]] = SearchParamCustom(), ListValidator(IntegerValidator())
     source_uid: Optional[str] = SearchParamEquals(), StringValidator()
     source_uids: Optional[str] = SearchParamMultiSelect(), ListValidator(StringValidator())
     name: Optional[str] = SearchParamContains(), StringValidator()
+    ignore_duplicates: bool = SearchParamCustom(), BooleanValidator(allow_strings=True), Default(True)
     purpose: Optional[PurposeType] = SearchParamEquals(), EnumValidator(PurposeType)
     limit: Optional[int] = PaginationLimitValidator(max_value=1000), Default(None)
 

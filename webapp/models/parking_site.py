@@ -55,6 +55,7 @@ class ParkingSite(BaseModel):
     )
 
     source_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('source.id'), nullable=False)
+    duplicate_of_parking_site_id: Mapped[Optional[int]] = mapped_column(BigInteger, db.ForeignKey('parking_site.id'), nullable=True)
     original_uid: Mapped[str] = mapped_column(String(256), index=True, nullable=False)
     name: Mapped[str] = mapped_column(String(256), nullable=False)
     operator_name: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
@@ -63,6 +64,7 @@ class ParkingSite(BaseModel):
     description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
     type: Mapped[Optional[ParkingSiteType]] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
     purpose: Mapped[PurposeType] = mapped_column(SqlalchemyEnum(PurposeType), nullable=False, index=True)
+    photo_url: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
 
     max_stay: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     max_height: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)

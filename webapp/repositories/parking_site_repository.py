@@ -3,6 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from dataclasses import dataclass
 from typing import Optional
 
 from sqlalchemy import func
@@ -14,6 +15,14 @@ from validataclass_search_queries.search_queries import BaseSearchQuery
 from webapp.models import ParkingSite, Source
 from webapp.repositories import BaseRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
+
+
+@dataclass
+class ParkingSiteLocation:
+    id: int
+    source_id: int
+    lat: float
+    lon: float
 
 
 class ParkingSiteRepository(BaseRepository):
@@ -37,6 +46,14 @@ class ParkingSiteRepository(BaseRepository):
 
     def fetch_parking_site_by_id(self, parking_site_id: int):
         return self.fetch_resource_by_id(parking_site_id)
+
+    def fetch_parking_site_by_ids(self, parking_site_ids: list[int], *, include_sources: bool = False) -> list[ParkingSite]:
+        query = self.session.query(ParkingSite).filter(ParkingSite.id.in_(parking_site_ids))
+
+        if include_sources:
+            query = query.options(joinedload(ParkingSite.source))
+
+        return query.all()
 
     def fetch_parking_site_by_source_id_and_external_uid(self, source_id: int, original_uid: str) -> ParkingSite:
         parking_site: Optional[ParkingSite] = (
@@ -104,4 +121,22 @@ class ParkingSiteRepository(BaseRepository):
             return query.join(Source, Source.id == ParkingSite.source_id).filter(Source.uid == bound_filter.value)
         if bound_filter.param_name == 'source_uids':
             return query.join(Source, Source.id == ParkingSite.source_id).filter(Source.uid.in_(bound_filter.value))
+        if bound_filter.param_name == 'ignore_duplicates':
+            if bound_filter.value is False:
+                return query
+            return query.filter(ParkingSite.duplicate_of_parking_site_id.is_(None))
         return super()._apply_bound_search_filter(query, bound_filter)
+
+    def fetch_parking_site_locations(self) -> list[ParkingSiteLocation]:
+        items = self.session.query(ParkingSite.id, ParkingSite.lat, ParkingSite.lon, ParkingSite.source_id).all()
+        result: list[ParkingSiteLocation] = []
+        for item in items:
+            result.append(
+                ParkingSiteLocation(
+                    id=item.id,
+                    source_id=item.source_id,
+                    lat=float(item.lat),
+                    lon=float(item.lon),
+                ),
+            )
+        return result
