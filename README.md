@@ -121,6 +121,8 @@ Afterward, the password will be asked in a secure way, then the upload progress 
 
 ## Flag duplicates via command line interface
 
+*Warning: experimental feature. Interface might change.*
+
 ParkAPI provides a mechanism to flag dataset as duplicates. There are two endpoints to do this, which are used by two 
 helper scripts. For both scripts you need python requests, please have a look at "Prepare scripts environment" for 
 preparations. Additionally, you will have to set up an admin user and password using at config using the config
