@@ -1,5 +1,27 @@
 # Changelog
 
+## Version 0.4.0
+
+Released 2024-05-16
+
+### Features
+
+* [New ParkAPI sources](https://github.com/ParkenDD/parkapi-sources-v3/blob/main/CHANGELOG.md#040)
+* [New experimental ParkAPI source RadVIS](https://github.com/ParkenDD/parkapi-sources-v3/blob/main/CHANGELOG.md#040)
+* [Experimental duplicate matching](https://github.com/ParkenDD/park-api-v3/pull/144), 
+  additional information [at README](https://github.com/ParkenDD/park-api-v3?tab=readme-ov-file#flag-duplicates-via-command-line-interface)
+* Data model extension at `ParkingSite.type` (new enum values), `ParkingSite.tags` (generic tag system) and `ParkingSite.photo_url` (photos)
+
+### Fixes
+
+* [Some converter fixes from ParkAPI sources project](https://github.com/ParkenDD/parkapi-sources-v3/blob/main/CHANGELOG.md#040)
+
+
+### Fixes and Maintenance
+
+* Dependency updates
+
+
 ## Version 0.3.0
 
 Released 2024-05-08

@@ -33,6 +33,7 @@ from .base import BaseModel
 if TYPE_CHECKING:
     from .external_identifier import ExternalIdentifier
     from .source import Source
+    from .tag import Tag
 
 
 class ParkingSite(BaseModel):
@@ -50,6 +51,11 @@ class ParkingSite(BaseModel):
     source: Mapped['Source'] = relationship('Source', back_populates='parking_sites')
     external_identifiers: Mapped[list['ExternalIdentifier']] = relationship(
         'ExternalIdentifier',
+        back_populates='parking_site',
+        cascade='all, delete, delete-orphan',
+    )
+    tags: Mapped[list['Tag']] = relationship(
+        'Tag',
         back_populates='parking_site',
         cascade='all, delete, delete-orphan',
     )
@@ -122,6 +128,7 @@ class ParkingSite(BaseModel):
         fields: Optional[list[str]] = None,
         ignore: Optional[list[str]] = None,
         include_external_identifiers: bool = False,
+        include_tags: bool = False,
     ) -> dict:
         if ignore is None:
             ignore = []
@@ -144,6 +151,10 @@ class ParkingSite(BaseModel):
                         'value': external_identifier.value,
                     }
                 )
+        if include_tags:
+            result['tags'] = []
+            for tag in self.tags:
+                result['tags'].append(tag.value)
 
         if not self.has_realtime_data:
             return {key: value for key, value in result.items() if not key.startswith('realtime_')}

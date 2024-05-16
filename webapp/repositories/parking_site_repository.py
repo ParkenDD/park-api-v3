@@ -33,6 +33,7 @@ class ParkingSiteRepository(BaseRepository):
         *,
         search_query: Optional[BaseSearchQuery] = None,
         include_external_identifiers: bool = False,
+        include_tags: bool = False,
         include_source: bool = True,
     ) -> PaginatedResult[ParkingSite]:
         query = self.session.query(ParkingSite)
@@ -41,11 +42,24 @@ class ParkingSiteRepository(BaseRepository):
             query.options(joinedload(ParkingSite.source))
         if include_external_identifiers:
             query.options(selectinload(ParkingSite.external_identifiers))
+        if include_tags:
+            query.options(selectinload(ParkingSite.tags))
 
         return self._search_and_paginate(query, search_query)
 
-    def fetch_parking_site_by_id(self, parking_site_id: int):
-        return self.fetch_resource_by_id(parking_site_id)
+    def fetch_parking_site_by_id(
+        self,
+        parking_site_id: int,
+        include_external_identifiers: bool = False,
+        include_tags: bool = False,
+    ):
+        load_options = []
+        if include_external_identifiers:
+            load_options.append(selectinload(ParkingSite.external_identifiers))
+        if include_tags:
+            load_options.append(selectinload(ParkingSite.tags))
+
+        return self.fetch_resource_by_id(parking_site_id, load_options=load_options)
 
     def fetch_parking_site_by_ids(self, parking_site_ids: list[int], *, include_sources: bool = False) -> list[ParkingSite]:
         query = self.session.query(ParkingSite).filter(ParkingSite.id.in_(parking_site_ids))
