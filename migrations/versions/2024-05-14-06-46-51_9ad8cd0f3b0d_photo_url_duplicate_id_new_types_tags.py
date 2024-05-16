@@ -55,7 +55,7 @@ def upgrade():
     op.create_table(
         'tag',
         sa.Column('parking_site_id', sa.BigInteger(), nullable=False),
-        sa.Column('tag', sa.String(length=256), nullable=False),
+        sa.Column('value', sa.String(length=256), nullable=False),
         sa.Column('id', sa.BigInteger(), nullable=False),
         sa.Column('created_at', sqlalchemy_utc.sqltypes.UtcDateTime(timezone=True), nullable=False),
         sa.Column('modified_at', sqlalchemy_utc.sqltypes.UtcDateTime(timezone=True), nullable=False),

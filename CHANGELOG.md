@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 0.4.1
+
+Released 2024-05-16
+
+### Fixes
+
+* Issue in database migration leading to database not matching the model
+
+
 ## Version 0.4.0
 
 Released 2024-05-16
