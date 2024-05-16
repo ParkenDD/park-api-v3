@@ -6,7 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from webapp.public_rest_api.datex2.datex2_mapper import Datex2Mapper
 from webapp.public_rest_api.datex2.datex2_models import Datex2Publication
 from webapp.repositories import SourceRepository
-from webapp.shared.parking_site import GenericParkingSiteHandler
+from webapp.shared.parking_site.generic_parking_site_handler import GenericParkingSiteHandler
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
 
 
