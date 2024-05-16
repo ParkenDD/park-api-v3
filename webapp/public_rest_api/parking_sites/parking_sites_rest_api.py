@@ -105,7 +105,7 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
 
         parking_sites = self.parking_site_handler.get_parking_site_list(search_query=search_query)
 
-        parking_sites = parking_sites.map(lambda item: item.to_dict(include_external_identifiers=True))
+        parking_sites = parking_sites.map(lambda item: item.to_dict(include_external_identifiers=True, include_tags=True))
 
         return self.jsonify_paginated_response(parking_sites, search_query)
 
@@ -130,4 +130,4 @@ class ParkingSiteItemMethodView(ParkingSiteBaseMethodView):
     def get(self, parking_site_id: int):
         parking_site = self.parking_site_handler.get_parking_site_item(parking_site_id)
 
-        return jsonify(parking_site.to_dict())
+        return jsonify(parking_site.to_dict(include_external_identifiers=True, include_tags=True))

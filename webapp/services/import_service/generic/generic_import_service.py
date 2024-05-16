@@ -10,10 +10,11 @@ from parkapi_sources import ParkAPISources
 from parkapi_sources.converters.base_converter.pull import PullConverter
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
-from parkapi_sources.models.enums import OpeningStatus, ParkingSiteType
+from parkapi_sources.models.enums import OpeningStatus
+from validataclass.helpers import UnsetValue
 
 from webapp.common.logging.models import LogMessageType, LogTag
-from webapp.models import ExternalIdentifier, ParkingSite, Source
+from webapp.models import ExternalIdentifier, ParkingSite, Source, Tag
 from webapp.models.source import SourceStatus
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
@@ -149,13 +150,11 @@ class ParkingSiteGenericImportService(BaseService):
             parking_site.original_uid = static_parking_site_input.uid
 
         for key, value in static_parking_site_input.to_dict().items():
-            if key in ['uid', 'external_identifiers']:
+            if key in ['uid', 'external_identifiers', 'tags']:
                 continue
-            if key == 'type' and value:
-                value = ParkingSiteType[value.name]
             setattr(parking_site, key, value)
 
-        if static_parking_site_input.external_identifiers:
+        if static_parking_site_input.external_identifiers not in [None, UnsetValue]:
             external_identifiers: list[ExternalIdentifier] = []
             for i, external_identifier_input in enumerate(static_parking_site_input.external_identifiers):
                 if len(static_parking_site_input.external_identifiers) < len(parking_site.external_identifiers):
@@ -166,6 +165,17 @@ class ParkingSiteGenericImportService(BaseService):
                 external_identifier.value = external_identifier_input.value
                 external_identifiers.append(external_identifier)
             parking_site.external_identifiers = external_identifiers
+
+        if static_parking_site_input.tags not in [None, UnsetValue]:
+            tags: list[Tag] = []
+            for i, tag_input in enumerate(static_parking_site_input.tags):
+                if len(static_parking_site_input.tags) < len(parking_site.tags):
+                    tag = parking_site.tags[i]
+                else:
+                    tag = Tag()
+                tag.value = tag_input
+                tags.append(tag)
+            parking_site.tags = tags
 
         self.parking_site_repository.save_parking_site(parking_site)
 
