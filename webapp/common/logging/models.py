@@ -15,6 +15,7 @@ class LogMessageType(Enum):
     EXCEPTION = 'exception'
     FAILED_SOURCE_HANDLING = 'failed-source-handling'
     FAILED_PARKING_SITE_HANDLING = 'failed-parking-site-handling'
+    DUPLICATE_HANDLING = 'duplicate-handling'
     MISC = 'misc'
 
 
