@@ -102,7 +102,7 @@ If you want to create new data sources, please have a look at
 ### Using the push command line interface
 
 In order to test push tasks or to upload files you got per e-mail, there is an upload script included in this
-repository. It's located at `/push-client/push-client.py`. You need python requests for this, please have a look at
+repository. It's located at `/scripts/push-client.py`. You need python requests for this, please have a look at
 "Prepare scripts environment" for preparations. You can use the script using:
 
 ```bash

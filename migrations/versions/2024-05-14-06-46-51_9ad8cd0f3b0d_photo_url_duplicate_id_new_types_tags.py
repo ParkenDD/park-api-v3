@@ -107,11 +107,6 @@ def downgrade():
     sa.Enum(*new_parking_site_types, name='_parkingsitetype').drop(op.get_bind())
 
     with op.batch_alter_table('parking_site', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('is_supervised', sa.Boolean(), autoincrement=False, nullable=True))
-        batch_op.drop_column('related_location')
-        batch_op.drop_column('supervision_type')
-        batch_op.drop_column('is_covered')
-        batch_op.drop_column('purpose')
         batch_op.alter_column(
             'type',
             existing_type=sa.Enum(*new_parking_site_types, name='parkingsitetype'),

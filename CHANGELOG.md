@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 0.4.2
+
+Released 2024-05-28
+
+### Fixes
+
+* Fixes issue in database migration downgrade leading to database not matching the model
+* Catches and logs an issue with invalid data at duplicate distance calculation
+
+
 ## Version 0.4.1
 
 Released 2024-05-16

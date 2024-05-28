@@ -7,6 +7,7 @@ from dataclasses import asdict, dataclass
 from decimal import Decimal
 from math import acos, cos, sin
 
+from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSite
 from webapp.repositories import ParkingSiteRepository
 from webapp.repositories.parking_site_repository import ParkingSiteLocation
@@ -52,7 +53,15 @@ class MatchingService(BaseService):
                     continue
 
                 # If distance is over match radius: ignore possible match
-                if self.distance(parking_site_locations[i], parking_site_locations[j]) > match_radius:
+                try:
+                    if self.distance(parking_site_locations[i], parking_site_locations[j]) > match_radius:
+                        continue
+                # Ignore (and log) invalid data at distance calculations (eg 'math domain error')
+                except ValueError:
+                    self.logger.warning(
+                        LogMessageType.DUPLICATE_HANDLING,
+                        f'Cannot calculate distance between {parking_site_locations[i]} and {parking_site_locations[j]}',
+                    )
                     continue
 
                 matches.append((parking_site_locations[i], parking_site_locations[j]))
