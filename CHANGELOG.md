@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 0.4.3
+
+Released 2024-05-29
+
+### Fixes
+
+* Version updates in dependencies, especially a lat-lon bugfix in parkapi-sources 
+
+
 ## Version 0.4.2
 
 Released 2024-05-28
