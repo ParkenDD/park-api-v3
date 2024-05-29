@@ -6,8 +6,8 @@ SQLAlchemy~=2.0.30
 SQLAlchemy-Utc~=0.14.0
 pytz~=2024.1
 psycopg2-binary~=2.9.9
-pymysql~=1.1.0
-requests~=2.31.0
+pymysql~=1.1.1
+requests~=2.32.2
 alembic~=1.13.1
 gunicorn~=22.0.0
 pyyaml~=6.0.1
@@ -20,7 +20,7 @@ openpyxl~=3.1.2
 opening-hours-py~=0.6.18
 kombu~=5.3.7
 lxml~=5.2.2
-parkapi-sources~=0.4.1
+parkapi-sources~=0.4.3
 
 # required for converters
 beautifulsoup4~=4.12.3
