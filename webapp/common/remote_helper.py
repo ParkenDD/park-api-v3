@@ -72,6 +72,7 @@ class RemoteHelper:
                 data=json_data,
                 headers={'content-type': 'application/json'},
                 verify=remote_server.cert,
+                timeout=300,
             )
 
             log_fragments = [f'{method.upper()} {response.url}: HTTP {response.status_code}']
