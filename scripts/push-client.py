@@ -9,8 +9,7 @@ from getpass import getpass
 from pathlib import Path
 
 import requests
-
-from _constants import DEFAULT_BASE_URL, DATA_TYPES, PUSH_BASE_PATH, USER_AGENT
+from _constants import DATA_TYPES, DEFAULT_BASE_URL, PUSH_BASE_PATH, USER_AGENT
 
 
 def main():
@@ -51,10 +50,11 @@ def main():
             'Content-Type': DATA_TYPES[file_ending],
             'User-Agent': USER_AGENT,
         },
+        timeout=300,
     )
 
     if requests_response.status_code == 200:
-        print(f'Upload successful. Result: {requests_response.json()}')
+        print(f'Upload successful. Result: {requests_response.json()}')  # noqa: T201
         return
 
     if requests_response.status_code == 400:
@@ -66,5 +66,5 @@ def main():
     sys.exit(f'Unknown error with HTTP status code {requests_response.status_code}.')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

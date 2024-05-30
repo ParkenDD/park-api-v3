@@ -3,15 +3,14 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import argparse
 import sys
 from getpass import getpass
+from pathlib import Path
 from typing import Optional
 
 import requests
-import argparse
-from pathlib import Path
-
-from _constants import DUPLICATES_BASE_PATH, USER_AGENT, DEFAULT_BASE_URL
+from _constants import DEFAULT_BASE_URL, DUPLICATES_BASE_PATH, USER_AGENT
 from _helper import load_duplicates, save_duplicates
 
 
@@ -28,12 +27,13 @@ def main():
         help='Old duplicate file. If not provided, all duplicates will be replied.',
     )
     parser.add_argument('-u', '--url', default=DEFAULT_BASE_URL, help='Base URL')
+    parser.add_argument('-r', '--radius', type=int, help='Set radius [m]')
     parser.add_argument(
         '-n',
         '--new-duplicates-file',
         dest='new_duplicates_file',
-        help='New duplicates file. If not provides, duplicates will be printed to stdout. If it\'s the same as the old duplicates file, '
-             'the old duplicates file will be updated.',
+        help="New duplicates file. If not provides, duplicates will be printed to stdout. If it's the same as the old duplicates file, "
+        'the old duplicates file will be updated.',
     )
     args = parser.parse_args()
 
@@ -45,6 +45,7 @@ def main():
 
     old_duplicates_file_path: Optional[Path] = None if args.old_duplicates_file is None else Path(args.old_duplicates_file)
     new_duplicates_file_path: Optional[Path] = None if args.new_duplicates_file is None else Path(args.new_duplicates_file)
+    radius: Optional[int] = args.radius
 
     # Check if data can be saved
     if new_duplicates_file_path is not None and new_duplicates_file_path != old_duplicates_file_path:
@@ -64,12 +65,13 @@ def main():
     endpoint = f'{base_url}{DUPLICATES_BASE_PATH}/generate'
     requests_response = requests.post(
         url=endpoint,
-        json=old_duplicates,
+        json={'old_duplicates': old_duplicates, 'radius': radius},
         auth=(username, password),
         headers={
             'Content-Type': 'application/json',
             'User-Agent': USER_AGENT,
         },
+        timeout=300,
     )
     if requests_response.status_code != 200:
         sys.exit(f'Invalid http response code: {requests_response.status_code}')
@@ -77,13 +79,13 @@ def main():
     response_items: list[dict] = requests_response.json()
 
     if args.new_duplicates_file is None:
-        print(response_items)
+        print(response_items)  # noqa: T201
     else:
         new_duplicates_file_path: Path = Path(args.new_duplicates_file)
         save_duplicates(new_duplicates_file_path, requests_response.json(), append=old_duplicates_file_path == new_duplicates_file_path)
 
-    print(f'Got {len(response_items)} new duplicates.')
+    print(f'Got {len(response_items)} new duplicates.')  # noqa: T201
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

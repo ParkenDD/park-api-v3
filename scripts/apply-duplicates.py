@@ -3,15 +3,14 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import argparse
 import sys
 from getpass import getpass
+from pathlib import Path
 from typing import Optional
 
 import requests
-import argparse
-from pathlib import Path
-
-from _constants import DUPLICATES_BASE_PATH, USER_AGENT, DEFAULT_BASE_URL
+from _constants import DEFAULT_BASE_URL, DUPLICATES_BASE_PATH, USER_AGENT
 from _helper import load_duplicates, save_duplicates
 
 
@@ -50,10 +49,11 @@ def main():
             'Content-Type': 'application/json',
             'User-Agent': USER_AGENT,
         },
+        timeout=300,
     )
     if requests_response.status_code != 204:
         sys.exit(f'Invalid http response code: {requests_response.status_code}')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

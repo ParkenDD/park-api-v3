@@ -9,9 +9,8 @@ from logging.handlers import QueueHandler, QueueListener
 from queue import Queue
 from typing import Optional
 
-from flask import Flask
+from webapp.common.config import ConfigHelper
 
-from ..config import ConfigHelper
 from .loki_emitter import BasicAuth, LokiEmitter
 
 

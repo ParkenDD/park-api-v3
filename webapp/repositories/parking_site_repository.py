@@ -6,7 +6,8 @@ Use of this source code is governed by an MIT-style license that can be found in
 from dataclasses import dataclass
 from typing import Optional
 
-from sqlalchemy import func
+from parkapi_sources.models.enums import PurposeType
+from sqlalchemy import func, select
 from sqlalchemy.orm import Query, joinedload, selectinload
 from validataclass_search_queries.filters import BoundSearchFilter
 from validataclass_search_queries.pagination import PaginatedResult
@@ -23,6 +24,7 @@ class ParkingSiteLocation:
     source_id: int
     lat: float
     lon: float
+    purpose: PurposeType
 
 
 class ParkingSiteRepository(BaseRepository):
@@ -82,11 +84,14 @@ class ParkingSiteRepository(BaseRepository):
 
         return parking_site
 
+    def fetch_parking_sites_ids_by_source_id(self, source_id: int) -> list[int]:
+        return self.session.scalars(select(ParkingSite.id).where(ParkingSite.source_id == source_id)).all()
+
     def save_parking_site(self, parking_site: ParkingSite, *, commit: bool = True):
         self._save_resources(parking_site, commit=commit)
 
-    def delete_parking_site(self, parking_site: ParkingSite):
-        self._delete_resources(parking_site)
+    def delete_parking_site(self, parking_site: ParkingSite, *, commit: bool = True):
+        self._delete_resources(parking_site, commit=commit)
 
     def _filter_by_search_query(self, query: Query, search_query: Optional[BaseSearchQuery]) -> Query:
         if search_query is None:
@@ -142,13 +147,14 @@ class ParkingSiteRepository(BaseRepository):
         return super()._apply_bound_search_filter(query, bound_filter)
 
     def fetch_parking_site_locations(self) -> list[ParkingSiteLocation]:
-        items = self.session.query(ParkingSite.id, ParkingSite.lat, ParkingSite.lon, ParkingSite.source_id).all()
+        items = self.session.query(ParkingSite.id, ParkingSite.lat, ParkingSite.lon, ParkingSite.source_id, ParkingSite.purpose).all()
         result: list[ParkingSiteLocation] = []
         for item in items:
             result.append(
                 ParkingSiteLocation(
                     id=item.id,
                     source_id=item.source_id,
+                    purpose=item.purpose,
                     lat=float(item.lat),
                     lon=float(item.lon),
                 ),

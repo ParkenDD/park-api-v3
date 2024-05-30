@@ -3,15 +3,15 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from flask_openapi.decorator import document
 from validataclass.validators import DataclassValidator, IntegerValidator, ListValidator
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
+from webapp.common.json import empty_json_response
 from webapp.dependencies import dependencies
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
-from ...common.json import empty_json_response
-from ...shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 from .parking_site_handler import ParkingSiteHandler
+from .parking_site_validators import GetDuplicatesInput
 
 
 class ParkingSitesBlueprint(AdminApiBaseBlueprint):
@@ -84,12 +84,12 @@ class ParkingSiteMethodView(ParkingSiteBaseMethodView):
 
 
 class ParkingSiteDuplicatesGenerateMethodView(ParkingSiteBaseMethodView):
-    duplicate_ids_validator = ListValidator(ListValidator(IntegerValidator(), min_length=2, max_length=2))
+    duplicate_validator = DataclassValidator(GetDuplicatesInput)
 
     def post(self):
-        duplicate_ids: list[list[int]] = self.duplicate_ids_validator.validate(self.request_helper.get_parsed_json())
+        duplicate_input: GetDuplicatesInput = self.duplicate_validator.validate(self.request_helper.get_parsed_json())
 
-        return self.parking_site_handler.generate_duplicates(duplicate_ids)
+        return self.parking_site_handler.generate_duplicates(duplicate_input.old_duplicates, duplicate_input.radius)
 
 
 class ParkingSiteDuplicatesApplyMethodView(ParkingSiteBaseMethodView):
