@@ -127,8 +127,14 @@ class ParkingSiteGenericImportService(BaseService):
         static_parking_site_inputs: list[StaticParkingSiteInput],
         static_parking_site_errors: list[ImportParkingSiteException],
     ):
+        existing_parking_site_ids = self.parking_site_repository.fetch_parking_sites_ids_by_source_id(source.id)
         for static_parking_site_input in static_parking_site_inputs:
-            self._save_static_parking_site_input(source, static_parking_site_input)
+            self._save_static_parking_site_input(source, static_parking_site_input, existing_parking_site_ids)
+
+        # Delete remaining existing parking sites because they are not in the new dataset
+        for existing_parking_site_id in existing_parking_site_ids:
+            existing_parking_site = self.parking_site_repository.fetch_parking_site_by_id(existing_parking_site_id)
+            self.parking_site_repository.delete_parking_site(existing_parking_site)
 
         if len(static_parking_site_inputs):
             source.static_status = SourceStatus.ACTIVE
@@ -138,12 +144,20 @@ class ParkingSiteGenericImportService(BaseService):
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
         source.static_parking_site_error_count = len(static_parking_site_errors)
 
-    def _save_static_parking_site_input(self, source: Source, static_parking_site_input: StaticParkingSiteInput):
+    def _save_static_parking_site_input(
+        self,
+        source: Source,
+        static_parking_site_input: StaticParkingSiteInput,
+        existing_parking_site_ids: list[int],
+    ):
         try:
             parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
                 source_id=source.id,
                 original_uid=static_parking_site_input.uid,
             )
+            # If the ParkingSite exists: remove it from existing parking site list
+            if parking_site.id in existing_parking_site_ids:
+                existing_parking_site_ids.remove(parking_site.id)
         except ObjectNotFoundException:
             parking_site = ParkingSite()
             parking_site.source_id = source.id

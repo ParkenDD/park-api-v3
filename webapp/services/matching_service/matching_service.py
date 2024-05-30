@@ -6,6 +6,9 @@ Use of this source code is governed by an MIT-style license that can be found in
 from dataclasses import asdict, dataclass
 from decimal import Decimal
 from math import acos, cos, sin
+from typing import Optional
+
+from parkapi_sources.models.enums import ParkAndRideType, ParkingSiteType
 
 from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSite
@@ -23,8 +26,16 @@ class DuplicatedParkingSite:
     source_uid: str
     lat: Decimal
     lon: Decimal
-    address: str
+    name: str
     capacity: int
+    api_url: str
+    type: Optional[ParkingSiteType]
+    park_and_ride_type: Optional[list[ParkAndRideType]]
+    address: Optional[str]
+    description: Optional[str]
+    photo_url: Optional[str]
+    public_url: Optional[str]
+    opening_hours: Optional[str]
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -37,16 +48,25 @@ class MatchingService(BaseService):
         super().__init__(*args, **kwargs)
         self.parking_site_repository = parking_site_repository
 
-    def generate_duplicates(self, existing_matches: list[tuple[int, int]]) -> list[DuplicatedParkingSite]:
+    def generate_duplicates(
+        self,
+        existing_matches: list[tuple[int, int]],
+        match_radius: Optional[int] = None,
+    ) -> list[DuplicatedParkingSite]:
         matches: list[tuple[ParkingSiteLocation, ParkingSiteLocation]] = []
-        match_radius: int = self.config_helper.get('MATCH_RADIUS', 100)
+        if match_radius is None:
+            match_radius: int = self.config_helper.get('MATCH_RADIUS', 100)
 
         parking_site_locations = self.parking_site_repository.fetch_parking_site_locations()
         for i in range(0, len(parking_site_locations)):
             for j in range(i + 1, len(parking_site_locations)):
                 # If both datasets are from the same source: ignore possible match
-                # if parking_site_locations[i].source_id == parking_site_locations[j].source_id:
-                #    continue
+                if parking_site_locations[i].source_id == parking_site_locations[j].source_id:
+                    continue
+
+                # Duplicates should have same purpose
+                if parking_site_locations[i].purpose != parking_site_locations[j].purpose:
+                    continue
 
                 # If the combination in this order is in existing matches: ignore that match
                 if (parking_site_locations[i].id, parking_site_locations[j].id) in existing_matches:
@@ -84,8 +104,7 @@ class MatchingService(BaseService):
             duplicate_parking_site.duplicate_of_parking_site_id = parking_site.id
             self.parking_site_repository.save_parking_site(duplicate_parking_site)
 
-    @staticmethod
-    def parking_site_to_duplicate(parking_site: ParkingSite, duplicate_id: int) -> DuplicatedParkingSite:
+    def parking_site_to_duplicate(self, parking_site: ParkingSite, duplicate_id: int) -> DuplicatedParkingSite:
         return DuplicatedParkingSite(
             id=parking_site.id,
             duplicate_id=duplicate_id,
@@ -96,6 +115,14 @@ class MatchingService(BaseService):
             lon=parking_site.lon,
             address=parking_site.address,
             capacity=parking_site.capacity,
+            name=parking_site.name,
+            api_url=f'{self.config_helper.get("PROJECT_URL")}/api/public/v3/parking-sites/{parking_site.id}',
+            type=parking_site.type,
+            park_and_ride_type=parking_site.park_and_ride_type,
+            description=parking_site.description,
+            photo_url=parking_site.photo_url,
+            public_url=parking_site.public_url,
+            opening_hours=parking_site.opening_hours,
         )
 
     @staticmethod

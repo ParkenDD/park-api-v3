@@ -1,5 +1,25 @@
 # Changelog
 
+## Version 0.5.0
+
+Released 2024-05-30
+
+### Features
+
+* Deletes ParkingSites if they don't exist in the latest pull / push
+* Several Improvements for Duplicate Matching Service:
+  * Don't offer ParkingSites with different purposes as duplicates
+  * Don't offer ParkingSites from the same source as duplicates as this is an data source issue
+  * Add several fields at the duplicate JSON / CSV output
+  * Add header line to duplicate CSVs
+  * Give the ability to set the radius from client side
+
+
+### Fixes
+
+* Add missing fields to OpenAPI documentation
+
+
 ## Version 0.4.3
 
 Released 2024-05-29

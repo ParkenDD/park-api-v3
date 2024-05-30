@@ -3,6 +3,8 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from typing import Optional
+
 from validataclass_search_queries.pagination import PaginatedResult
 
 from webapp.admin_rest_api import AdminApiBaseHandler
@@ -27,10 +29,10 @@ class ParkingSiteHandler(AdminApiBaseHandler):
     def get_parking_site(self, parking_site_id: int) -> ParkingSite:
         return self.parking_site_repository.fetch_parking_site_by_id(parking_site_id)
 
-    def generate_duplicates(self, duplicate_ids: list[list[int]]) -> list[DuplicatedParkingSite]:
+    def generate_duplicates(self, duplicate_ids: list[list[int]], radius: Optional[int] = None) -> list[DuplicatedParkingSite]:
         duplicate_ids: list[tuple[int, int]] = [(duplicate[0], duplicate[1]) for duplicate in duplicate_ids]
 
-        return self.matching_service.generate_duplicates(duplicate_ids)
+        return self.matching_service.generate_duplicates(duplicate_ids, match_radius=radius)
 
     def apply_duplicates(self, duplicate_ids: list[list[int]]) -> list[DuplicatedParkingSite]:
         duplicate_ids: list[tuple[int, int]] = [(duplicate[0], duplicate[1]) for duplicate in duplicate_ids]

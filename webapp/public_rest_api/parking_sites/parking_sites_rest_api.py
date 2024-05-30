@@ -15,7 +15,8 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, IntegerField, NumericField, StringField
+from flask_openapi.schema import ArrayField, BooleanField, EnumField, IntegerField, NumericField, StringField
+from parkapi_sources.models.enums import PurposeType
 from validataclass.validators import DataclassValidator
 
 from webapp.dependencies import dependencies
@@ -86,6 +87,12 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
             Parameter('radius', schema=NumericField(), description='Radius, in m', example='3500'),
             Parameter('limit', schema=IntegerField(), description='Limit results'),
             Parameter('start', schema=IntegerField(), description='Start of search query.'),
+            Parameter('purpose', schema=EnumField(enum=PurposeType)),
+            Parameter(
+                'ignore_duplicates',
+                schema=BooleanField(),
+                description='Defaults to true. If set to false, you will get ParkingSites flagged as duplicates, too.',
+            ),
         ],
         response=[
             Response(

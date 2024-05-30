@@ -8,8 +8,8 @@ from typing import Dict, List, Optional, Sequence
 from webapp.common.celery import CeleryHelper
 from webapp.common.contexts import ContextHelper
 from webapp.common.logging import Logger
+from webapp.common.logging.models import LogMessageType
 
-from ..logging.models import LogMessageType
 from .delayed_events import trigger_delayed_event
 from .enum import EventSource, EventType
 from .event import Event
