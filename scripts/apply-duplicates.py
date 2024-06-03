@@ -27,8 +27,7 @@ def main():
     parser.add_argument('-u', '--url', default=DEFAULT_BASE_URL, help='Base URL')
     args = parser.parse_args()
 
-    username = args.username
-
+    username: str = args.username
     base_url: str = args.url
 
     password = getpass(f'Password for {username}: ')
@@ -52,7 +51,7 @@ def main():
         timeout=300,
     )
     if requests_response.status_code != 204:
-        sys.exit(f'Invalid http response code: {requests_response.status_code}')
+        sys.exit(f'Invalid http response code: {requests_response.status_code}: {requests_response.text}')
 
 
 if __name__ == '__main__':
