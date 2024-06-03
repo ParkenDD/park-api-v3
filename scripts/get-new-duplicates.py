@@ -28,6 +28,7 @@ def main():
     )
     parser.add_argument('-u', '--url', default=DEFAULT_BASE_URL, help='Base URL')
     parser.add_argument('-r', '--radius', type=int, help='Set radius [m]')
+    parser.add_argument('-s', '--silence', action='store_true', default=False, help='Silences the non-structured result message.')
     parser.add_argument(
         '-n',
         '--new-duplicates-file',
@@ -37,9 +38,9 @@ def main():
     )
     args = parser.parse_args()
 
-    username = args.username
-
+    username: str = args.username
     base_url: str = args.url
+    silence: bool = args.silence
 
     password = getpass(f'Password for {username}: ')
 
@@ -74,17 +75,18 @@ def main():
         timeout=300,
     )
     if requests_response.status_code != 200:
-        sys.exit(f'Invalid http response code: {requests_response.status_code}')
+        sys.exit(f'Invalid http response code: {requests_response.status_code}: {requests_response.text}')
 
     response_items: list[dict] = requests_response.json()
 
     if args.new_duplicates_file is None:
-        print(response_items)  # noqa: T201
+        print(requests_response.text)  # noqa: T201
     else:
         new_duplicates_file_path: Path = Path(args.new_duplicates_file)
         save_duplicates(new_duplicates_file_path, requests_response.json(), append=old_duplicates_file_path == new_duplicates_file_path)
 
-    print(f'Got {len(response_items)} new duplicates.')  # noqa: T201
+    if silence is False:
+        print(f'Got {len(response_items)} new duplicates.')  # noqa: T201
 
 
 if __name__ == '__main__':

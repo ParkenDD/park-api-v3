@@ -146,6 +146,7 @@ using following optional options:
   If it's the same file path as the old duplicate file, the script will append the new duplicates to the old file.
 - `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For 
   example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
+- `-s` to silence the status output. Using this, you can pipe the JSON output to other applications like `json_pp`.
 
   
 ### Apply duplicates
