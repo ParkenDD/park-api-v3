@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 0.5.1
+
+Released 2024-06-04
+
+### Fixes
+
+* [Fixes an issue with wrong koordinates at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/48)
+* [Fixes an issue with Bahn data without capacity](https://github.com/ParkenDD/parkapi-sources-v3/pull/49)
+* [Better usability of the get-new-duplicates script](https://github.com/ParkenDD/park-api-v3/pull/155)
+
+
 ## Version 0.5.0
 
 Released 2024-05-30
