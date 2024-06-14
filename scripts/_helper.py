@@ -29,6 +29,7 @@ def save_duplicates(duplicates_file_path: Path, items: list[dict], append: bool 
         'id',
         'duplicate_id',
         'status',
+        'distance',
         'source_id',
         'source_uid',
         'lat',

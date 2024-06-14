@@ -3,12 +3,13 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import math
 from dataclasses import asdict, dataclass
 from decimal import Decimal
-from math import acos, cos, sin
 from typing import Optional
 
 from parkapi_sources.models.enums import ParkAndRideType, ParkingSiteType
+from pyproj import Geod
 
 from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSite
@@ -26,6 +27,7 @@ class DuplicatedParkingSite:
     source_uid: str
     lat: Decimal
     lon: Decimal
+    distance: float
     name: str
     capacity: int
     api_url: str
@@ -43,6 +45,7 @@ class DuplicatedParkingSite:
 
 class MatchingService(BaseService):
     parking_site_repository: ParkingSiteRepository
+    geo_distance_service = Geod(ellps='WGS84')
 
     def __init__(self, *args, parking_site_repository: ParkingSiteRepository, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,7 +56,7 @@ class MatchingService(BaseService):
         existing_matches: list[tuple[int, int]],
         match_radius: Optional[int] = None,
     ) -> list[DuplicatedParkingSite]:
-        matches: list[tuple[ParkingSiteLocation, ParkingSiteLocation]] = []
+        matches: list[tuple[ParkingSiteLocation, ParkingSiteLocation, float]] = []
         if match_radius is None:
             match_radius: int = self.config_helper.get('MATCH_RADIUS', 100)
 
@@ -73,18 +76,10 @@ class MatchingService(BaseService):
                     continue
 
                 # If distance is over match radius: ignore possible match
-                try:
-                    if self.distance(parking_site_locations[i], parking_site_locations[j]) > match_radius:
-                        continue
-                # Ignore (and log) invalid data at distance calculations (eg 'math domain error')
-                except ValueError:
-                    self.logger.warning(
-                        LogMessageType.DUPLICATE_HANDLING,
-                        f'Cannot calculate distance between {parking_site_locations[i]} and {parking_site_locations[j]}',
-                    )
+                distance = self.distance(parking_site_locations[i], parking_site_locations[j])
+                if math.isnan(distance) or distance > match_radius:
                     continue
-
-                matches.append((parking_site_locations[i], parking_site_locations[j]))
+                matches.append((parking_site_locations[i], parking_site_locations[j], distance))
 
         duplicates: list[DuplicatedParkingSite] = []
         parking_site_ids: list[int] = list(set([match[0].id for match in matches] + [match[1].id for match in matches]))
@@ -92,8 +87,8 @@ class MatchingService(BaseService):
         parking_sites_by_id: dict[int, ParkingSite] = {parking_site.id: parking_site for parking_site in parking_sites}
 
         for match in matches:
-            duplicates.append(self.parking_site_to_duplicate(parking_sites_by_id[match[0].id], match[1].id))
-            duplicates.append(self.parking_site_to_duplicate(parking_sites_by_id[match[1].id], match[0].id))
+            duplicates.append(self.parking_site_to_duplicate(parking_sites_by_id[match[0].id], match[1].id, match[2]))
+            duplicates.append(self.parking_site_to_duplicate(parking_sites_by_id[match[1].id], match[0].id, match[2]))
 
         return duplicates
 
@@ -104,7 +99,7 @@ class MatchingService(BaseService):
             duplicate_parking_site.duplicate_of_parking_site_id = parking_site.id
             self.parking_site_repository.save_parking_site(duplicate_parking_site)
 
-    def parking_site_to_duplicate(self, parking_site: ParkingSite, duplicate_id: int) -> DuplicatedParkingSite:
+    def parking_site_to_duplicate(self, parking_site: ParkingSite, duplicate_id: int, distance: float) -> DuplicatedParkingSite:
         return DuplicatedParkingSite(
             id=parking_site.id,
             duplicate_id=duplicate_id,
@@ -113,6 +108,7 @@ class MatchingService(BaseService):
             source_uid=parking_site.source.uid,
             lat=parking_site.lat,
             lon=parking_site.lon,
+            distance=distance,
             address=parking_site.address,
             capacity=parking_site.capacity,
             name=parking_site.name,
@@ -125,8 +121,11 @@ class MatchingService(BaseService):
             opening_hours=parking_site.opening_hours,
         )
 
-    @staticmethod
-    def distance(location_1: ParkingSiteLocation, location_2: ParkingSiteLocation) -> float:
-        return 6371010 * acos(
-            sin(location_1.lat) * sin(location_2.lat) + cos(location_1.lat) * cos(location_2.lat) * cos(location_1.lon - location_2.lon),
+    def distance(self, location_1: ParkingSiteLocation, location_2: ParkingSiteLocation) -> float:
+        _, _, distance = self.geo_distance_service.inv(
+            float(location_1.lat),
+            float(location_1.lon),
+            float(location_2.lat),
+            float(location_2.lon),
         )
+        return distance
