@@ -5,11 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from typing import TYPE_CHECKING
 
-from parkapi_sources.models.enums import ExternalIdentifierType
 from sqlalchemy import BigInteger, String
-from sqlalchemy import (
-    Enum as SqlalchemyEnum,
-)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from webapp.extensions import db

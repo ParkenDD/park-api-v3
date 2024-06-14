@@ -4,7 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from flask import jsonify
-from flask_openapi.decorator import EmptyResponse, ErrorResponse, Request, document
+from flask_openapi.decorator import ErrorResponse, Request, document
 from flask_openapi.schema import JsonSchema
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput

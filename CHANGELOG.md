@@ -1,5 +1,24 @@
 # Changelog
 
+## Version 0.6.0
+
+Released 2024-06-14
+
+### Features
+
+* [Multiple new converters at ParkAPI Sources 0.5.0](https://github.com/ParkenDD/parkapi-sources-v3/blob/main/CHANGELOG.md#050)
+
+### Fixes
+
+* [Fixes calculating geo-distance at matching service](https://github.com/ParkenDD/park-api-v3/pull/162)
+* [Multiple fixes at ParkAPI Sources 0.5.0](https://github.com/ParkenDD/parkapi-sources-v3/blob/main/CHANGELOG.md#050)
+
+### Maintenance
+
+* Replace black by ruff formatter
+* Dependency updates
+
+
 ## Version 0.5.1
 
 Released 2024-06-04

@@ -6,4 +6,4 @@ Use of this source code is governed by an MIT-style license that can be found in
 from .app import launch
 
 application = launch()
-from .extensions import celery  # noqa: E402
+from .extensions import celery  # noqa: E402, F401

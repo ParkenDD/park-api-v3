@@ -11,7 +11,6 @@ from typing import Optional
 from parkapi_sources.models.enums import ParkAndRideType, ParkingSiteType
 from pyproj import Geod
 
-from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSite
 from webapp.repositories import ParkingSiteRepository
 from webapp.repositories.parking_site_repository import ParkingSiteLocation

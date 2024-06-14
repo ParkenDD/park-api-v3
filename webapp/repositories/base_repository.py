@@ -6,7 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from abc import ABC, abstractmethod
 from typing import Any, Generic, Optional, Type, TypeVar
 
-from sqlalchemy.orm import Query, scoped_session
+from sqlalchemy.orm import scoped_session
 from validataclass_search_queries.repositories import SearchQueryRepositoryMixin
 
 from webapp.models import BaseModel

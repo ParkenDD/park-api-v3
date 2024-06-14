@@ -4,7 +4,6 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import os
-from datetime import timedelta
 
 
 class BaseConfig:

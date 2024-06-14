@@ -11,12 +11,15 @@ from webapp.common.validation.integer_validators import GermanDurationIntegerVal
 
 class IntegerValidatorsTest:
     @staticmethod
-    @pytest.mark.parametrize('input_str, output_int', [
-        ('3 Stunden', 60 * 60 * 3),
-        ('10 Tage', 60 * 60 * 24 * 10),
-        ('1 Woche', 60 * 60 * 24 * 7),
-        ('10 Monate', 60 * 60 * 24 * 30 * 10),
-    ])
+    @pytest.mark.parametrize(
+        'input_str, output_int',
+        [
+            ('3 Stunden', 60 * 60 * 3),
+            ('10 Tage', 60 * 60 * 24 * 10),
+            ('1 Woche', 60 * 60 * 24 * 7),
+            ('10 Monate', 60 * 60 * 24 * 30 * 10),
+        ],
+    )
     def test_german_duration_integer_validate_success(input_str: str, output_int: int):
         validator = GermanDurationIntegerValidator()
         result = validator.validate(input_str)

@@ -54,7 +54,8 @@ park_api_v1_parking_site_schema = JsonSchema(
                         },
                     ),
                     'forecast': BooleanField(
-                        description='If the data source offers a forecast. Is not available at this service and documented just for compatibility reasons.'
+                        description='If the data source offers a forecast. Is not available at this service and documented just for '
+                        'compatibility reasons.'
                     ),
                     'lot_type': AnyOfField(
                         allowed_values=['street', 'lot', 'underground', 'garage'],
@@ -71,7 +72,8 @@ park_api_v1_parking_site_schema = JsonSchema(
                     'opening_hours': StringField(required=False, description='In OSM opening_hours format'),
                     'fee_hours': StringField(
                         required=False,
-                        description='In OSM opening_hours format. Is not available at this service and documented just for compatibility reasons.',
+                        description='In OSM opening_hours format. Is not available at this service and documented just for compatibility '
+                        'reasons.',
                     ),
                     'address': StringField(
                         required=False,
