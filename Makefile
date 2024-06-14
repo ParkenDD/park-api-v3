@@ -178,10 +178,10 @@ open-coverage:
 
 .PHONY: lint-fix
 lint-fix:
-	$(FLASK_RUN) ruff --exclude webapp/converter --fix ./webapp
-	$(FLASK_RUN) black --exclude converter ./webapp
+	$(FLASK_RUN) ruff format ./webapp
+	$(FLASK_RUN) ruff check --fix ./webapp
 
 .PHONY: lint-check
 lint-check:
-	$(FLASK_RUN) ruff --exclude webapp/converter ./webapp
-	$(FLASK_RUN) black --exclude converter -S --check --diff webapp
+	$(FLASK_RUN) ruff format --check --diff webapp
+	$(FLASK_RUN) ruff check ./webapp

@@ -10,7 +10,7 @@ from flask.cli import AppGroup
 
 from webapp.dependencies import dependencies
 from webapp.repositories import SourceRepository
-from webapp.services.import_service import ParkingSiteGenericImportService, ParkingSiteXlsxImportService
+from webapp.services.import_service import ParkingSiteXlsxImportService
 
 source_cli = AppGroup('source', help='Source related commands')
 
