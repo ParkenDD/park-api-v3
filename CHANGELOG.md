@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 0.6.2
+
+Released 2024-06-18
+
+## Fixes
+
+* [Add ACTIVE status to P+M BW Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/64)
+
+
 ## Version 0.6.1
 
 Released 2024-06-18
