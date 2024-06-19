@@ -1,10 +1,19 @@
 # Changelog
 
+## Version 0.6.3
+
+Released 2024-06-19
+
+### Fixes
+
+* [set karlsruhe to realtime](https://github.com/ParkenDD/parkapi-sources-v3/pull/65)
+
+
 ## Version 0.6.2
 
 Released 2024-06-18
 
-## Fixes
+### Fixes
 
 * [Add ACTIVE status to P+M BW Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/64)
 
@@ -13,7 +22,7 @@ Released 2024-06-18
 
 Released 2024-06-18
 
-## Fixes
+### Fixes
 
 * [ParkAPI Sources: Renames and extends P+M BW Converter with static data](https://github.com/ParkenDD/parkapi-sources-v3/pull/63)
 
