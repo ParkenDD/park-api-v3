@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.1
+
+Released 2024-07-13
+
+### Fixes
+
+* [ParkAPI Sources: Fix Herrenberg base class to fix realtime updates](https://github.com/ParkenDD/parkapi-sources-v3/pull/73)
+
+
 ## Version 0.7.0
 
 Released 2024-07-13
