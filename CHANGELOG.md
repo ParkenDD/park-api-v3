@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 0.7.0
+
+Released 2024-07-13
+
+### Features
+
+* [ParkAPI Sources: Add Herrenberg converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/71)
+* [ParkAPI Sources: Add APCOA converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/72)
+
+
 ## Version 0.6.3
 
 Released 2024-06-19
