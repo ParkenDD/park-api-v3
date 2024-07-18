@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.5
+
+Released 2024-07-18
+
+### Fixes
+
+* Fix more metrics logic
+
+
 ## 0.7.4
 
 Released 2024-07-18

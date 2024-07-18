@@ -158,26 +158,32 @@ class PrometheusHandler:
                     parking_site_name=parking_site.name,
                 )
             )
-            if parking_site.has_realtime_data:
-                if parking_site.realtime_capacity is None:
-                    continue
-                parking_site_realtime_capacity.metrics.append(
-                    ParkingSiteMetric(
-                        parking_site_uid=parking_site.original_uid,
-                        source=parking_site.source.uid,
-                        value=parking_site.realtime_capacity,
-                        parking_site_name=parking_site.name,
-                    )
-                )
-                if parking_site.realtime_free_capacity is None:
-                    continue
-                parking_site_realtime_free_capacity.metrics.append(
-                    ParkingSiteMetric(
-                        parking_site_uid=parking_site.original_uid,
-                        source=parking_site.source.uid,
-                        value=parking_site.realtime_free_capacity,
-                        parking_site_name=parking_site.name,
-                    )
-                )
+            if not parking_site.has_realtime_data:
+                continue
 
-        return parking_site_static_capacity.to_metrics() + parking_site_realtime_capacity.to_metrics()
+            if parking_site.realtime_capacity is None:
+                continue
+            parking_site_realtime_capacity.metrics.append(
+                ParkingSiteMetric(
+                    parking_site_uid=parking_site.original_uid,
+                    source=parking_site.source.uid,
+                    value=parking_site.realtime_capacity,
+                    parking_site_name=parking_site.name,
+                )
+            )
+            if parking_site.realtime_free_capacity is None:
+                continue
+            parking_site_realtime_free_capacity.metrics.append(
+                ParkingSiteMetric(
+                    parking_site_uid=parking_site.original_uid,
+                    source=parking_site.source.uid,
+                    value=parking_site.realtime_free_capacity,
+                    parking_site_name=parking_site.name,
+                )
+            )
+
+        return (
+            parking_site_static_capacity.to_metrics()
+            + parking_site_realtime_capacity.to_metrics()
+            + parking_site_realtime_free_capacity.to_metrics()
+        )
