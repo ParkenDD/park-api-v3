@@ -18,7 +18,12 @@ class BaseMetric:
 
     def to_metric(self, identifier: str) -> str:
         data = asdict(self)
-        label_list = [f'{key}="{value}"' for key, value in data.items() if key != 'value']
+        label_list: list[str] = []
+        for key, value in data.items():
+            if key == 'value':
+                continue
+            value = value.replace('"', '')
+            label_list.append(f'{key}="{value}"')
         return f'{identifier}{{{",".join(label_list)}}} {self.value}'
 
 
@@ -31,6 +36,7 @@ class SourceMetric(BaseMetric):
 class ParkingSiteMetric(BaseMetric):
     source: str
     parking_site: str
+    name: str
 
 
 @dataclass

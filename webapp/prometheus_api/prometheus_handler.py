@@ -148,6 +148,7 @@ class PrometheusHandler:
                     parking_site=parking_site.original_uid,
                     source=parking_site.source.uid,
                     value=parking_site.capacity,
+                    name=parking_site.name,
                 )
             )
             if parking_site.has_realtime_data:
@@ -156,6 +157,7 @@ class PrometheusHandler:
                         parking_site=parking_site.original_uid,
                         source=parking_site.source.uid,
                         value=parking_site.realtime_capacity,
+                        name=parking_site.name,
                     )
                 )
 
