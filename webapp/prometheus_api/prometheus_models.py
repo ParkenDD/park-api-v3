@@ -35,8 +35,8 @@ class SourceMetric(BaseMetric):
 @dataclass
 class ParkingSiteMetric(BaseMetric):
     source: str
-    parking_site: str
-    name: str
+    parking_site_uid: str
+    parking_site_name: str
 
 
 @dataclass

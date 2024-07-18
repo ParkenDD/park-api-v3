@@ -141,23 +141,42 @@ class PrometheusHandler:
             type=MetricType.gauge,
             identifier='app_park_api_parking_site_realtime_capacity',
         )
+        parking_site_realtime_free_capacity = Metrics(
+            help='Parking site realtime free capacity',
+            type=MetricType.gauge,
+            identifier='app_park_api_parking_site_realtime_free_capacity',
+        )
 
         for parking_site in parking_sites:
+            if parking_site.capacity is None:
+                continue
             parking_site_static_capacity.metrics.append(
                 ParkingSiteMetric(
-                    parking_site=parking_site.original_uid,
+                    parking_site_uid=parking_site.original_uid,
                     source=parking_site.source.uid,
                     value=parking_site.capacity,
-                    name=parking_site.name,
+                    parking_site_name=parking_site.name,
                 )
             )
             if parking_site.has_realtime_data:
+                if parking_site.realtime_capacity:
+                    continue
                 parking_site_realtime_capacity.metrics.append(
                     ParkingSiteMetric(
-                        parking_site=parking_site.original_uid,
+                        parking_site_uid=parking_site.original_uid,
                         source=parking_site.source.uid,
                         value=parking_site.realtime_capacity,
-                        name=parking_site.name,
+                        parking_site_name=parking_site.name,
+                    )
+                )
+                if parking_site.realtime_free_capacity:
+                    continue
+                parking_site_realtime_free_capacity.metrics.append(
+                    ParkingSiteMetric(
+                        parking_site_uid=parking_site.original_uid,
+                        source=parking_site.source.uid,
+                        value=parking_site.realtime_free_capacity,
+                        parking_site_name=parking_site.name,
                     )
                 )
 

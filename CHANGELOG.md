@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.3
+
+Released 2024-07-18
+
+### Fixes
+
+* [Add free capacity to Parking Site metrics, better labels](https://github.com/ParkenDD/park-api-v3/pull/177)
+
+
 ## 0.7.2
 
 Released 2024-07-18
