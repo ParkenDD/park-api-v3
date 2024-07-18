@@ -159,7 +159,7 @@ class PrometheusHandler:
                 )
             )
             if parking_site.has_realtime_data:
-                if parking_site.realtime_capacity:
+                if parking_site.realtime_capacity is None:
                     continue
                 parking_site_realtime_capacity.metrics.append(
                     ParkingSiteMetric(
@@ -169,7 +169,7 @@ class PrometheusHandler:
                         parking_site_name=parking_site.name,
                     )
                 )
-                if parking_site.realtime_free_capacity:
+                if parking_site.realtime_free_capacity is None:
                     continue
                 parking_site_realtime_free_capacity.metrics.append(
                     ParkingSiteMetric(
