@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.2
+
+Released 2024-07-18
+
+### Fixes
+
+* [Add names to Parking Site metrics](https://github.com/ParkenDD/park-api-v3/pull/176)
+
+
 ## 0.7.1
 
 Released 2024-07-13
