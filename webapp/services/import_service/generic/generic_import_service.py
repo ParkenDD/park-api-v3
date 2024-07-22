@@ -62,12 +62,15 @@ class ParkingSiteGenericImportService(BaseService):
         try:
             static_parking_site_inputs, static_parking_site_errors = converter.get_static_parking_sites()
         except Exception as e:
-            self.logger.info(message_type=LogMessageType.FAILED_SOURCE_HANDLING, message=str(e))
+            self.logger.warning(message_type=LogMessageType.FAILED_SOURCE_HANDLING, message=str(e))
             source.static_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
 
         self.handle_static_import_results(source, static_parking_site_inputs, static_parking_site_errors)
+
+        for static_parking_site_error in static_parking_site_errors:
+            self.logger.warning(LogMessageType.FAILED_PARKING_SITE_HANDLING, str(static_parking_site_error))
 
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
         source.static_status = SourceStatus.ACTIVE
@@ -90,12 +93,15 @@ class ParkingSiteGenericImportService(BaseService):
         try:
             realtime_parking_site_inputs, realtime_parking_site_errors = converter.get_realtime_parking_sites()
         except Exception as e:
-            self.logger.info(message_type=LogMessageType.FAILED_SOURCE_HANDLING, message=str(e))
+            self.logger.warning(message_type=LogMessageType.FAILED_SOURCE_HANDLING, message=str(e))
             source.realtime_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
 
         self.handle_realtime_import_results(source, realtime_parking_site_inputs, realtime_parking_site_errors)
+
+        for realtime_parking_site_error in realtime_parking_site_errors:
+            self.logger.warning(LogMessageType.FAILED_PARKING_SITE_HANDLING, str(realtime_parking_site_error))
 
         source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
         source.realtime_status = SourceStatus.ACTIVE
