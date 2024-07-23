@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.7.5
+
+Released 2024-07-23
 
 ## Features
 
