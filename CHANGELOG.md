@@ -1,14 +1,23 @@
 # Changelog
 
-## 0.7.5
+## 0.8.0
 
 Released 2024-07-23
 
-## Features
+### Features
+
+* [Goldbeck support](https://github.com/ParkenDD/parkapi-sources-v3/pull/68)
+
+
+## 0.7.6
+
+Released 2024-07-23
+
+### Features
 
 * [Add pull errors to log](https://github.com/ParkenDD/park-api-v3/pull/178)
 
-## Maintenance
+### Maintenance
 
 * Dependency updates
 
