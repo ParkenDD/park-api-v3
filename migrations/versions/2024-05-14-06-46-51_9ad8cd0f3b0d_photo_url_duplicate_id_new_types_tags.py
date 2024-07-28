@@ -9,7 +9,6 @@ Create Date: 2024-05-14 06:46:51.653360
 import sqlalchemy as sa
 import sqlalchemy_utc
 from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '9ad8cd0f3b0d'
@@ -62,7 +61,7 @@ def upgrade():
         sa.ForeignKeyConstraint(['parking_site_id'], ['parking_site.id'], name=op.f('fk_tag_parking_site_id')),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_tag')),
         mysql_charset='utf8mb4',
-        mysql_collate='utf8mb4_unicode_ci'
+        mysql_collate='utf8mb4_unicode_ci',
     )
     with op.batch_alter_table('tag', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_tag_created_at'), ['created_at'], unique=False)
@@ -72,7 +71,9 @@ def upgrade():
     engine_name = op.get_bind().engine.name
     if engine_name == 'postgresql':
         op.execute('ALTER TYPE parkingsitetype RENAME TO _parkingsitetype')
-        sa.Enum(*new_parking_site_types, name='parkingsitetype',
+        sa.Enum(
+            *new_parking_site_types,
+            name='parkingsitetype',
         ).create(op.get_bind())
         op.execute('ALTER TABLE parking_site ALTER COLUMN type type parkingsitetype using type::text::parkingsitetype;')
         sa.Enum(*old_parking_site_types, name='_parkingsitetype').drop(op.get_bind())

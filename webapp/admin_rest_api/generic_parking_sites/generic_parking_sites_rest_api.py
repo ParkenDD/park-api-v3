@@ -25,6 +25,7 @@ class GenericParkingSitesBlueprint(AdminApiBaseBlueprint):
         self.generic_parking_sites_handler = GenericParkingSitesHandler(
             **self.get_base_handler_dependencies(),
             parking_site_repository=dependencies.get_parking_site_repository(),
+            parking_site_history_repository=dependencies.get_parking_site_history_repository(),
             source_repository=dependencies.get_source_repository(),
             parking_site_generic_import_service=dependencies.get_parking_site_generic_import_service(),
         )
