@@ -16,13 +16,14 @@ from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteIn
 from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.common.rest.exceptions import InvalidInputException
 from webapp.models import Source
-from webapp.repositories import ParkingSiteRepository, SourceRepository
+from webapp.repositories import ParkingSiteHistoryRepository, ParkingSiteRepository, SourceRepository
 from webapp.services.import_service import ParkingSiteGenericImportService
 
 
 class GenericParkingSitesHandler(AdminApiBaseHandler):
     source_repository: SourceRepository
     parking_site_repository: ParkingSiteRepository
+    parking_site_history_repository: ParkingSiteHistoryRepository
     parking_site_generic_import_service: ParkingSiteGenericImportService
 
     def __init__(
@@ -30,12 +31,14 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         *args,
         source_repository: SourceRepository,
         parking_site_repository: ParkingSiteRepository,
+        parking_site_history_repository: ParkingSiteHistoryRepository,
         parking_site_generic_import_service: ParkingSiteGenericImportService,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.source_repository = source_repository
         self.parking_site_repository = parking_site_repository
+        self.parking_site_history_repository = parking_site_history_repository
         self.parking_site_generic_import_service = parking_site_generic_import_service
 
     def handle_json_data(

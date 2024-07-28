@@ -20,24 +20,32 @@ from parkapi_sources.models.enums import PurposeType
 from validataclass.validators import DataclassValidator
 
 from webapp.dependencies import dependencies
+from webapp.models import ParkingSiteHistory
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
-from webapp.public_rest_api.parking_sites.parking_sites_schema import parking_site_example, parking_site_schema
+from webapp.public_rest_api.parking_sites.parking_sites_handler import ParkingSiteHandler
+from webapp.public_rest_api.parking_sites.parking_sites_schema import (
+    parking_site_example,
+    parking_site_history_example,
+    parking_site_history_schema,
+    parking_site_schema,
+)
+from webapp.public_rest_api.parking_sites.parking_sites_validators import ParkingSiteHistorySearchQueryInput
 from webapp.public_rest_api.sources.source_schema import source_example, source_schema
-from webapp.shared.parking_site.generic_parking_site_handler import GenericParkingSiteHandler
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 
 class ParkingSiteBlueprint(PublicApiBaseBlueprint):
     documented: bool = True
-    parking_site_handler: GenericParkingSiteHandler
+    parking_site_handler: ParkingSiteHandler
 
     def __init__(self):
         super().__init__('parking-sites', __name__, url_prefix='/v3/parking-sites')
 
-        self.parking_site_handler = GenericParkingSiteHandler(
+        self.parking_site_handler = ParkingSiteHandler(
             **self.get_base_handler_dependencies(),
             parking_site_repository=dependencies.get_parking_site_repository(),
+            parking_site_history_repository=dependencies.get_parking_site_history_repository(),
         )
 
         self.add_url_rule(
@@ -58,11 +66,20 @@ class ParkingSiteBlueprint(PublicApiBaseBlueprint):
             ),
         )
 
+        self.add_url_rule(
+            '/<int:parking_site_id>/history',
+            view_func=ParkingSiteHistoryListMethodView.as_view(
+                'parking-site-history-by-id',
+                **self.get_base_method_view_dependencies(),
+                parking_site_handler=self.parking_site_handler,
+            ),
+        )
+
 
 class ParkingSiteBaseMethodView(PublicApiBaseMethodView):
-    parking_site_handler: GenericParkingSiteHandler
+    parking_site_handler: ParkingSiteHandler
 
-    def __init__(self, *, parking_site_handler: GenericParkingSiteHandler, **kwargs):
+    def __init__(self, *, parking_site_handler: ParkingSiteHandler, **kwargs):
         super().__init__(**kwargs)
         self.parking_site_handler = parking_site_handler
 
@@ -138,3 +155,31 @@ class ParkingSiteItemMethodView(ParkingSiteBaseMethodView):
         parking_site = self.parking_site_handler.get_parking_site_item(parking_site_id)
 
         return jsonify(parking_site.to_dict(include_external_identifiers=True, include_tags=True))
+
+
+class ParkingSiteHistoryListMethodView(ParkingSiteBaseMethodView):
+    parking_site_history_search_query_validator = DataclassValidator(ParkingSiteHistorySearchQueryInput)
+
+    @document(
+        description='Get Parking Site History.',
+        path=[Parameter('parking_site_id', schema=int, example=1)],
+        response=[
+            Response(
+                ResponseData(
+                    schema=SchemaListReference('ParkingSiteHistory'),
+                    example=ExampleListReference('ParkingSiteHistory'),
+                )
+            )
+        ],
+        components=[
+            Schema('ParkingSiteHistory', schema=parking_site_history_schema, example=parking_site_history_example),
+        ],
+    )
+    def get(self, parking_site_id: int):
+        search_query = self.validate_query_args(self.parking_site_history_search_query_validator)
+
+        parking_site_history_items = self.parking_site_handler.get_parking_site_history_list(parking_site_id, search_query=search_query)
+
+        parking_site_history_items = parking_site_history_items.map(ParkingSiteHistory.to_dict)
+
+        return self.jsonify_paginated_response(parking_site_history_items, search_query)

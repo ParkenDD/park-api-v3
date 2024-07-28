@@ -32,6 +32,7 @@ from .base import BaseModel
 
 if TYPE_CHECKING:
     from .external_identifier import ExternalIdentifier
+    from .parking_site_history import ParkingSiteHistory
     from .source import Source
     from .tag import Tag
 
@@ -56,6 +57,11 @@ class ParkingSite(BaseModel):
     )
     tags: Mapped[list['Tag']] = relationship(
         'Tag',
+        back_populates='parking_site',
+        cascade='all, delete, delete-orphan',
+    )
+    parking_site_history: Mapped['ParkingSiteHistory'] = relationship(
+        'ParkingSiteHistory',
         back_populates='parking_site',
         cascade='all, delete, delete-orphan',
     )
