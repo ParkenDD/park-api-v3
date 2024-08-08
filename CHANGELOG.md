@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.9.0
+
+Released 2024-08-08
+
+### Features
+
+* [ParkAPI Sources: Opendata Swiss pull converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/70)
+
+### Fixes
+
+* [ParkAPI Sources: Ellwangen converter: Added OSM opening_hours](https://github.com/ParkenDD/parkapi-sources-v3/pull/90)
+* [ParkAPI Sources: Updated the source_url Karlsruhe converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/88)
+* [ParkAPI Sources: Goldbeck converter: Added OSM opening_hours](https://github.com/ParkenDD/parkapi-sources-v3/pull/89)
+
+
+
 ## 0.8.0
 
 Released 2024-07-23
