@@ -13,6 +13,10 @@ Released 2024-08-08
 * [ParkAPI Sources: Ellwangen converter: Added OSM opening_hours](https://github.com/ParkenDD/parkapi-sources-v3/pull/90)
 * [ParkAPI Sources: Updated the source_url Karlsruhe converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/88)
 * [ParkAPI Sources: Goldbeck converter: Added OSM opening_hours](https://github.com/ParkenDD/parkapi-sources-v3/pull/89)
+* [ParkAPI Sources: Fix Ulm scraper](https://github.com/ParkenDD/parkapi-sources-v3/pull/82)
+* [ParkAPI Sources: Fix Herrenberg address](https://github.com/ParkenDD/parkapi-sources-v3/pull/83)
+* [ParkAPI Sources: Fix Herrenberg state mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/84)
+* [ParkAPI Sources: Fix BFRK is_covered naming](https://github.com/ParkenDD/parkapi-sources-v3/pull/85)
 
 
 
