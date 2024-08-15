@@ -10,13 +10,12 @@ from parkapi_sources import ParkAPISources
 from parkapi_sources.converters.base_converter.pull import PullConverter
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
-from parkapi_sources.models.enums import OpeningStatus
 from validataclass.helpers import UnsetValue
 
 from webapp.common.logging.models import LogMessageType, LogTag
-from webapp.models import ExternalIdentifier, ParkingSite, Source, Tag
+from webapp.models import ExternalIdentifier, ParkingSite, ParkingSiteHistory, Source, Tag
 from webapp.models.source import SourceStatus
-from webapp.repositories import ParkingSiteRepository, SourceRepository
+from webapp.repositories import ParkingSiteHistoryRepository, ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.base_service import BaseService
 
@@ -24,12 +23,21 @@ from webapp.services.base_service import BaseService
 class ParkingSiteGenericImportService(BaseService):
     source_repository: SourceRepository
     parking_site_repository: ParkingSiteRepository
+    parking_site_history_repository: ParkingSiteHistoryRepository
     park_api_sources: ParkAPISources
 
-    def __init__(self, *args, source_repository: SourceRepository, parking_site_repository: ParkingSiteRepository, **kwargs):
+    def __init__(
+        self,
+        *args,
+        source_repository: SourceRepository,
+        parking_site_repository: ParkingSiteRepository,
+        parking_site_history_repository: ParkingSiteHistoryRepository,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.source_repository = source_repository
         self.parking_site_repository = parking_site_repository
+        self.parking_site_history_repository = parking_site_history_repository
 
     def init_app(self, app: Flask):
         park_api_source_uids: list[str] = []
@@ -169,9 +177,13 @@ class ParkingSiteGenericImportService(BaseService):
             parking_site.source_id = source.id
             parking_site.original_uid = static_parking_site_input.uid
 
+        history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
+        history_changed = False
         for key, value in static_parking_site_input.to_dict().items():
             if key in ['uid', 'external_identifiers', 'tags']:
                 continue
+            if history_enabled and ('capacity' in key or key == 'realtime_opening_status') and getattr(parking_site, key) != value:
+                history_changed = True
             setattr(parking_site, key, value)
 
         if static_parking_site_input.external_identifiers not in [None, UnsetValue]:
@@ -198,6 +210,8 @@ class ParkingSiteGenericImportService(BaseService):
             parking_site.tags = tags
 
         self.parking_site_repository.save_parking_site(parking_site)
+        if history_enabled and history_changed:
+            self._add_history(parking_site)
 
     def handle_realtime_import_results(
         self,
@@ -232,11 +246,23 @@ class ParkingSiteGenericImportService(BaseService):
             original_uid=realtime_parking_site_input.uid,
         )
 
+        history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
+        history_changed = False
         for key, value in realtime_parking_site_input.to_dict().items():
             if key in ['uid']:
                 continue
-            if key == 'realtime_opening_status' and value:
-                value = OpeningStatus[value.name]
+            if history_enabled and ('capacity' in key or key == 'realtime_opening_status') and getattr(parking_site, key) != value:
+                history_changed = True
             setattr(parking_site, key, value)
 
         self.parking_site_repository.save_parking_site(parking_site)
+        if history_enabled and history_changed:
+            self._add_history(parking_site)
+
+    def _add_history(self, parking_site: ParkingSite):
+        parking_site_history = ParkingSiteHistory()
+        parking_site_history.parking_site_id = parking_site.id
+        for key, value in parking_site.to_dict().items():
+            if 'capacity' in key or key in ['realtime_opening_status', 'static_data_updated_at', 'realtime_data_updated_at']:
+                setattr(parking_site_history, key, value)
+        self.parking_site_history_repository.save_parking_site_history(parking_site_history)
