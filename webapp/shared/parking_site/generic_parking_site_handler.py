@@ -23,6 +23,7 @@ class GenericParkingSiteHandler(PublicApiBaseHandler):
             search_query=search_query,
             include_external_identifiers=True,
             include_tags=True,
+            include_parking_site_group=True,
         )
 
     def get_parking_site_item(self, parking_site_id: int) -> ParkingSite:

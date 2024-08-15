@@ -14,8 +14,9 @@ from validataclass.helpers import UnsetValue
 
 from webapp.common.logging.models import LogMessageType, LogTag
 from webapp.models import ExternalIdentifier, ParkingSite, ParkingSiteHistory, Source, Tag
+from webapp.models.parking_site_group import ParkingSiteGroup
 from webapp.models.source import SourceStatus
-from webapp.repositories import ParkingSiteHistoryRepository, ParkingSiteRepository, SourceRepository
+from webapp.repositories import ParkingSiteGroupRepository, ParkingSiteHistoryRepository, ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.base_service import BaseService
 
@@ -24,6 +25,7 @@ class ParkingSiteGenericImportService(BaseService):
     source_repository: SourceRepository
     parking_site_repository: ParkingSiteRepository
     parking_site_history_repository: ParkingSiteHistoryRepository
+    parking_site_group_repository: ParkingSiteGroupRepository
     park_api_sources: ParkAPISources
 
     def __init__(
@@ -32,12 +34,14 @@ class ParkingSiteGenericImportService(BaseService):
         source_repository: SourceRepository,
         parking_site_repository: ParkingSiteRepository,
         parking_site_history_repository: ParkingSiteHistoryRepository,
+        parking_site_group_repository: ParkingSiteGroupRepository,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.source_repository = source_repository
         self.parking_site_repository = parking_site_repository
         self.parking_site_history_repository = parking_site_history_repository
+        self.parking_site_group_repository = parking_site_group_repository
 
     def init_app(self, app: Flask):
         park_api_source_uids: list[str] = []
@@ -180,7 +184,7 @@ class ParkingSiteGenericImportService(BaseService):
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
         for key, value in static_parking_site_input.to_dict().items():
-            if key in ['uid', 'external_identifiers', 'tags']:
+            if key in ['uid', 'external_identifiers', 'tags', 'group_uid']:
                 continue
             if history_enabled and ('capacity' in key or key == 'realtime_opening_status') and getattr(parking_site, key) != value:
                 history_changed = True
@@ -208,6 +212,20 @@ class ParkingSiteGenericImportService(BaseService):
                 tag.value = tag_input
                 tags.append(tag)
             parking_site.tags = tags
+
+        if static_parking_site_input.group_uid:
+            try:
+                parking_site_group = self.parking_site_group_repository.fetch_parking_site_group_by_original_uid(
+                    static_parking_site_input.group_uid,
+                )
+            except ObjectNotFoundException:
+                parking_site_group = ParkingSiteGroup()
+                parking_site_group.original_uid = static_parking_site_input.group_uid
+                parking_site_group.source_id = parking_site.source_id
+
+            parking_site.parking_site_group = parking_site_group
+        else:
+            parking_site.parking_site_group_id = None
 
         self.parking_site_repository.save_parking_site(parking_site)
         if history_enabled and history_changed:

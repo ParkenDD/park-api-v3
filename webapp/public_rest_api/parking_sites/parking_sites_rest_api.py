@@ -20,7 +20,7 @@ from parkapi_sources.models.enums import PurposeType
 from validataclass.validators import DataclassValidator
 
 from webapp.dependencies import dependencies
-from webapp.models import ParkingSiteHistory
+from webapp.models import ParkingSite, ParkingSiteHistory
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.parking_sites.parking_sites_handler import ParkingSiteHandler
@@ -83,6 +83,14 @@ class ParkingSiteBaseMethodView(PublicApiBaseMethodView):
         super().__init__(**kwargs)
         self.parking_site_handler = parking_site_handler
 
+    @staticmethod
+    def _map_parking_site(parking_site: ParkingSite) -> dict:
+        return parking_site.to_dict(
+            include_external_identifiers=True,
+            include_tags=True,
+            include_group=True,
+        )
+
 
 class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
     parking_site_search_query_validator = DataclassValidator(ParkingSiteSearchInput)
@@ -129,7 +137,7 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
 
         parking_sites = self.parking_site_handler.get_parking_site_list(search_query=search_query)
 
-        parking_sites = parking_sites.map(lambda item: item.to_dict(include_external_identifiers=True, include_tags=True))
+        parking_sites = parking_sites.map(self._map_parking_site)
 
         return self.jsonify_paginated_response(parking_sites, search_query)
 
@@ -154,7 +162,7 @@ class ParkingSiteItemMethodView(ParkingSiteBaseMethodView):
     def get(self, parking_site_id: int):
         parking_site = self.parking_site_handler.get_parking_site_item(parking_site_id)
 
-        return jsonify(parking_site.to_dict(include_external_identifiers=True, include_tags=True))
+        return jsonify(self._map_parking_site(parking_site))
 
 
 class ParkingSiteHistoryListMethodView(ParkingSiteBaseMethodView):
