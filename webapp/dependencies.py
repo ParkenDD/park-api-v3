@@ -15,7 +15,13 @@ from webapp.common.contexts import ContextHelper
 from webapp.common.logging import Logger
 from webapp.common.remote_helper import RemoteHelper
 from webapp.common.rest import RequestHelper
-from webapp.repositories import BaseRepository, ParkingSiteHistoryRepository, ParkingSiteRepository, SourceRepository
+from webapp.repositories import (
+    BaseRepository,
+    ParkingSiteGroupRepository,
+    ParkingSiteHistoryRepository,
+    ParkingSiteRepository,
+    SourceRepository,
+)
 from webapp.services.import_service import ParkingSiteGenericImportService
 from webapp.services.matching_service import MatchingService
 from webapp.services.sqlalchemy_service import SqlalchemyService
@@ -141,6 +147,10 @@ class Dependencies:
         return self._create_repository(ParkingSiteHistoryRepository)
 
     @cache_dependency
+    def get_parking_site_group_repository(self) -> ParkingSiteGroupRepository:
+        return self._create_repository(ParkingSiteGroupRepository)
+
+    @cache_dependency
     def get_source_repository(self) -> SourceRepository:
         return self._create_repository(SourceRepository)
 
@@ -162,7 +172,8 @@ class Dependencies:
         return ParkingSiteGenericImportService(
             source_repository=self.get_source_repository(),
             parking_site_repository=self.get_parking_site_repository(),
-            parking_site_history_repository=dependencies.get_parking_site_history_repository(),
+            parking_site_history_repository=self.get_parking_site_history_repository(),
+            parking_site_group_repository=self.get_parking_site_group_repository(),
             **self.get_base_service_dependencies(),
         )
 

@@ -32,6 +32,7 @@ from .base import BaseModel
 
 if TYPE_CHECKING:
     from .external_identifier import ExternalIdentifier
+    from .parking_site_group import ParkingSiteGroup
     from .parking_site_history import ParkingSiteHistory
     from .source import Source
     from .tag import Tag
@@ -65,8 +66,13 @@ class ParkingSite(BaseModel):
         back_populates='parking_site',
         cascade='all, delete, delete-orphan',
     )
+    parking_site_group: Mapped[list['ParkingSiteGroup']] = relationship(
+        'ParkingSiteGroup',
+        back_populates='parking_sites',
+    )
 
     source_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('source.id'), nullable=False)
+    parking_site_group_id: Mapped[Optional[int]] = mapped_column(BigInteger, db.ForeignKey('parking_site_group.id'), nullable=True)
     duplicate_of_parking_site_id: Mapped[Optional[int]] = mapped_column(BigInteger, db.ForeignKey('parking_site.id'), nullable=True)
     original_uid: Mapped[str] = mapped_column(String(256), index=True, nullable=False)
     name: Mapped[str] = mapped_column(String(256), nullable=False)
@@ -135,11 +141,13 @@ class ParkingSite(BaseModel):
         ignore: Optional[list[str]] = None,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
+        include_group: bool = False,
     ) -> dict:
         if ignore is None:
             ignore = []
         # Geometry is an internal geo-indexed field, so it should not be part of the default output
         ignore.append('geometry')
+        ignore.append('parking_site_group_id')
 
         result = super().to_dict(fields, ignore)
         result = {key: value for key, value in result.items() if value is not None}
@@ -148,7 +156,7 @@ class ParkingSite(BaseModel):
         if self.supervision_type is not None:
             result['is_supervised'] = self.supervision_type != SupervisionType.NO
 
-        if include_external_identifiers:
+        if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []
             for external_identifier in self.external_identifiers:
                 result['external_identifiers'].append(
@@ -157,10 +165,15 @@ class ParkingSite(BaseModel):
                         'value': external_identifier.value,
                     }
                 )
-        if include_tags:
+        if include_tags and len(self.tags):
             result['tags'] = []
             for tag in self.tags:
                 result['tags'].append(tag.value)
+
+        if include_group and self.parking_site_group:
+            result['group'] = self.parking_site_group.to_dict(
+                ignore=['parking_site_id'],
+            )
 
         if not self.has_realtime_data:
             return {key: value for key, value in result.items() if not key.startswith('realtime_')}

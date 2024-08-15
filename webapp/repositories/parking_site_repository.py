@@ -37,15 +37,18 @@ class ParkingSiteRepository(BaseRepository):
         include_external_identifiers: bool = False,
         include_tags: bool = False,
         include_source: bool = True,
+        include_parking_site_group: bool = False,
     ) -> PaginatedResult[ParkingSite]:
         query = self.session.query(ParkingSite)
 
         if include_source:
-            query.options(joinedload(ParkingSite.source))
+            query = query.options(joinedload(ParkingSite.source))
         if include_external_identifiers:
-            query.options(selectinload(ParkingSite.external_identifiers))
+            query = query.options(selectinload(ParkingSite.external_identifiers))
         if include_tags:
-            query.options(selectinload(ParkingSite.tags))
+            query = query.options(selectinload(ParkingSite.tags))
+        if include_parking_site_group:
+            query = query.options(joinedload(ParkingSite.parking_site_group))
 
         return self._search_and_paginate(query, search_query)
 
