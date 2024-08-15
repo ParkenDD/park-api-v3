@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.10.0
+
+Released 2024-08-15
+
+### Features
+
+* [Introduce parking site groups](https://github.com/ParkenDD/park-api-v3/pull/192)
+* [ParlAPI Sources: parking site groups](https://github.com/ParkenDD/parkapi-sources-v3/pull/95)
+* [ParlAPI Sources: split up kienzler](https://github.com/ParkenDD/parkapi-sources-v3/pull/96)
+
+
+### Fixes
+
+* [Query optimization for much faster response times with large dataabses](https://github.com/ParkenDD/park-api-v3/pull/192)
+* [ParlAPI Sources: Karlsruhe converter: Updated parking place name and opening_status attributes](https://github.com/ParkenDD/parkapi-sources-v3/pull/94)
+
+
 ## 0.9.0
 
 Released 2024-08-08
