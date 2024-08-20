@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.11.0
+
+Released 2024-08-20
+
+### Features
+
+* [ParlAPI Sources: Converters for Bondorf, Kirchheim, Neustadt and Vaihingen](https://github.com/ParkenDD/parkapi-sources-v3/pull/98)
+* [ParlAPI Sources: Converter for Konstanz](https://github.com/ParkenDD/parkapi-sources-v3/pull/102)
+
+
+### Fixes
+
+* [ParlAPI Sources: Fixes env vars at Kienzler split-up](https://github.com/ParkenDD/parkapi-sources-v3/pull/101)
+
+
 ## 0.10.0
 
 Released 2024-08-15
