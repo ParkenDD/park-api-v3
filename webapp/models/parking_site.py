@@ -86,6 +86,7 @@ class ParkingSite(BaseModel):
 
     max_stay: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     max_height: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
+    max_width: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     has_lighting: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
     is_covered: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
     fee_description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
