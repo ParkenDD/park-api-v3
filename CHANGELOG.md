@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.12.0
+
+Released 2024-08-24
+
+### Featues
+
+* [ParlAPI Sources:BFRK: Use API](https://github.com/ParkenDD/parkapi-sources-v3/pull/109)
+* [Add max_width Support](https://github.com/ParkenDD/park-api-v3/pull/194)
+
+
+### Fixes
+
+* [ParlAPI Sources:Dynamic Realtime Setting at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/105)
+* [ParlAPI Sources:Fixes VRS UID mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/108)
+
+
 ## 0.11.0
 
 Released 2024-08-20
