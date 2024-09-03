@@ -1,19 +1,36 @@
 # Changelog
 
+## 0.13.0
+
+Released 2024-09-03
+
+### Features
+
+* [ParkAPI Sources: Hüfner Push Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/106)
+
+
+### Fixes
+
+* [ParkAPI Sources: BFRK: Make URL configurable](https://github.com/ParkenDD/parkapi-sources-v3/pull/114)
+* [ParkAPI Sources: Karlsruhe Bike: Ignore missing capacities](https://github.com/ParkenDD/parkapi-sources-v3/pull/113)
+* [ParkAPI Sources: APCOA: Ignore missing coordinates](https://github.com/ParkenDD/parkapi-sources-v3/pull/112)
+* [ParkAPI Sources: APCOA: Fox OSM Opening Times](https://github.com/ParkenDD/parkapi-sources-v3/pull/107)
+
+
 ## 0.12.0
 
 Released 2024-08-24
 
-### Featues
+### Features
 
-* [ParlAPI Sources:BFRK: Use API](https://github.com/ParkenDD/parkapi-sources-v3/pull/109)
+* [ParkAPI Sources: BFRK: Use API](https://github.com/ParkenDD/parkapi-sources-v3/pull/109)
 * [Add max_width Support](https://github.com/ParkenDD/park-api-v3/pull/194)
 
 
 ### Fixes
 
-* [ParlAPI Sources:Dynamic Realtime Setting at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/105)
-* [ParlAPI Sources:Fixes VRS UID mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/108)
+* [ParkAPI Sources: Dynamic Realtime Setting at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/105)
+* [ParkAPI Sources: Fixes VRS UID mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/108)
 
 
 ## 0.11.0
@@ -22,8 +39,8 @@ Released 2024-08-20
 
 ### Features
 
-* [ParlAPI Sources: Converters for Bondorf, Kirchheim, Neustadt and Vaihingen](https://github.com/ParkenDD/parkapi-sources-v3/pull/98)
-* [ParlAPI Sources: Converter for Konstanz](https://github.com/ParkenDD/parkapi-sources-v3/pull/102)
+* [ParkAPI Sources: Converters for Bondorf, Kirchheim, Neustadt and Vaihingen](https://github.com/ParkenDD/parkapi-sources-v3/pull/98)
+* [ParkAPI Sources: Converter for Konstanz](https://github.com/ParkenDD/parkapi-sources-v3/pull/102)
 
 
 ### Fixes
@@ -38,14 +55,14 @@ Released 2024-08-15
 ### Features
 
 * [Introduce parking site groups](https://github.com/ParkenDD/park-api-v3/pull/192)
-* [ParlAPI Sources: parking site groups](https://github.com/ParkenDD/parkapi-sources-v3/pull/95)
-* [ParlAPI Sources: split up kienzler](https://github.com/ParkenDD/parkapi-sources-v3/pull/96)
+* [ParkAPI Sources: parking site groups](https://github.com/ParkenDD/parkapi-sources-v3/pull/95)
+* [ParkAPI Sources: split up kienzler](https://github.com/ParkenDD/parkapi-sources-v3/pull/96)
 
 
 ### Fixes
 
 * [Query optimization for much faster response times with large dataabses](https://github.com/ParkenDD/park-api-v3/pull/192)
-* [ParlAPI Sources: Karlsruhe converter: Updated parking place name and opening_status attributes](https://github.com/ParkenDD/parkapi-sources-v3/pull/94)
+* [ParkAPI Sources: Karlsruhe converter: Updated parking place name and opening_status attributes](https://github.com/ParkenDD/parkapi-sources-v3/pull/94)
 
 
 ## 0.9.0
