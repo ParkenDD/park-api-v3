@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.13.1
+
+Released 2024-09-09
+
+### Fixes
+
+* [ParkAPI Sources: has_fee True at all Heidelberg parking sites](https://github.com/ParkenDD/parkapi-sources-v3/pull/117)
+
+
 ## 0.13.0
 
 Released 2024-09-03
