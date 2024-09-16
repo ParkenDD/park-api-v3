@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.14.0
+
+Released 2024-09-16
+
+### Features
+
+* [ParkAPI Sources: Herrenberg static bike pull converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/110)
+
+
+### Fixes
+
+* [ParkAPI Sources: Park and Ride at BFRK](https://github.com/ParkenDD/parkapi-sources-v3/pull/121)
+* [small fixes in openapi docs](https://github.com/ParkenDD/park-api-v3/pull/200)
+
+
 ## 0.13.1
 
 Released 2024-09-09
