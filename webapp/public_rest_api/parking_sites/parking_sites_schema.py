@@ -85,7 +85,7 @@ parking_site_schema = JsonSchema(
         'address': StringField(
             maxLength=512,
             required=False,
-            description='Full address including street postalcode and city. Preferable in format <street with number>, <postalcode> <city>',
+            description='Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city}',
         ),
         'description': StringField(
             maxLength=4096,

@@ -60,6 +60,7 @@ datex2_dimension = ObjectField(
         ),
         'width': NumericField(required=False, description='Width in meters.'),
     },
+    required=False,
 )
 
 datex2_assignment_schema = ObjectField(
