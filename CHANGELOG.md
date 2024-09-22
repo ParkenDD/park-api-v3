@@ -1,5 +1,22 @@
 # Changelog
 
+# Changelog
+
+## 0.14.1
+
+Release 2024-09-22
+
+### Fixes
+
+* [Remove generic bike](https://github.com/ParkenDD/park-api-v3/pull/205)
+* [ParkAPI Sources: Add VRS data](https://github.com/ParkenDD/parkapi-sources-v3/pull/123)
+* [ParkAPI Sources: Fix bahn mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/124)
+* [ParkAPI Sources: Fix PBW Mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/125)
+* [ParkAPI Sources: Fix Heidelberg fee](https://github.com/ParkenDD/parkapi-sources-v3/pull/126)
+* [ParkAPI Sources: Split up kienzler requests](https://github.com/ParkenDD/parkapi-sources-v3/pull/128)
+* [ParkAPI Sources: Fix bfrk mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/129)
+
+
 ## 0.14.0
 
 Released 2024-09-16
