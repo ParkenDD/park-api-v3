@@ -24,7 +24,7 @@ parkapi-sources~=0.13.3
 
 # required for converters
 beautifulsoup4~=4.12.3
-pyproj~=3.6.1
+pyproj~=3.7.0
 
 # binary butterfly shared libraries (https://git.sectio-aurea.org/public_libraries)
 --extra-index-url https://git.sectio-aurea.org/api/v4/groups/262/-/packages/pypi/simple
