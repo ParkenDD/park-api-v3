@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.15.0
+
+Release 2024-10-17
+
+### Features
+
+* [ParkAPI Sources: Add Kienzler VVS Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/147)
+
+
+### Fixes
+
+* [ParkAPI Sources: Update pbw data for static parking sites](https://github.com/ParkenDD/parkapi-sources-v3/pull/144)
+* [ParkAPI Sources: Update kienzler data for static parking sites](https://github.com/ParkenDD/parkapi-sources-v3/pull/145)
+* [ParkAPI Sources: Fix bfrk_bw_car attribute after source change](https://github.com/ParkenDD/parkapi-sources-v3/pull/149)
+
+
 ## 0.14.3
 
 Release 2024-09-24

@@ -66,7 +66,7 @@ class ParkingSite(BaseModel):
         back_populates='parking_site',
         cascade='all, delete, delete-orphan',
     )
-    parking_site_group: Mapped[list['ParkingSiteGroup']] = relationship(
+    parking_site_group: Mapped['ParkingSiteGroup'] = relationship(
         'ParkingSiteGroup',
         back_populates='parking_sites',
     )
