@@ -10,7 +10,7 @@ from pathlib import Path
 def load_duplicates(duplicates_file_path: Path, ignore: bool = False) -> list[tuple[int, int]]:
     old_duplicates: list[tuple[int, int]] = []
     first = True
-    with open(duplicates_file_path) as duplicates_file:
+    with open(duplicates_file_path, newline='') as duplicates_file:
         rows = csv.reader(duplicates_file)
         for row in rows:
             if first:
@@ -45,7 +45,7 @@ def save_duplicates(duplicates_file_path: Path, items: list[dict], append: bool 
         'public_url',
         'opening_hours',
     ]
-    with open(duplicates_file_path, 'a' if append else 'w') as duplicates_file:
+    with open(duplicates_file_path, 'a' if append else 'w', newline='') as duplicates_file:
         duplicate_csv = csv.writer(duplicates_file)
         # Write header if not appending
         if append is False:
