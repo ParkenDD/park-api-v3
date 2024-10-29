@@ -1,20 +1,26 @@
 [tool.ruff]
 lint.select = [
-    "E", # pycodestyle errors
-    "W", # pycodestyle warnings
     "F", # pyflakes
-    "Q", # pydocstyle
-    "T", # mypy
-    "R", # pylint
-    "S", # flake8
     "I", # isort
-    "C", # flake8-comprehensions
-    "B", # flake8-bugbear
+    "S", # flake8-bandit
+    "ASYNC", # flake8-async
+    "ISC", # flake8-implicit-str-concat
+    "LOG", # flake8-logging
+    "INP", # flake8-no-pep420 (missing __init__.py)
+    "PIE", # flake8-pie
+    "T20", # flake8-print
+    "Q", # flake8-quotes
+    "TID", # flake8-tidy-imports
+    "FLY", # flynt (use f-string instead of static join)
 ]
+
+# Enable preview rules since a lot of basic pycodestyle rules are in preview mode for some reason
+preview = true
 
 lint.ignore = [
     "B008", # do not perform function calls in argument defaults
     "C901", # too complex
+    "ISC001", # single-line-implicit-string-concatenation - conflicts with formatter
 ]
 
 
@@ -41,11 +47,23 @@ exclude = [
     "venv",
 ]
 
-line-length = 140
+line-length = 120
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
-"tests/*" = ["S101", "S105", "S106"]
+"tests/*" = [
+    # Allow assert
+    "S101",
+    # Ignore unsafe practices like hardcoded passwords
+    "S101", "S105", "S106",
+    # Don't require __init__.py files
+    "INP",
+]
+"migrations/*" = [
+    # Don't require __init__.py files
+    "INP",
+]
+
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"

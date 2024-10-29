@@ -5,9 +5,9 @@ Revises: 3e92c13d297e
 Create Date: 2024-09-22 16:53:00.630618
 
 """
-from alembic import op
+
 import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '95992608c5d1'
@@ -50,6 +50,7 @@ new_parking_site_types: list[str] = [
     'OTHER',
 ]
 
+
 def upgrade():
     # Set all generic bike to other
     op.execute("UPDATE parking_site SET type = 'OTHER' WHERE type = 'GENERIC_BIKE'")
@@ -87,4 +88,3 @@ def downgrade():
             type_=sa.Enum(*old_parking_site_types, name='parkingsitetype'),
             existing_nullable=True,
         )
-

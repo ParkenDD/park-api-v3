@@ -88,7 +88,10 @@ def upgrade():
         batch_op.add_column(sa.Column('duplicate_of_parking_site_id', sa.BigInteger(), nullable=True))
         batch_op.add_column(sa.Column('photo_url', sa.String(length=4096), nullable=True))
         batch_op.create_foreign_key(
-            batch_op.f('fk_parking_site_duplicate_of_parking_site_id'), 'parking_site', ['duplicate_of_parking_site_id'], ['id']
+            batch_op.f('fk_parking_site_duplicate_of_parking_site_id'),
+            'parking_site',
+            ['duplicate_of_parking_site_id'],
+            ['id'],
         )
 
     # ### end Alembic commands ###

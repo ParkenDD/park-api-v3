@@ -81,13 +81,11 @@ class LogErrorsCelery(Celery):
             raise ValueError('Already registered extension CELERY.')
         app.extensions['celery'] = CeleryState(self, app)
 
-        self.conf.update(
-            {
-                'accept_content': ['extended_json'],
-                'task_serializer': 'extended_json',
-                'result_serializer': 'extended_json',
-            }
-        )
+        self.conf.update({
+            'accept_content': ['extended_json'],
+            'task_serializer': 'extended_json',
+            'result_serializer': 'extended_json',
+        })
 
         super().__init__(
             app.import_name,
@@ -108,7 +106,10 @@ class LogErrorsCelery(Celery):
                     # late import to avoid import loops
                     from webapp.dependencies import dependencies
 
-                    dependencies.get_logger().critical(LogMessageType.EXCEPTION, f'{str(exc).strip()}: {str(exc_info).strip()}')
+                    dependencies.get_logger().critical(
+                        LogMessageType.EXCEPTION,
+                        f'{str(exc).strip()}: {str(exc_info).strip()}',
+                    )
 
         ContextTask.abstract = True
         self.Task = ContextTask

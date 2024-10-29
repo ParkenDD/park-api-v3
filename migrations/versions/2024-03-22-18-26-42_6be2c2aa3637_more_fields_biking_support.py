@@ -44,7 +44,11 @@ def upgrade():
         sa.Column('id', sa.BigInteger(), nullable=False),
         sa.Column('created_at', sqlalchemy_utc.sqltypes.UtcDateTime(timezone=True), nullable=False),
         sa.Column('modified_at', sqlalchemy_utc.sqltypes.UtcDateTime(timezone=True), nullable=False),
-        sa.ForeignKeyConstraint(['parking_site_id'], ['parking_site.id'], name=op.f('fk_external_identifier_parking_site_id')),
+        sa.ForeignKeyConstraint(
+            ['parking_site_id'],
+            ['parking_site.id'],
+            name=op.f('fk_external_identifier_parking_site_id'),
+        ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_external_identifier')),
         mysql_charset='utf8mb4',
         mysql_collate='utf8mb4_unicode_ci',
@@ -65,9 +69,22 @@ def upgrade():
         sa.Enum(*old_parking_site_types, name='_parkingsitetype').drop(op.get_bind())
 
     with op.batch_alter_table('parking_site', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('purpose', sa.Enum('CAR', 'BIKE', 'ITEM', name='purposetype'), server_default='CAR', nullable=False))
+        batch_op.add_column(
+            sa.Column(
+                'purpose',
+                sa.Enum('CAR', 'BIKE', 'ITEM', name='purposetype'),
+                server_default='CAR',
+                nullable=False,
+            ),
+        )
         batch_op.add_column(sa.Column('is_covered', sa.Boolean(), nullable=True))
-        batch_op.add_column(sa.Column('supervision_type', sa.Enum('YES', 'NO', 'VIDEO', 'ATTENDED', name='supervisiontype'), nullable=True))
+        batch_op.add_column(
+            sa.Column(
+                'supervision_type',
+                sa.Enum('YES', 'NO', 'VIDEO', 'ATTENDED', name='supervisiontype'),
+                nullable=True,
+            ),
+        )
         batch_op.add_column(sa.Column('related_location', sa.String(length=256), nullable=True))
         batch_op.drop_column('is_supervised')
         batch_op.alter_column(

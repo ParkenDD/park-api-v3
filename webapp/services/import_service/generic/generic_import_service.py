@@ -16,7 +16,12 @@ from webapp.common.logging.models import LogMessageType, LogTag
 from webapp.models import ExternalIdentifier, ParkingSite, ParkingSiteHistory, Source, Tag
 from webapp.models.parking_site_group import ParkingSiteGroup
 from webapp.models.source import SourceStatus
-from webapp.repositories import ParkingSiteGroupRepository, ParkingSiteHistoryRepository, ParkingSiteRepository, SourceRepository
+from webapp.repositories import (
+    ParkingSiteGroupRepository,
+    ParkingSiteHistoryRepository,
+    ParkingSiteRepository,
+    SourceRepository,
+)
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.base_service import BaseService
 
@@ -186,7 +191,11 @@ class ParkingSiteGenericImportService(BaseService):
         for key, value in static_parking_site_input.to_dict().items():
             if key in ['uid', 'external_identifiers', 'tags', 'group_uid']:
                 continue
-            if history_enabled and ('capacity' in key or key == 'realtime_opening_status') and getattr(parking_site, key) != value:
+            if (
+                history_enabled
+                and ('capacity' in key or key == 'realtime_opening_status')
+                and getattr(parking_site, key) != value
+            ):
                 history_changed = True
             setattr(parking_site, key, value)
 
@@ -269,7 +278,11 @@ class ParkingSiteGenericImportService(BaseService):
         for key, value in realtime_parking_site_input.to_dict().items():
             if key in ['uid']:
                 continue
-            if history_enabled and ('capacity' in key or key == 'realtime_opening_status') and getattr(parking_site, key) != value:
+            if (
+                history_enabled
+                and ('capacity' in key or key == 'realtime_opening_status')
+                and getattr(parking_site, key) != value
+            ):
                 history_changed = True
             setattr(parking_site, key, value)
 
@@ -281,6 +294,10 @@ class ParkingSiteGenericImportService(BaseService):
         parking_site_history = ParkingSiteHistory()
         parking_site_history.parking_site_id = parking_site.id
         for key, value in parking_site.to_dict().items():
-            if 'capacity' in key or key in ['realtime_opening_status', 'static_data_updated_at', 'realtime_data_updated_at']:
+            if 'capacity' in key or key in [
+                'realtime_opening_status',
+                'static_data_updated_at',
+                'realtime_data_updated_at',
+            ]:
                 setattr(parking_site_history, key, value)
         self.parking_site_history_repository.save_parking_site_history(parking_site_history)

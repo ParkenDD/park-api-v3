@@ -116,7 +116,12 @@ class ParkingSiteXlsxImportService(BaseService):
             mapping.append(self.header_row[col.value])
         return mapping
 
-    def import_parking_sites(self, source: Source, worksheet: Worksheet, mapping: list[str]) -> List[ImportDatasetException]:
+    def import_parking_sites(
+        self,
+        source: Source,
+        worksheet: Worksheet,
+        mapping: list[str],
+    ) -> List[ImportDatasetException]:
         validation_exceptions: List[ImportDatasetException] = []
         for row in worksheet.iter_rows(min_row=2):
             parking_site_dict = {}

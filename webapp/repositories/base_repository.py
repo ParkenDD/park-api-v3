@@ -63,7 +63,12 @@ class BaseRepository(SearchQueryRepositoryMixin[T_Model], Generic[T_Model], ABC)
         """
         load_options = load_options or []
 
-        resource = self.session.query(self.model_cls).options(*load_options).filter(self.model_cls.id == resource_id).one_or_none()
+        resource = (
+            self.session.query(self.model_cls)
+            .options(*load_options)
+            .filter(self.model_cls.id == resource_id)
+            .one_or_none()
+        )
 
         return self._or_raise(
             resource,

@@ -24,12 +24,10 @@ class StatusRestApi(Blueprint):
 
 class RootStatusMethodView(BaseMethodView):
     def get(self):
-        return jsonify(
-            {
-                'application': 'park-api-v3',
-                'documentation': {
-                    'public': f'{self.config_helper.get("PROJECT_URL")}/documentation/public.html',
-                    'admin': f'{self.config_helper.get("PROJECT_URL")}/documentation/admin.html',
-                },
-            }
-        )
+        return jsonify({
+            'application': 'park-api-v3',
+            'documentation': {
+                'public': f'{self.config_helper.get("PROJECT_URL")}/documentation/public.html',
+                'admin': f'{self.config_helper.get("PROJECT_URL")}/documentation/admin.html',
+            },
+        })

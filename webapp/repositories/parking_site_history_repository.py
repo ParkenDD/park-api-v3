@@ -15,7 +15,11 @@ from webapp.repositories import BaseRepository
 class ParkingSiteHistoryRepository(BaseRepository):
     model_cls = ParkingSiteHistory
 
-    def fetch_parking_site_history(self, *, search_query: Optional[BaseSearchQuery] = None) -> PaginatedResult[ParkingSiteHistory]:
+    def fetch_parking_site_history(
+        self,
+        *,
+        search_query: Optional[BaseSearchQuery] = None,
+    ) -> PaginatedResult[ParkingSiteHistory]:
         query = self.session.query(ParkingSiteHistory)
 
         return self._search_and_paginate(query, search_query)

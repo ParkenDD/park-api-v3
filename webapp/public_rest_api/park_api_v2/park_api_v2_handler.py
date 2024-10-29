@@ -65,7 +65,9 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
                     continue
                 lot[key] = getattr(parking_site, key)
 
-            if parking_site.opening_hours or (parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None):
+            if parking_site.opening_hours or (
+                parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None
+            ):
                 lot['latest_data'] = {}
 
             if parking_site.opening_hours:
@@ -73,7 +75,9 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
                 lot['latest_data']['status'] = oh.state()
 
             if parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None:
-                capacity = parking_site.capacity if parking_site.realtime_capacity is None else parking_site.realtime_capacity
+                capacity = (
+                    parking_site.capacity if parking_site.realtime_capacity is None else parking_site.realtime_capacity
+                )
                 if capacity:
                     lot['latest_data']['timestamp'] = parking_site.realtime_data_updated_at
                     lot['latest_data']['capacity'] = capacity

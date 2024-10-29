@@ -76,7 +76,10 @@ class ServerAuthDatabase:
         Parses the "SERVER_AUTH_USERS" and "PARK_API_CONVERTER" dictionary from the app config and creates a ServerAuthDatabase from it.
         """
         users_from_config = config.get('SERVER_AUTH_USERS')
-        users_parsed = {username: ServerAuthUser.create_from_dict(username, userdata) for username, userdata in users_from_config.items()}
+        users_parsed = {
+            username: ServerAuthUser.create_from_dict(username, userdata)
+            for username, userdata in users_from_config.items()
+        }
 
         # Add additional users from converters
         converters_from_config = config.get('PARK_API_CONVERTER')

@@ -18,7 +18,13 @@ class ParkingSiteHandler(AdminApiBaseHandler):
     parking_site_repository: ParkingSiteRepository
     matching_service: MatchingService
 
-    def __init__(self, *args, parking_site_repository: ParkingSiteRepository, matching_service: MatchingService, **kwargs):
+    def __init__(
+        self,
+        *args,
+        parking_site_repository: ParkingSiteRepository,
+        matching_service: MatchingService,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.parking_site_repository = parking_site_repository
         self.matching_service = matching_service
@@ -29,7 +35,11 @@ class ParkingSiteHandler(AdminApiBaseHandler):
     def get_parking_site(self, parking_site_id: int) -> ParkingSite:
         return self.parking_site_repository.fetch_parking_site_by_id(parking_site_id)
 
-    def generate_duplicates(self, duplicate_ids: list[list[int]], radius: Optional[int] = None) -> list[DuplicatedParkingSite]:
+    def generate_duplicates(
+        self,
+        duplicate_ids: list[list[int]],
+        radius: Optional[int] = None,
+    ) -> list[DuplicatedParkingSite]:
         duplicate_ids: list[tuple[int, int]] = [(duplicate[0], duplicate[1]) for duplicate in duplicate_ids]
 
         return self.matching_service.generate_duplicates(duplicate_ids, match_radius=radius)

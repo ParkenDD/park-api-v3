@@ -60,7 +60,7 @@ class MatchingService(BaseService):
             match_radius: int = self.config_helper.get('MATCH_RADIUS', 100)
 
         parking_site_locations = self.parking_site_repository.fetch_parking_site_locations()
-        for i in range(0, len(parking_site_locations)):
+        for i in range(len(parking_site_locations)):
             for j in range(i + 1, len(parking_site_locations)):
                 # If both datasets are from the same source: ignore possible match
                 if parking_site_locations[i].source_id == parking_site_locations[j].source_id:
@@ -98,7 +98,12 @@ class MatchingService(BaseService):
             duplicate_parking_site.duplicate_of_parking_site_id = parking_site.id
             self.parking_site_repository.save_parking_site(duplicate_parking_site)
 
-    def parking_site_to_duplicate(self, parking_site: ParkingSite, duplicate_id: int, distance: float) -> DuplicatedParkingSite:
+    def parking_site_to_duplicate(
+        self,
+        parking_site: ParkingSite,
+        duplicate_id: int,
+        distance: float,
+    ) -> DuplicatedParkingSite:
         return DuplicatedParkingSite(
             id=parking_site.id,
             duplicate_id=duplicate_id,
