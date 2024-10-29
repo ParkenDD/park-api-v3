@@ -41,7 +41,10 @@ class ParkingSiteInput:
     has_fee: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)
     fee_description: Optional[str] = ExcelNoneable(StringValidator(max_length=4096)), Default(None)
     has_live_data: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)
-    type: Optional[str] = ExcelNoneable(AnyOfValidator(['Parkplatz', 'Parkhaus', 'Tiefgarage', 'Am Straßenrand'])), Default(None)
+    type: Optional[str] = (
+        ExcelNoneable(AnyOfValidator(['Parkplatz', 'Parkhaus', 'Tiefgarage', 'Am Straßenrand'])),
+        Default(None),
+    )
 
     lat: Decimal = NumericValidator()
     lon: Decimal = NumericValidator()

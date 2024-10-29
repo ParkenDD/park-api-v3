@@ -73,14 +73,12 @@ class RestApiErrorHandler(BaseErrorHandler):
             self._log_critical(error)
 
         # Generate HTTP response
-        response = jsonify(
-            {
-                'error': {
-                    'code': self._http_code_to_str(error),
-                    'message': error.description,
-                }
+        response = jsonify({
+            'error': {
+                'code': self._http_code_to_str(error),
+                'message': error.description,
             }
-        )
+        })
 
         # Add all headers that error.get_response() would have
         for key, value in error.get_headers():

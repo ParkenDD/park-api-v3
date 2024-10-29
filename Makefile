@@ -179,9 +179,9 @@ open-coverage:
 .PHONY: lint-fix
 lint-fix:
 	$(FLASK_RUN) ruff format ./webapp
-	$(FLASK_RUN) ruff check --fix ./webapp
+	$(FLASK_RUN) ruff check --fix ./webapp ./tests ./migrations
 
 .PHONY: lint-check
 lint-check:
 	$(FLASK_RUN) ruff format --check --diff webapp
-	$(FLASK_RUN) ruff check ./webapp
+	$(FLASK_RUN) ruff check ./webapp ./tests ./migrations

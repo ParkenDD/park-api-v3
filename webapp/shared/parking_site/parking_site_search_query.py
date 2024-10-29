@@ -9,7 +9,14 @@ from typing import Optional
 from parkapi_sources.models.enums import PurposeType
 from validataclass.dataclasses import Default
 from validataclass.exceptions import ValidationError
-from validataclass.validators import BooleanValidator, EnumValidator, IntegerValidator, ListValidator, NumericValidator, StringValidator
+from validataclass.validators import (
+    BooleanValidator,
+    EnumValidator,
+    IntegerValidator,
+    ListValidator,
+    NumericValidator,
+    StringValidator,
+)
 from validataclass_search_queries.filters import (
     SearchParamContains,
     SearchParamCustom,

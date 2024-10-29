@@ -51,7 +51,10 @@ class TaskRunner:
         # Add parameterized tasks
         for source_uid in self.parking_site_generic_import_service.park_api_sources.converter_by_uid.keys():
             # Don't try to pull push-endpoints
-            if not isinstance(self.parking_site_generic_import_service.park_api_sources.converter_by_uid[source_uid], PullConverter):
+            if not isinstance(
+                self.parking_site_generic_import_service.park_api_sources.converter_by_uid[source_uid],
+                PullConverter,
+            ):
                 continue
 
             celery.add_periodic_task(

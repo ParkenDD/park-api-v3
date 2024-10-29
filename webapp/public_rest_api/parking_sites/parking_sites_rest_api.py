@@ -186,7 +186,10 @@ class ParkingSiteHistoryListMethodView(ParkingSiteBaseMethodView):
     def get(self, parking_site_id: int):
         search_query = self.validate_query_args(self.parking_site_history_search_query_validator)
 
-        parking_site_history_items = self.parking_site_handler.get_parking_site_history_list(parking_site_id, search_query=search_query)
+        parking_site_history_items = self.parking_site_handler.get_parking_site_history_list(
+            parking_site_id,
+            search_query=search_query,
+        )
 
         parking_site_history_items = parking_site_history_items.map(ParkingSiteHistory.to_dict)
 

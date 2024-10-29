@@ -11,5 +11,7 @@ from validataclass.validators import IntegerValidator, ListValidator, Noneable
 
 @validataclass
 class GetDuplicatesInput:
-    old_duplicates: list[list[int]] = ListValidator(ListValidator(IntegerValidator(min_value=1), min_length=2, max_length=2))
+    old_duplicates: list[list[int]] = ListValidator(
+        ListValidator(IntegerValidator(min_value=1), min_length=2, max_length=2),
+    )
     radius: Optional[int] = Noneable(IntegerValidator(min_value=1)), Default(None)

@@ -77,7 +77,9 @@ class GenericParkingSitesMethodView(AdminApiBaseMethodView):
         parking_site_errors: list[ImportParkingSiteException],
     ) -> dict:
         static_parking_site_inputs = [item for item in parking_site_inputs if isinstance(item, StaticParkingSiteInput)]
-        realtime_parking_site_inputs = [item for item in parking_site_inputs if isinstance(item, RealtimeParkingSiteInput)]
+        realtime_parking_site_inputs = [
+            item for item in parking_site_inputs if isinstance(item, RealtimeParkingSiteInput)
+        ]
 
         return {
             'summary': {

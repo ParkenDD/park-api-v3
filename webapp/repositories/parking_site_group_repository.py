@@ -15,7 +15,11 @@ from webapp.repositories import BaseRepository
 class ParkingSiteGroupRepository(BaseRepository):
     model_cls = ParkingSiteGroup
 
-    def fetch_parking_site_group(self, *, search_query: Optional[BaseSearchQuery] = None) -> PaginatedResult[ParkingSiteGroup]:
+    def fetch_parking_site_group(
+        self,
+        *,
+        search_query: Optional[BaseSearchQuery] = None,
+    ) -> PaginatedResult[ParkingSiteGroup]:
         query = self.session.query(ParkingSiteGroup)
 
         return self._search_and_paginate(query, search_query)
@@ -24,7 +28,9 @@ class ParkingSiteGroupRepository(BaseRepository):
         return self.fetch_resource_by_id(parking_site_group_id)
 
     def fetch_parking_site_group_by_original_uid(self, parking_site_group_uid: str) -> ParkingSiteGroup:
-        parking_site_group = self.session.query(ParkingSiteGroup).filter(ParkingSiteGroup.original_uid == parking_site_group_uid).first()
+        parking_site_group = (
+            self.session.query(ParkingSiteGroup).filter(ParkingSiteGroup.original_uid == parking_site_group_uid).first()
+        )
 
         return self._or_raise(parking_site_group, f'ParkingSiteGroup with {parking_site_group_uid} does not exist')
 

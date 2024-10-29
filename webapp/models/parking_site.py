@@ -61,7 +61,7 @@ class ParkingSite(BaseModel):
         back_populates='parking_site',
         cascade='all, delete, delete-orphan',
     )
-    parking_site_history: Mapped['ParkingSiteHistory'] = relationship(
+    parking_site_history: Mapped[list['ParkingSiteHistory']] = relationship(
         'ParkingSiteHistory',
         back_populates='parking_site',
         cascade='all, delete, delete-orphan',
@@ -72,8 +72,16 @@ class ParkingSite(BaseModel):
     )
 
     source_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('source.id'), nullable=False)
-    parking_site_group_id: Mapped[Optional[int]] = mapped_column(BigInteger, db.ForeignKey('parking_site_group.id'), nullable=True)
-    duplicate_of_parking_site_id: Mapped[Optional[int]] = mapped_column(BigInteger, db.ForeignKey('parking_site.id'), nullable=True)
+    parking_site_group_id: Mapped[Optional[int]] = mapped_column(
+        BigInteger,
+        db.ForeignKey('parking_site_group.id'),
+        nullable=True,
+    )
+    duplicate_of_parking_site_id: Mapped[Optional[int]] = mapped_column(
+        BigInteger,
+        db.ForeignKey('parking_site.id'),
+        nullable=True,
+    )
     original_uid: Mapped[str] = mapped_column(String(256), index=True, nullable=False)
     name: Mapped[str] = mapped_column(String(256), nullable=False)
     operator_name: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
@@ -160,12 +168,10 @@ class ParkingSite(BaseModel):
         if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []
             for external_identifier in self.external_identifiers:
-                result['external_identifiers'].append(
-                    {
-                        'type': external_identifier.type,
-                        'value': external_identifier.value,
-                    }
-                )
+                result['external_identifiers'].append({
+                    'type': external_identifier.type,
+                    'value': external_identifier.value,
+                })
         if include_tags and len(self.tags):
             result['tags'] = []
             for tag in self.tags:
@@ -216,6 +222,9 @@ def set_geometry(mapper, connection, parking_site: ParkingSite):
                 4326,
             )
         elif engine_name == 'mysql':
-            parking_site.geometry = func.ST_GeomFromText(f'POINT({float(parking_site.lat)} {float(parking_site.lon)})', 4326)
+            parking_site.geometry = func.ST_GeomFromText(
+                f'POINT({float(parking_site.lat)} {float(parking_site.lon)})',
+                4326,
+            )
         else:
             raise NotImplementedError('The application just supports mysql, mariadb and postgresql.')

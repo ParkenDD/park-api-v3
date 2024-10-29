@@ -50,15 +50,26 @@ class Source(BaseModel):
     attribution_contributor: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
     attribution_url: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
 
-    static_status: Mapped[SourceStatus] = mapped_column(Enum(SourceStatus), nullable=False, default=SourceStatus.PROVISIONED)
-    realtime_status: Mapped[SourceStatus] = mapped_column(Enum(SourceStatus), nullable=False, default=SourceStatus.PROVISIONED)
+    static_status: Mapped[SourceStatus] = mapped_column(
+        Enum(SourceStatus),
+        nullable=False,
+        default=SourceStatus.PROVISIONED,
+    )
+    realtime_status: Mapped[SourceStatus] = mapped_column(
+        Enum(SourceStatus),
+        nullable=False,
+        default=SourceStatus.PROVISIONED,
+    )
 
     static_parking_site_error_count: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
     realtime_parking_site_error_count: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
 
     @property
     def combined_status(self) -> SourceStatus:
-        if self.static_status != SourceStatus.ACTIVE or self.realtime_status in [SourceStatus.PROVISIONED, SourceStatus.DISABLED]:
+        if self.static_status != SourceStatus.ACTIVE or self.realtime_status in [
+            SourceStatus.PROVISIONED,
+            SourceStatus.DISABLED,
+        ]:
             return self.static_status
         return self.realtime_status
 

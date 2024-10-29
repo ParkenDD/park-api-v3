@@ -31,7 +31,9 @@ datex2_coordinate_schema = ObjectField(
     description='A pair of planar coordinates defining the geodetic position of a single point using the European Terrestrial Reference '
     'System 1989 (ETRS89).',
     properties={
-        'latitude': NumericField(description='Latitude in decimal degrees using the European Terrestrial Reference System 1989 (ETRS89).'),
+        'latitude': NumericField(
+            description='Latitude in decimal degrees using the European Terrestrial Reference System 1989 (ETRS89).',
+        ),
         'longitude': NumericField(
             description='Longitude in decimal degrees using the European Terrestrial Reference System 1989 (ETRS89).',
         ),
@@ -66,20 +68,26 @@ datex2_dimension = ObjectField(
 datex2_assignment_schema = ObjectField(
     description='An assignment for a parking site or a parking space. Might be including or excluding, depending on typeOfAssignment.',
     properties={
-        'additionalAssignment': StringField(required=False, description='An additional assignment in natural language.'),
+        'additionalAssignment': StringField(
+            required=False, description='An additional assignment in natural language.'
+        ),
         'availableSpaces': IntegerField(
             minimum=0,
             required=False,
             description='The total number of currently vacant parking spaces within this site for the given assignment. (e.g. for lorries).'
             ' Use only with type of assignment = "optimised" or "allowed". Do not use when describing a single parking space.',
         ),
-        'fuelType': EnumField(enum=Datex2FuelType, required=False, description='The type of fuel this assignment refers to.'),
+        'fuelType': EnumField(
+            enum=Datex2FuelType, required=False, description='The type of fuel this assignment refers to.'
+        ),
         'typeOfAssignment': EnumField(
             enum=Datex2AssignmentType,
             description='Defines, if this assignment is of including or excluding nature.',
         ),
         'user': EnumField(enum=Datex2UserType, required=False, description='A user this assignment refers to.'),
-        'vehicleType': EnumField(enum=Datex2VehicleType, required=False, description='The vehicle type this assignment refers to.'),
+        'vehicleType': EnumField(
+            enum=Datex2VehicleType, required=False, description='The vehicle type this assignment refers to.'
+        ),
     },
 )
 
@@ -94,7 +102,9 @@ datex2_location_and_dimension_schema = ObjectField(
             description='The level of the parking space (0 = ground etc.), or the first level of the entire parking site (for example, if '
             'a parking site is located on the roof of a building).',
         ),
-        'locationDescriptor': StringField(required=False, description='Supplementary human-readable description of the location'),
+        'locationDescriptor': StringField(
+            required=False, description='Supplementary human-readable description of the location'
+        ),
         'roadName': StringField(required=False, description='Information on a road'),
         'roadNumber': StringField(required=False, description='The road number designated by the road authority'),
         'specificAccessInformation': ArrayField(
@@ -193,9 +203,15 @@ datex_2_parking_space_schema = ObjectField(
             required=False,
             description='Information on accessibility, easements and marking for handicapped people.',
         ),
-        'availability': EnumField(enum=Datex2Availability, description='Information if this space is closed, available or occupied.'),
-        'externalIdentifier': StringField(required=False, description='An external identfier for this parking space, e.g. "R145"'),
-        'lastUpdate': DateTimeField(required=False, description='Point of time of the latest update of this information.'),
+        'availability': EnumField(
+            enum=Datex2Availability, description='Information if this space is closed, available or occupied.'
+        ),
+        'externalIdentifier': StringField(
+            required=False, description='An external identfier for this parking space, e.g. "R145"'
+        ),
+        'lastUpdate': DateTimeField(
+            required=False, description='Point of time of the latest update of this information.'
+        ),
         'maximumParkingDuration': IntegerField(
             required=False,
             description='The maximum parking duration in seconds for this parking space.',

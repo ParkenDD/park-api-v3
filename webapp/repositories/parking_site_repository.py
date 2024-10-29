@@ -66,7 +66,12 @@ class ParkingSiteRepository(BaseRepository):
 
         return self.fetch_resource_by_id(parking_site_id, load_options=load_options)
 
-    def fetch_parking_site_by_ids(self, parking_site_ids: list[int], *, include_sources: bool = False) -> list[ParkingSite]:
+    def fetch_parking_site_by_ids(
+        self,
+        parking_site_ids: list[int],
+        *,
+        include_sources: bool = False,
+    ) -> list[ParkingSite]:
         query = self.session.query(ParkingSite).filter(ParkingSite.id.in_(parking_site_ids))
 
         if include_sources:
@@ -83,7 +88,9 @@ class ParkingSiteRepository(BaseRepository):
         )
 
         if not parking_site:
-            raise ObjectNotFoundException(message=f'ParkingSite with source id {source_id} and original_uid {original_uid} not found')
+            raise ObjectNotFoundException(
+                message=f'ParkingSite with source id {source_id} and original_uid {original_uid} not found',
+            )
 
         return parking_site
 
@@ -150,7 +157,9 @@ class ParkingSiteRepository(BaseRepository):
         return super()._apply_bound_search_filter(query, bound_filter)
 
     def fetch_parking_site_locations(self) -> list[ParkingSiteLocation]:
-        items = self.session.query(ParkingSite.id, ParkingSite.lat, ParkingSite.lon, ParkingSite.source_id, ParkingSite.purpose).all()
+        items = self.session.query(
+            ParkingSite.id, ParkingSite.lat, ParkingSite.lon, ParkingSite.source_id, ParkingSite.purpose
+        ).all()
         result: list[ParkingSiteLocation] = []
         for item in items:
             result.append(

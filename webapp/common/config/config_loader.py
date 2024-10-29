@@ -43,7 +43,9 @@ class ConfigLoader:
         app.config.from_file(config_path, safe_load)
 
         # load additional secrets config from yaml file (if it exists)
-        config_secrets_path = Path(app.config['PROJECT_ROOT']).parent.joinpath(os.getenv('CONFIG_SECRETS_FILE', 'config.secrets.yaml'))
+        config_secrets_path = Path(app.config['PROJECT_ROOT']).parent.joinpath(
+            os.getenv('CONFIG_SECRETS_FILE', 'config.secrets.yaml'),
+        )
         if config_secrets_path.exists():
             app.config.from_file(config_secrets_path, safe_load)
 

@@ -21,7 +21,7 @@ class LokiEmitter:
     success_response_code: int = 204
     level_tag: str = 'severity'
     logger_tag: str = 'logger'
-    label_allowed_chars: str = ''.join((string.ascii_letters, string.digits, '_'))
+    label_allowed_chars: str = f'{string.ascii_letters}{string.digits}_'
     label_replace_with: tuple[tuple[str, str], ...] = (
         ("'", ''),
         ('"', ''),

@@ -11,8 +11,6 @@ class RestApiException(AppException):
     Base exception class for errors that are specific to REST APIs.
     """
 
-    pass
-
 
 class RestApiRemoteException(RestApiException):
     code = 'remote_exception'
