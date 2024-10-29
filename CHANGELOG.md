@@ -1,8 +1,20 @@
 # Changelog
 
+## 0.15.1
+
+Released 2024-10-29
+
+## Fixes
+
+* [documentation fixes](https://github.com/ParkenDD/park-api-v3/pull/218)
+* [ruff modernization](https://github.com/ParkenDD/park-api-v3/pull/218)
+* [ParkAPI Sources: Fixed Karlsruhe format for stand_stammdaten ](https://github.com/ParkenDD/parkapi-sources-v3/pull/152)
+* [ParkAPI Sources: ruff modernization](https://github.com/ParkenDD/parkapi-sources-v3/pull/155)
+
+
 ## 0.15.0
 
-Release 2024-10-17
+Released 2024-10-17
 
 ### Features
 
@@ -18,7 +30,7 @@ Release 2024-10-17
 
 ## 0.14.3
 
-Release 2024-09-24
+Released 2024-09-24
 
 ### Fixes
 
@@ -27,7 +39,7 @@ Release 2024-09-24
 
 ## 0.14.2
 
-Release 2024-09-24
+Released 2024-09-24
 
 ### Fixes
 
@@ -39,7 +51,7 @@ Release 2024-09-24
 
 ## 0.14.1
 
-Release 2024-09-22
+Released 2024-09-22
 
 ### Fixes
 
@@ -321,7 +333,7 @@ Released 2024-05-29
 
 ### Fixes
 
-* Version updates in dependencies, especially a lat-lon bugfix in parkapi-sources 
+* Version updates in dependencies, especially a lat-lon bugfix in parkapi-sources
 
 
 ## Version 0.4.2
@@ -351,7 +363,7 @@ Released 2024-05-16
 
 * [New ParkAPI sources](https://github.com/ParkenDD/parkapi-sources-v3/blob/main/CHANGELOG.md#040)
 * [New experimental ParkAPI source RadVIS](https://github.com/ParkenDD/parkapi-sources-v3/blob/main/CHANGELOG.md#040)
-* [Experimental duplicate matching](https://github.com/ParkenDD/park-api-v3/pull/144), 
+* [Experimental duplicate matching](https://github.com/ParkenDD/park-api-v3/pull/144),
   additional information [at README](https://github.com/ParkenDD/park-api-v3?tab=readme-ov-file#flag-duplicates-via-command-line-interface)
 * Data model extension at `ParkingSite.type` (new enum values), `ParkingSite.tags` (generic tag system) and `ParkingSite.photo_url` (photos)
 
@@ -403,6 +415,6 @@ Released 2024-04-21
 
 Released 2024-04-21
 
-First release with SemVer versioning. Included refactored ParkAPI Sources, now 
-[based on Python module instead of Git Submodules](https://pypi.org/project/parkapi-sources/), and bike parking 
+First release with SemVer versioning. Included refactored ParkAPI Sources, now
+[based on Python module instead of Git Submodules](https://pypi.org/project/parkapi-sources/), and bike parking
 support. Includes a data model change, therefore a database migration is required.
