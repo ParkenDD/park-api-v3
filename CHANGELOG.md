@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.15.2
+
+Released 2024-11-12
+
+### Fixes
+
+* [ParkAPI Sources: APCOA: Remove park control objects and added production endpoint](https://github.com/ParkenDD/parkapi-sources-v3/pull/162)
+* [ParkAPI Sources: radvis_bw: filter unprintable characters](https://github.com/ParkenDD/parkapi-sources-v3/pull/167)
+* [ParkAPI Sources: multiple converters: set opening status to none if unset](https://github.com/ParkenDD/parkapi-sources-v3/pull/160)
+
+
 ## 0.15.1
 
 Released 2024-10-29
