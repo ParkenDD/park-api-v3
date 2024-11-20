@@ -25,8 +25,8 @@ class ParkingSiteHistory(BaseModel):
 
     static_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
     realtime_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
-    realtime_opening_status: Mapped[OpeningStatus] = mapped_column(
-        SqlalchemyEnum(OpeningStatus), nullable=False, default=OpeningStatus.UNKNOWN
+    realtime_opening_status: Mapped[OpeningStatus | None] = mapped_column(
+        SqlalchemyEnum(OpeningStatus), nullable=True, default=None
     )
 
     capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
