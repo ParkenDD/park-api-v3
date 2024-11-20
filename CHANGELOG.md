@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.15.3
+
+Released 2024-11-20
+
+### Fixes
+
+* [Allow Realtime Opening Status Null](https://github.com/ParkenDD/park-api-v3/pull/221)
+
+
 ## 0.15.2
 
 Released 2024-11-12
