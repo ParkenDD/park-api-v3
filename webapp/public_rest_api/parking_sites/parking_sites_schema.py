@@ -125,6 +125,7 @@ parking_site_schema = JsonSchema(
         'realtime_opening_status': EnumField(
             enum=OpeningStatus,
             required=False,
+            nullable=True,
             description='Realtime opening status which is reported by the client.',
         ),
         'lat': DecimalField(precision=10, scale=7),
