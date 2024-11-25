@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.16.0
+
+Released 2024-11-25
+
+## Features
+
+* [ParkAPI Sources: New Source: Velobrix](https://github.com/ParkenDD/parkapi-sources-v3/pull/165)
+* [ParkAPI Sources: Kienzler: use static data as additional data input](https://github.com/ParkenDD/parkapi-sources-v3/pull/168)
+
+
 ## 0.15.3
 
 Released 2024-11-20
