@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.16.1
+
+Released 2024-11-27
+
+* [Improved cron and logging](https://github.com/ParkenDD/park-api-v3/pull/223)
+* [ParkAPI Sources: GeoJSON Approach cleanup](https://github.com/ParkenDD/parkapi-sources-v3/pull/173)
+* [ParkAPI Sources: Fix DateTime Format at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/173)
+* [ParkAPI Sources: Fix optional attributes at Kienzler](https://github.com/ParkenDD/parkapi-sources-v3/pull/173)
+
+
 ## 0.16.0
 
 Released 2024-11-25
