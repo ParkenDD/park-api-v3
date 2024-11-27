@@ -6,6 +6,8 @@ Use of this source code is governed by an MIT-style license that can be found in
 import abc
 from abc import ABC
 
+from celery.schedules import crontab
+
 
 class BaseTask(ABC):
     @property
@@ -14,7 +16,7 @@ class BaseTask(ABC):
 
     @property
     @abc.abstractmethod
-    def run_interval(self) -> int:
+    def run_interval(self) -> int | crontab:
         raise RuntimeError('Not Implemented')
 
     @staticmethod
