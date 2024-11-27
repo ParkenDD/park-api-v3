@@ -3,6 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import traceback
 from datetime import datetime, timezone
 
 from flask import Flask
@@ -79,7 +80,7 @@ class ParkingSiteGenericImportService(BaseService):
         try:
             static_parking_site_inputs, static_parking_site_errors = converter.get_static_parking_sites()
         except Exception as e:
-            self.logger.warning(message_type=LogMessageType.FAILED_SOURCE_HANDLING, message=str(e))
+            self.logger.warning(message_type=LogMessageType.FAILED_STATIC_SOURCE_HANDLING, message=str(e))
             source.static_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
@@ -87,7 +88,7 @@ class ParkingSiteGenericImportService(BaseService):
         self.handle_static_import_results(source, static_parking_site_inputs, static_parking_site_errors)
 
         for static_parking_site_error in static_parking_site_errors:
-            self.logger.warning(LogMessageType.FAILED_PARKING_SITE_HANDLING, str(static_parking_site_error))
+            self.logger.warning(LogMessageType.FAILED_STATIC_PARKING_SITE_HANDLING, str(static_parking_site_error))
 
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
         source.static_status = SourceStatus.ACTIVE
@@ -110,7 +111,7 @@ class ParkingSiteGenericImportService(BaseService):
         try:
             realtime_parking_site_inputs, realtime_parking_site_errors = converter.get_realtime_parking_sites()
         except Exception as e:
-            self.logger.warning(message_type=LogMessageType.FAILED_SOURCE_HANDLING, message=str(e))
+            self.logger.warning(message_type=LogMessageType.FAILED_REALTIME_SOURCE_HANDLING, message=str(e))
             source.realtime_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
@@ -118,7 +119,7 @@ class ParkingSiteGenericImportService(BaseService):
         self.handle_realtime_import_results(source, realtime_parking_site_inputs, realtime_parking_site_errors)
 
         for realtime_parking_site_error in realtime_parking_site_errors:
-            self.logger.warning(LogMessageType.FAILED_PARKING_SITE_HANDLING, str(realtime_parking_site_error))
+            self.logger.warning(LogMessageType.FAILED_REALTIME_PARKING_SITE_HANDLING, str(realtime_parking_site_error))
 
         source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
         source.realtime_status = SourceStatus.ACTIVE
@@ -152,9 +153,15 @@ class ParkingSiteGenericImportService(BaseService):
     ):
         existing_parking_site_ids = self.parking_site_repository.fetch_parking_sites_ids_by_source_id(source.id)
         for static_parking_site_input in static_parking_site_inputs:
-            self._save_static_parking_site_input(source, static_parking_site_input, existing_parking_site_ids)
+            try:
+                self._save_static_parking_site_input(source, static_parking_site_input, existing_parking_site_ids)
+            except:
+                self.logger.warning(
+                    LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
+                    f'Unhandled exception at dataset {static_parking_site_input}: {traceback.format_exc()}',
+                )
 
-        # Delete remaining existing parking sites because they are not in the new dataset
+                # Delete remaining existing parking sites because they are not in the new dataset
         for existing_parking_site_id in existing_parking_site_ids:
             existing_parking_site = self.parking_site_repository.fetch_parking_site_by_id(existing_parking_site_id)
             self.parking_site_repository.delete_parking_site(existing_parking_site)
@@ -256,6 +263,12 @@ class ParkingSiteGenericImportService(BaseService):
                 self._save_realtime_parking_site_input(source, realtime_parking_site_input)
             except ObjectNotFoundException:
                 realtime_parking_site_error_count += 1
+            except:
+                realtime_parking_site_error_count += 1
+                self.logger.warning(
+                    LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
+                    f'Unhandled exception at dataset {realtime_parking_site_input}: {traceback.format_exc()}',
+                )
 
         if len(realtime_parking_site_inputs):
             source.realtime_status = SourceStatus.ACTIVE

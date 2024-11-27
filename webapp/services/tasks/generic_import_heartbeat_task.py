@@ -3,6 +3,8 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from celery.schedules import crontab
+
 from webapp.dependencies import dependencies
 from webapp.extensions import celery
 
@@ -20,7 +22,7 @@ class RunGenericRealtimeImportTask(BaseTask):
 
 
 class RunGenericStaticImportTask(BaseTask):
-    run_interval = 60 * 60 * 24  # 24 hours
+    run_interval = crontab(hour='1')
 
     @staticmethod
     @celery.task()
