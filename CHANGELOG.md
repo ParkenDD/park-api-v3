@@ -1,8 +1,17 @@
 # Changelog
 
+## 0.16.2
+
+Released 2024-11-28
+
+* [Fixes an issue with Celery Tasks sometimes preventing static data imports](https://github.com/ParkenDD/park-api-v3/pull/224)
+
+
 ## 0.16.1
 
 Released 2024-11-27
+
+### Fixes
 
 * [Improved cron and logging](https://github.com/ParkenDD/park-api-v3/pull/223)
 * [ParkAPI Sources: GeoJSON Approach cleanup](https://github.com/ParkenDD/parkapi-sources-v3/pull/173)

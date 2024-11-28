@@ -22,6 +22,10 @@ PARK_API_CONVERTER:
 # Stdout Logging (useful especially for development)
 STDOUT_LOGGING_ENABLED: true
 
+# Change hour of the day for static data pulling and the frequency in seconds for realtime data pulling
+PARKING_SITE_STATIC_PULL_HOUR: 1
+PARKING_SITE_REALTIME_PULL_FREQUENCY: 300
+
 # Loki Logging Client
 LOKI_ENABLED: false
 LOKI_URL: https://your-monitoring-host/loki/api/v1/push
