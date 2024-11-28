@@ -29,7 +29,7 @@ from webapp.services.sqlalchemy_service import SqlalchemyService
 if TYPE_CHECKING:
     from webapp.common.events import EventHelper
     from webapp.common.server_auth import ServerAuthHelper
-    from webapp.services.tasks import TaskRunner
+    from webapp.services.import_service.generic.generic_import_runner import GenericImportRunner
 
 
 T = TypeVar('T')
@@ -185,10 +185,10 @@ class Dependencies:
         )
 
     @cache_dependency
-    def get_task_runner(self) -> 'TaskRunner':
-        from webapp.services.tasks import TaskRunner
+    def get_generic_import_runner(self) -> 'GenericImportRunner':
+        from webapp.services.import_service.generic.generic_import_runner import GenericImportRunner
 
-        return TaskRunner(
+        return GenericImportRunner(
             celery_helper=self.get_celery_helper(),
             logger=self.get_logger(),
             config_helper=self.get_config_helper(),
