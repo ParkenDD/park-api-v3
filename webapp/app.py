@@ -106,5 +106,5 @@ def configure_error_handlers(app: App):
 
 @celery.on_after_configure.connect
 def configure_periodic_tasks(**kwargs):
-    task_runner = dependencies.get_task_runner()
+    task_runner = dependencies.get_generic_import_runner()
     task_runner.start()
