@@ -13,6 +13,33 @@ from sqlalchemy import create_engine, text
 
 from webapp import launch
 from webapp.extensions import db as flask_sqlalchemy
+from webapp.models import BaseModel
+
+
+@pytest.fixture(scope='session')
+def db_noreset(flask_app: Flask):
+    """
+    Yields the database as a session-scoped fixture without resetting any content.
+
+    If you use this in a test, make sure to manually reset the affected tables
+    at the beginning and end of the test, e.g. by calling empty_tables().
+    """
+    # TODO: using this instead of the function-scoped 'db' fixture
+    #  will probably make the tests a lot faster again,
+    #  but every test using it needs to be updated to include its own cleanup.
+    with flask_app.app_context():
+        yield flask_sqlalchemy
+
+
+def empty_tables(db_noreset, models: list[type[BaseModel]]):
+    """
+    can be used to empty only the tables that are affected by a specific test
+    """
+    db_noreset.session.close()
+    db_noreset.engine.execute('SET FOREIGN_KEY_CHECKS=0;')
+    for model in models:
+        db_noreset.engine.execute(f'TRUNCATE `{model.__tablename__}`;')
+    db_noreset.engine.execute('SET FOREIGN_KEY_CHECKS=1;')
 
 
 @pytest.fixture(scope='session')
