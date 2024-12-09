@@ -33,13 +33,13 @@ def db_noreset(flask_app: Flask):
 
 def empty_tables(db_noreset, models: list[type[BaseModel]]):
     """
-    can be used to empty only the tables that are affected by a specific test
+    Can be used to empty only the tables that are affected by a specific test
     """
     db_noreset.session.close()
-    db_noreset.engine.execute('SET FOREIGN_KEY_CHECKS=0;')
-    for model in models:
-        db_noreset.engine.execute(f'TRUNCATE `{model.__tablename__}`;')
-    db_noreset.engine.execute('SET FOREIGN_KEY_CHECKS=1;')
+    table_names = [model.__tablename__ for model in models]
+    with db_noreset.engine.connect() as conn:
+        conn.execute(text(f'TRUNCATE {", ".join(table_names)} RESTART IDENTITY CASCADE;'))
+        conn.commit()
 
 
 @pytest.fixture(scope='session')
