@@ -161,7 +161,8 @@ test-all: test-unit test-integration
 # Run unit tests only and generate coverage report in HTML format
 .PHONY: test-unit
 test-unit: config
-	$(FLASK_RUN) python -m pytest tests/unit --cov=webapp --cov-report=html
+	$(DOCKER_COMPOSE) run --rm flask python -m pytest tests/unit
+	$(DOCKER_COMPOSE) down
 
 # Run integration tests in a separate environment
 .PHONY: test-integration

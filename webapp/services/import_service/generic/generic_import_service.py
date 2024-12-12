@@ -54,10 +54,9 @@ class ParkingSiteGenericImportService(BaseService):
         park_api_sources_config: dict[str, str] = {
             'STATIC_GEOJSON_BASE_URL': app.config['STATIC_GEOJSON_BASE_URL'],
         }
-        for source_dict in app.config.get('PARK_API_CONVERTER', {}):
-            park_api_source_uids.append(source_dict['uid'])
-            if 'env' in source_dict:
-                park_api_sources_config.update(source_dict['env'])
+        source_dict = app.config.get('PARK_API_CONVERTER', {})
+        for source in source_dict:
+            park_api_source_uids.append(source_dict[source]['uid'])
         self.park_api_sources = ParkAPISources(converter_uids=park_api_source_uids, config=park_api_sources_config)
         self.park_api_sources.check_credentials()
 
