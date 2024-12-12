@@ -22,14 +22,12 @@ testpaths = [
 filterwarnings = [
     "error",
     "ignore::DeprecationWarning:dns.*",
-    "ignore::DeprecationWarning:eventlet.*",
     "ignore::DeprecationWarning:kombu.*",
     "ignore::DeprecationWarning:.*blinker.*",
     "ignore::DeprecationWarning:.*pyparsing.*",
     "ignore::DeprecationWarning:.*celery.*",
     "ignore::DeprecationWarning:.*flask.testing",
     "ignore::DeprecationWarning:.*werkzeug.urls.*",
-    "ignore::DeprecationWarning:.*passlib.*"
 ]
 
 
