@@ -5,6 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 import os
 import re
+from collections import namedtuple
 
 import pytest
 from flask import Flask
@@ -24,9 +25,6 @@ def db_noreset(flask_app: Flask):
     If you use this in a test, make sure to manually reset the affected tables
     at the beginning and end of the test, e.g. by calling empty_tables().
     """
-    # TODO: using this instead of the function-scoped 'db' fixture
-    #  will probably make the tests a lot faster again,
-    #  but every test using it needs to be updated to include its own cleanup.
     with flask_app.app_context():
         yield flask_sqlalchemy
 
@@ -69,7 +67,7 @@ def flask_app(tmp_path_factory) -> Flask:
 
     with app.app_context():
         flask_sqlalchemy.create_all()
-    yield app
+        yield app
 
 
 @pytest.fixture(scope='function')
