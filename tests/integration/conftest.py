@@ -5,7 +5,6 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 import os
 import re
-from collections import namedtuple
 
 import pytest
 from flask import Flask
