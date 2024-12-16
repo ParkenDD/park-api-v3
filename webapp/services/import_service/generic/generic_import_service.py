@@ -273,183 +273,33 @@ class ParkingSiteGenericImportService(BaseService):
             original_uid=realtime_parking_site_input.uid,
         )
 
-        if (
-            realtime_parking_site_input.realtime_capacity == UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity > parking_site.capacity
-        ):
-            realtime_parking_site_input.realtime_free_capacity = parking_site.capacity
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity {realtime_parking_site_input.realtime_free_capacity} was higher than capacity {parking_site.capacity}',
-            )
-        elif (
-            realtime_parking_site_input.realtime_capacity != UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity > realtime_parking_site_input.realtime_capacity
-        ):
-            realtime_parking_site_input.realtime_free_capacity = realtime_parking_site_input.realtime_capacity
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity {realtime_parking_site_input.realtime_free_capacity} was higher than realtime_capacity {realtime_parking_site_input.realtime_capacity}',
-            )
+        parking_site_capacities = [
+            ('realtime_capacity', 'realtime_free_capacity', parking_site.capacity),
+            ('realtime_capacity_woman', 'realtime_free_capacity_woman', parking_site.capacity_woman),
+            ('realtime_capacity_disabled', 'realtime_free_capacity_disabled', parking_site.capacity_disabled),
+            ('realtime_capacity_charging', 'realtime_free_capacity_charging', parking_site.capacity_charging),
+            ('realtime_capacity_carsharing', 'realtime_free_capacity_carsharing', parking_site.capacity_carsharing),
+            ('realtime_capacity_bus', 'realtime_free_capacity_bus', parking_site.capacity_bus),
+            ('realtime_capacity_family', 'realtime_free_capacity_family', parking_site.capacity_family),
+            ('realtime_capacity_truck', 'realtime_free_capacity_truck', parking_site.capacity_truck),
+        ]
 
-        if (
-            realtime_parking_site_input.realtime_capacity_woman == UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_woman > parking_site.capacity_woman
-        ):
-            realtime_parking_site_input.realtime_free_capacity_woman = parking_site.capacity_woman
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_woman {realtime_parking_site_input.realtime_free_capacity_woman} was higher than capacity_woman {parking_site.capacity_woman}',
-            )
+        for realtime_capacity_type, realtime_free_capacity_type, parking_site_capacity in parking_site_capacities:
+            realtime_free_capacity = getattr(realtime_parking_site_input, realtime_free_capacity_type)
+            realtime_capacity = getattr(realtime_parking_site_input, realtime_capacity_type)
 
-        elif (
-            realtime_parking_site_input.realtime_capacity_woman != UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_woman
-            > realtime_parking_site_input.realtime_capacity_woman
-        ):
-            realtime_parking_site_input.realtime_free_capacity_woman = (
-                realtime_parking_site_input.realtime_capacity_woman
-            )
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_woman {realtime_parking_site_input.realtime_free_capacity_woman} was higher than realtime_capacity_woman {realtime_parking_site_input.realtime_capacity_woman}',
-            )
-
-        if (
-            realtime_parking_site_input.realtime_capacity_disabled == UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_disabled > parking_site.capacity_disabled
-        ):
-            realtime_parking_site_input.realtime_free_capacity_disabled = parking_site.capacity_disabled
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_disabled {realtime_parking_site_input.realtime_free_capacity_disabled} was higher than capacity_disabled {parking_site.capacity_disabled}',
-            )
-
-        elif (
-            realtime_parking_site_input.realtime_capacity_disabled != UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_disabled
-            > realtime_parking_site_input.realtime_capacity_disabled
-        ):
-            realtime_parking_site_input.realtime_free_capacity_disabled = (
-                realtime_parking_site_input.realtime_capacity_disabled
-            )
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_disabled {realtime_parking_site_input.realtime_free_capacity_disabled} was higher than realtime_capacity_disabled {realtime_parking_site_input.realtime_capacity_disabled}',
-            )
-
-        if (
-            realtime_parking_site_input.realtime_capacity_charging == UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_charging > parking_site.capacity_charging
-        ):
-            realtime_parking_site_input.realtime_free_capacity_charging = parking_site.capacity_charging
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_charging {realtime_parking_site_input.realtime_free_capacity_charging} was higher than capacity_charging {parking_site.capacity_charging}',
-            )
-
-        elif (
-            realtime_parking_site_input.realtime_capacity_charging != UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_charging
-            > realtime_parking_site_input.realtime_capacity_charging
-        ):
-            realtime_parking_site_input.realtime_free_capacity_charging = (
-                realtime_parking_site_input.realtime_capacity_charging
-            )
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_charging {realtime_parking_site_input.realtime_free_capacity_charging} was higher than realtime_capacity_charging {realtime_parking_site_input.realtime_capacity_charging}',
-            )
-
-        if (
-            realtime_parking_site_input.realtime_capacity_carsharing == UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_carsharing > parking_site.capacity_carsharing
-        ):
-            realtime_parking_site_input.realtime_free_capacity_carsharing = parking_site.capacity_carsharing
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_carsharing {realtime_parking_site_input.realtime_free_capacity_carsharing} was higher than capacity_carsharing {parking_site.capacity_carsharing}',
-            )
-
-        elif (
-            realtime_parking_site_input.realtime_capacity_carsharing != UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_carsharing
-            > realtime_parking_site_input.realtime_capacity_carsharing
-        ):
-            realtime_parking_site_input.realtime_free_capacity_carsharing = (
-                realtime_parking_site_input.realtime_capacity_carsharing
-            )
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_carsharing {realtime_parking_site_input.realtime_free_capacity_carsharing} was higher than realtime_capacity_carsharing {realtime_parking_site_input.realtime_capacity_carsharing}',
-            )
-
-        if (
-            realtime_parking_site_input.realtime_capacity_bus == UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_bus > parking_site.capacity_bus
-        ):
-            realtime_parking_site_input.realtime_free_capacity_bus = parking_site.capacity_bus
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_bus {realtime_parking_site_input.realtime_free_capacity_bus} was higher than capacity_bus {parking_site.capacity_bus}',
-            )
-
-        elif (
-            realtime_parking_site_input.realtime_capacity_bus != UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_bus
-            > realtime_parking_site_input.realtime_capacity_bus
-        ):
-            realtime_parking_site_input.realtime_free_capacity_bus = realtime_parking_site_input.realtime_capacity_bus
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_bus {realtime_parking_site_input.realtime_free_capacity_bus} was higher than realtime_capacity_bus {realtime_parking_site_input.realtime_capacity_bus}',
-            )
-
-        if (
-            realtime_parking_site_input.realtime_capacity_family == UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_family > parking_site.capacity_family
-        ):
-            realtime_parking_site_input.realtime_free_capacity_family = parking_site.capacity_family
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_family {realtime_parking_site_input.realtime_free_capacity_family} was higher than capacity_family {parking_site.capacity_family}',
-            )
-
-        elif (
-            realtime_parking_site_input.realtime_capacity_family != UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_family
-            > realtime_parking_site_input.realtime_capacity_family
-        ):
-            realtime_parking_site_input.realtime_free_capacity_family = (
-                realtime_parking_site_input.realtime_capacity_family
-            )
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_family {realtime_parking_site_input.realtime_free_capacity_family} was higher than realtime_capacity_family {realtime_parking_site_input.realtime_capacity_family}',
-            )
-
-        if (
-            realtime_parking_site_input.realtime_capacity_truck == UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_truck > parking_site.capacity_truck
-        ):
-            realtime_parking_site_input.realtime_free_capacity_truck = parking_site.capacity_truck
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_truck {realtime_parking_site_input.realtime_free_capacity_truck} was higher than capacity_truck {parking_site.capacity_truck}',
-            )
-
-        elif (
-            realtime_parking_site_input.realtime_capacity_truck != UnsetValue
-            and realtime_parking_site_input.realtime_free_capacity_truck
-            > realtime_parking_site_input.realtime_capacity_truck
-        ):
-            realtime_parking_site_input.realtime_free_capacity_truck = (
-                realtime_parking_site_input.realtime_capacity_truck
-            )
-            self.logger.warn(
-                LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                f'At {parking_site.original_uid} from {source.id}, realtime_free_capacity_truck {realtime_parking_site_input.realtime_free_capacity_truck} was higher than realtime_capacity_truck {realtime_parking_site_input.realtime_capacity_truck}',
-            )
+            if realtime_capacity == UnsetValue and realtime_free_capacity > parking_site.capacity:
+                setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
+                self.logger.warn(
+                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                    f'At {parking_site.original_uid} from {source.id}, {realtime_free_capacity_type} {realtime_free_capacity} was higher than {realtime_capacity_type} {parking_site_capacity}',
+                )
+            elif realtime_capacity != UnsetValue and realtime_free_capacity > realtime_capacity:
+                setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
+                self.logger.warn(
+                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                    f'At {parking_site.original_uid} from {source.id}, {realtime_free_capacity_type} {realtime_free_capacity} was higher than {realtime_capacity_type} {realtime_capacity}',
+                )
 
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
