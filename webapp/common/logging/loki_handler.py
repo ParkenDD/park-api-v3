@@ -3,10 +3,11 @@ Copyright 2019 Andrey Maslov, binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
 import os
 from logging import Handler, LogRecord
 from logging.handlers import QueueHandler, QueueListener
-from queue import Queue
+from multiprocessing import Queue
 from typing import Optional
 
 from webapp.common.config import ConfigHelper
@@ -60,6 +61,7 @@ class LokiQueueHandler(QueueHandler):
 
         self.queue = Queue()
         super().__init__(self.queue)
+        self.setLevel(logging.INFO)
 
         if config_helper.get('LOKI_USER') and config_helper.get('LOKI_PASSWORD'):
             auth = BasicAuth(config_helper.get('LOKI_USER'), config_helper.get('LOKI_PASSWORD'))

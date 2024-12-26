@@ -1,8 +1,19 @@
 # Changelog
 
+## 0.16.3
+
+Released 2024-12-26
+
+### Fixes
+
+* [Fixes an issue with logs not sent to Loki in Celery](https://github.com/ParkenDD/park-api-v3/pull/226)
+
+
 ## 0.16.2
 
 Released 2024-11-28
+
+### Fixes
 
 * [Fixes an issue with Celery Tasks sometimes preventing static data imports](https://github.com/ParkenDD/park-api-v3/pull/224)
 

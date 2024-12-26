@@ -26,6 +26,11 @@ x-flask-defaults: &flask-defaults
     rabbitmq:
       condition: service_healthy
 
+# Define reusable defaults for mocked services
+x-mocked-service-defaults: &mocked-service-defaults
+  image: park-api:local-dev
+  command: ["python", "/app/app.py"]
+  user: *local-user
 
 # Define actual services (containers)
 services:
@@ -76,6 +81,10 @@ services:
       timeout: 1s
       retries: 20
 
+  mocked-loki:
+    <<: *mocked-service-defaults
+    volumes:
+      - ./dev/test_services/mocked_loki:/app
 
 volumes:
   postgresql:
