@@ -21,6 +21,7 @@ class Logger:
     config_helper: ConfigHelper
     context_helper: ContextHelper
     logger: PythonLogger
+    local_handler: Optional[LocalFileHandler] = None
     local_file_handler: Optional[LocalFileHandler] = None
     stdout_handler: Optional[StdoutHandler] = None
     loki_handler: Optional[LokiQueueHandler] = None
@@ -32,11 +33,11 @@ class Logger:
         self.logger = logging.getLogger('app')
         self.logger.setLevel(logging.INFO)
 
-        self.local_handler = LocalFileHandler(config_helper=config_helper)
+        self.local_handler = LocalFileHandler(config_helper=self.config_helper)
         self.logger.addHandler(self.local_handler)
 
         if self.config_helper.get('LOKI_ENABLED'):
-            self.loki_handler = LokiQueueHandler(config_helper=config_helper)
+            self.loki_handler = LokiQueueHandler(config_helper=self.config_helper)
             self.logger.addHandler(self.loki_handler)
 
         if self.config_helper.get('STDOUT_LOGGING_ENABLED'):
