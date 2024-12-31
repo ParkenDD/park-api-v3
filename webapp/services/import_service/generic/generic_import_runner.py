@@ -43,7 +43,10 @@ class GenericImportRunner:
                 continue
 
             celery.add_periodic_task(
-                crontab(hour=str(self.config_helper.get('PARKING_SITE_STATIC_PULL_HOUR', 1))),
+                crontab(
+                    minute=str(self.config_helper.get('PARKING_SITE_STATIC_PULL_MINUTE', 0)),
+                    hour=str(self.config_helper.get('PARKING_SITE_STATIC_PULL_HOUR', 1)),
+                ),
                 static_import_task,
                 kwargs={'source': source_uid},
             )
