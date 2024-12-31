@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.16.4
+
+Released 2024-12-31
+
+### Fixes
+
+* [Fixes an issue with default minute value at crontab](https://github.com/ParkenDD/park-api-v3/pull/227)
+
+
 ## 0.16.3
 
 Released 2024-12-26
