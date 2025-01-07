@@ -16,8 +16,7 @@ SQLALCHEMY_DATABASE_URI: 'postgresql://park-api:development@postgresql/park-api'
 CELERY_BROKER_URL: 'amqp://rabbitmq'
 
 PARK_API_CONVERTER:
-  herrenberg:
-    uid: herrenberg
+  - uid: herrenberg
 
 
 # Stdout Logging (useful especially for development)
