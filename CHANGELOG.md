@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.16.5
+
+Released 2025-01-07
+
+### Fixes
+
+* [Fixes a config format issue](https://github.com/ParkenDD/park-api-v3/pull/230)
+
+
 ## 0.16.4
 
 Released 2024-12-31
