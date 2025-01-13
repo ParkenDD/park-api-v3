@@ -272,33 +272,37 @@ class ParkingSiteGenericImportService(BaseService):
             source_id=source.id,
             original_uid=realtime_parking_site_input.uid,
         )
-
-        parking_site_capacities = [
-            ('realtime_capacity', 'realtime_free_capacity', parking_site.capacity),
-            ('realtime_capacity_woman', 'realtime_free_capacity_woman', parking_site.capacity_woman),
-            ('realtime_capacity_disabled', 'realtime_free_capacity_disabled', parking_site.capacity_disabled),
-            ('realtime_capacity_charging', 'realtime_free_capacity_charging', parking_site.capacity_charging),
-            ('realtime_capacity_carsharing', 'realtime_free_capacity_carsharing', parking_site.capacity_carsharing),
-            ('realtime_capacity_bus', 'realtime_free_capacity_bus', parking_site.capacity_bus),
-            ('realtime_capacity_family', 'realtime_free_capacity_family', parking_site.capacity_family),
-            ('realtime_capacity_truck', 'realtime_free_capacity_truck', parking_site.capacity_truck),
+        capacity_fields: list[str] = [
+            'capacity',
+            'capacity_woman',
+            'capacity_disabled',
+            'capacity_charging',
+            'capacity_carsharing',
+            'capacity_bus',
+            'capacity_family',
+            'capacity_truck',
         ]
 
-        for realtime_capacity_type, realtime_free_capacity_type, parking_site_capacity in parking_site_capacities:
-            realtime_free_capacity = getattr(realtime_parking_site_input, realtime_free_capacity_type)
-            realtime_capacity = getattr(realtime_parking_site_input, realtime_capacity_type)
+        for capacity_field in capacity_fields:
+            realtime_free_capacity = getattr(realtime_parking_site_input, f'realtime_free_{capacity_field}')
+            realtime_capacity = getattr(realtime_parking_site_input, f'realtime_{capacity_field}')
+            parking_site_capacity = getattr(parking_site, capacity_field)
 
-            if realtime_capacity == UnsetValue and realtime_free_capacity > parking_site.capacity:
+            if realtime_capacity == UnsetValue and realtime_free_capacity > parking_site_capacity:
                 setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
                 self.logger.warn(
                     LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                    f'At {parking_site.original_uid} from {source.id}, {realtime_free_capacity_type} {realtime_free_capacity} was higher than {realtime_capacity_type} {parking_site_capacity}',
+                    f'At {parking_site.original_uid} from {source.id}, '
+                    f'realtime_free_{capacity_field} {realtime_free_capacity} '
+                    f'was higher than {capacity_field} {parking_site_capacity}',
                 )
             elif realtime_capacity != UnsetValue and realtime_free_capacity > realtime_capacity:
                 setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
                 self.logger.warn(
                     LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                    f'At {parking_site.original_uid} from {source.id}, {realtime_free_capacity_type} {realtime_free_capacity} was higher than {realtime_capacity_type} {realtime_capacity}',
+                    f'At {parking_site.original_uid} from {source.id}, '
+                    f'realtime_free_{capacity_field} {realtime_free_capacity} '
+                    f'was higher than realtime_{capacity_field} {realtime_capacity}',
                 )
 
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)

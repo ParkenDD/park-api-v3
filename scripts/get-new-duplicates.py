@@ -28,7 +28,9 @@ def main():
     )
     parser.add_argument('-u', '--url', default=DEFAULT_BASE_URL, help='Base URL')
     parser.add_argument('-r', '--radius', type=int, help='Set radius [m]')
-    parser.add_argument('-s', '--silence', action='store_true', default=False, help='Silences the non-structured result message.')
+    parser.add_argument(
+        '-s', '--silence', action='store_true', default=False, help='Silences the non-structured result message.'
+    )
     parser.add_argument(
         '-n',
         '--new-duplicates-file',
@@ -44,8 +46,12 @@ def main():
 
     password = getpass(f'Password for {username}: ')
 
-    old_duplicates_file_path: Optional[Path] = None if args.old_duplicates_file is None else Path(args.old_duplicates_file)
-    new_duplicates_file_path: Optional[Path] = None if args.new_duplicates_file is None else Path(args.new_duplicates_file)
+    old_duplicates_file_path: Optional[Path] = (
+        None if args.old_duplicates_file is None else Path(args.old_duplicates_file)
+    )
+    new_duplicates_file_path: Optional[Path] = (
+        None if args.new_duplicates_file is None else Path(args.new_duplicates_file)
+    )
     radius: Optional[int] = args.radius
 
     # Check if data can be saved
@@ -83,7 +89,11 @@ def main():
         print(requests_response.text)  # noqa: T201
     else:
         new_duplicates_file_path: Path = Path(args.new_duplicates_file)
-        save_duplicates(new_duplicates_file_path, requests_response.json(), append=old_duplicates_file_path == new_duplicates_file_path)
+        save_duplicates(
+            new_duplicates_file_path,
+            requests_response.json(),
+            append=old_duplicates_file_path == new_duplicates_file_path,
+        )
 
     if silence is False:
         print(f'Got {len(response_items)} new duplicates.')  # noqa: T201

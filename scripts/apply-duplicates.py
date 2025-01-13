@@ -11,7 +11,7 @@ from typing import Optional
 
 import requests
 from _constants import DEFAULT_BASE_URL, DUPLICATES_BASE_PATH, USER_AGENT
-from _helper import load_duplicates, save_duplicates
+from _helper import load_duplicates
 
 
 def main():

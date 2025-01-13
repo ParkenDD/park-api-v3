@@ -10,6 +10,7 @@ from werkzeug._reloader import run_with_reloader
 @failsafe
 def run():
     from webapp.entry_point_celery import celery
+
     celery.start(argv=['--quiet', 'beat'])
 
 
