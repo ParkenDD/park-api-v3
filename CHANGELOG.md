@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.17.0
+
+Released 2025-01-21
+
+### Features
+
+* [Add plausibility check for realtime_free_capacity values](https://github.com/ParkenDD/park-api-v3/pull/222)
+* [ParkAPI Sources: Add VRN Park and Ride Realtime Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/180)
+* [ParkAPI Sources: Add bahnv2 bike parking locked and open](https://github.com/ParkenDD/parkapi-sources-v3/pull/172)
+
+### Fixes
+
+* [ParkAPI Sources: opendata_swiss: change to new source_url](https://github.com/ParkenDD/parkapi-sources-v3/pull/179)
+
+
 ## 0.16.5
 
 Released 2025-01-07
