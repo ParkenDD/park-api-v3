@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.17.2
+
+Released 2025-01-21
+
+### Fixes
+
+* Catch even more exceptions at plausibility check
+
+
 ## 0.17.1
 
 Released 2025-01-21

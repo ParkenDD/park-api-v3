@@ -299,27 +299,35 @@ class ParkingSiteGenericImportService(BaseService):
 
         for capacity_field in capacity_fields:
             realtime_free_capacity = getattr(realtime_parking_site_input, f'realtime_free_{capacity_field}')
+            # Not all realtime datasets have free capacities
+            if realtime_free_capacity is None or realtime_free_capacity is UnsetValue:
+                continue
+
             realtime_capacity = getattr(realtime_parking_site_input, f'realtime_{capacity_field}')
+
             parking_site_capacity = getattr(parking_site, capacity_field)
             if parking_site_capacity is None:
                 continue
 
-            if realtime_capacity is UnsetValue and realtime_free_capacity > parking_site_capacity:
-                setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
-                self.logger.warning(
-                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                    f'At {parking_site.original_uid} from {source.id}, '
-                    f'realtime_free_{capacity_field} {realtime_free_capacity} '
-                    f'was higher than {capacity_field} {parking_site_capacity}',
-                )
-            elif realtime_capacity is not UnsetValue and realtime_free_capacity > realtime_capacity:
-                setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
-                self.logger.warning(
-                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                    f'At {parking_site.original_uid} from {source.id}, '
-                    f'realtime_free_{capacity_field} {realtime_free_capacity} '
-                    f'was higher than realtime_{capacity_field} {realtime_capacity}',
-                )
+            if realtime_capacity is UnsetValue or realtime_capacity is None:
+                if realtime_free_capacity > parking_site_capacity:
+                    setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
+                    self.logger.warning(
+                        LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                        f'At {parking_site.original_uid} from {source.id}, '
+                        f'realtime_free_{capacity_field} {realtime_free_capacity} '
+                        f'was higher than {capacity_field} {parking_site_capacity}',
+                    )
+
+            if realtime_capacity is not UnsetValue and realtime_capacity is not None:
+                if realtime_free_capacity > realtime_capacity:
+                    setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
+                    self.logger.warning(
+                        LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                        f'At {parking_site.original_uid} from {source.id}, '
+                        f'realtime_free_{capacity_field} {realtime_free_capacity} '
+                        f'was higher than realtime_{capacity_field} {realtime_capacity}',
+                    )
 
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
