@@ -97,7 +97,10 @@ line-length = 120
     # Don't require __init__.py files
     "INP",
 ]
-
+"scripts/*" = [
+    # Don't require __init__.py files
+    "INP001",
+]
 
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"

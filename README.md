@@ -1,7 +1,7 @@
 # ParkAPI v3
 
 ParkAPI v3 is a web service which collects and provides access to parking data for cars and bikes. It uses
-[ParkAPI-sources v3](https://github.com/ParkenDD/parkapi-sources-v3) as a 
+[ParkAPI-sources v3](https://github.com/ParkenDD/parkapi-sources-v3) as a
 [Python module](https://pypi.org/project/parkapi-sources/).
 
 ## Data model
@@ -14,8 +14,8 @@ The data model is documented using an OpenAPI documentation:
 
 ### Source
 
-The source object represents a specific data source. Every data source has a unique identifier called `source.uid`. 
-The `uid` is the central identifier which defines the data handling and, at push endpoints, even the user for basic 
+The source object represents a specific data source. Every data source has a unique identifier called `source.uid`.
+The `uid` is the central identifier which defines the data handling and, at push endpoints, even the user for basic
 authorization.
 
 Additionally, every source has a human-readable name and a public URL where the user gets more information.
@@ -59,7 +59,7 @@ ParkAPI-sources "just" transforms the data to a unified model.
 ### Pull data
 
 Source UIDs which should be pulled have to be in `PARK_API_CONVERTER` as described in `config_dist_dev.yaml`. The UIDs
-need to correspond to an implementation in ParkAPI-sources which actually does the data pulling. ParkAPI-sources 
+need to correspond to an implementation in ParkAPI-sources which actually does the data pulling. ParkAPI-sources
 supports JSON data handling as well as HTML scraping, so almost every data format can be converted.
 
 Data pulling is done every five minutes. It uses
@@ -78,7 +78,7 @@ publishing realtime data, because if the client knows best when it gets an updat
 best realtime experience using push services. Push-services can also be used for pushing data which comes by other
 data transport channels, e.g. per mail client.
 
-Each source uid used for pushing requires an entry in config value `PARK_API_CONVERTER`, mapping the uid to the basic 
+Each source uid used for pushing requires an entry in config value `PARK_API_CONVERTER`, mapping the uid to the basic
 auth credentials that clients must provide to push to this source. have basic auth credentials. Other auth methods are
 not supported so far. The `hash` is a `sha256` hash. You can create such a hash by
 
@@ -90,10 +90,10 @@ sha256(b'your-very-long-random-generated-password').hexdigest()
 You can create sha256 hashes by other tools, too, but keep in mind not to hash newlines at the end of the string (this
 happens at bash quite easy).
 
-Additionally, there should be a suitable ParkAPI v3 converter at ParkAPI-sources to convert pushed data in ParkAPI v3's 
+Additionally, there should be a suitable ParkAPI v3 converter at ParkAPI-sources to convert pushed data in ParkAPI v3's
 internal format. It has to have the same source UID as the one configured in the `PARK_API_CONVERTER` config.
 
-Push services have four different entrypoints for common data formats: XML, JSON, CSV and XLSX which are all different 
+Push services have four different entrypoints for common data formats: XML, JSON, CSV and XLSX which are all different
 endpoints. The endpoints do some basic file loading and then hand it over to ParkAPI-sources.
 
 If you want to create new data sources, please have a look at
@@ -123,8 +123,8 @@ Afterward, the password will be asked in a secure way, then the upload progress 
 
 *Warning: experimental feature. Interface might change.*
 
-ParkAPI provides a mechanism to flag dataset as duplicates. There are two endpoints to do this, which are used by two 
-helper scripts. For both scripts you need python requests, please have a look at "Prepare scripts environment" for 
+ParkAPI provides a mechanism to flag dataset as duplicates. There are two endpoints to do this, which are used by two
+helper scripts. For both scripts you need python requests, please have a look at "Prepare scripts environment" for
 preparations. Additionally, you will have to set up an admin user and password using at config using the config
 key `SERVER_AUTH_USERS`. Please have a look at `config_dist_dev.yaml` for an example.
 
@@ -140,15 +140,15 @@ python get-new-duplicates.py username
 
 Per default, the scripts outputs the possible duplicates on stdout. You can modify this behaviour and other settings
 using following optional options:
-- `-o` for an old duplicate file path. These duplicates are sent to the server, and the result will not contain the old  
+- `-o` for an old duplicate file path. These duplicates are sent to the server, and the result will not contain the old
   duplicates. This helps to just append new duplicates.
 - `-n` for a new duplicate file path. The script saves an CSV to this file path instead of using stdout for results.
   If it's the same file path as the old duplicate file, the script will append the new duplicates to the old file.
-- `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For 
+- `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For
   example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
 - `-s` to silence the status output. Using this, you can pipe the JSON output to other applications like `json_pp`.
 
-  
+
 ### Apply duplicates
 
 The CSV file from the step before will have the following format:
@@ -169,7 +169,7 @@ with ID `10` as duplicates and keep the `ParkingSite` ID 11 active, it will look
 Please keep in mind that Excel will most likely break your CSV files. Please use a proper CSV editing tool like
 [LibreOffice Calc](https://www.libreoffice.org/discover/calc/).
 
-If you finished your file, you can apply this file using 
+If you finished your file, you can apply this file using
 
 ```
 python apply-duplicates.py username your/duplicate-file.csv
@@ -178,23 +178,23 @@ python apply-duplicates.py username your/duplicate-file.csv
 Please keep in mind that you will have to apply all duplicates at this command, because the server cannot un-flag
 duplicates without a full list of duplicates.
 
-There is again `-u` as option for a custom URL. If you cant to use this script for another environment, you will have 
+There is again `-u` as option for a custom URL. If you cant to use this script for another environment, you will have
 to set the url. For example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
 
 
 ## Configuration
 
-Besides `PARK_API_CONVERTER`, there are a few other configuration options to set, you will find valid config keys in 
+Besides `PARK_API_CONVERTER`, there are a few other configuration options to set, you will find valid config keys in
 `config_dist_dev.yaml`. You can set config values by two different approaches (or even mix them):
 
 1) You can create a config file called `config.yaml` in your root folder.
-2) You can set any config value by env var, but you have to prefix the config name with `PARKAPI_` then. For example, 
-   you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`. ENV vars overwrite 
+2) You can set any config value by env var, but you have to prefix the config name with `PARKAPI_` then. For example,
+   you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`. ENV vars overwrite
 
 
 ## Prepare scripts environment
 
-In order to use the scripts located in `scripts`, you will need [python requests](https://pypi.org/project/requests/). 
+In order to use the scripts located in `scripts`, you will need [python requests](https://pypi.org/project/requests/).
 You can use a system-installed version of requests, or you can create a virtual environment for this:
 
 ```bash

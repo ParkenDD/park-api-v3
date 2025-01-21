@@ -1,7 +1,7 @@
 # ParkAPIv3 Push Script
 
 In order to test push tasks or to upload files you got per e-mail, there is an upload script included in this
-repository. It requires python requests, so either, you have that installed at your system, or you create a virtual 
+repository. It requires python requests, so either, you have that installed at your system, or you create a virtual
 environment for that:
 
 ```

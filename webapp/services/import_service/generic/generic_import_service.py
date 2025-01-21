@@ -286,6 +286,38 @@ class ParkingSiteGenericImportService(BaseService):
             source_id=source.id,
             original_uid=realtime_parking_site_input.uid,
         )
+        capacity_fields: list[str] = [
+            'capacity',
+            'capacity_woman',
+            'capacity_disabled',
+            'capacity_charging',
+            'capacity_carsharing',
+            'capacity_bus',
+            'capacity_family',
+            'capacity_truck',
+        ]
+
+        for capacity_field in capacity_fields:
+            realtime_free_capacity = getattr(realtime_parking_site_input, f'realtime_free_{capacity_field}')
+            realtime_capacity = getattr(realtime_parking_site_input, f'realtime_{capacity_field}')
+            parking_site_capacity = getattr(parking_site, capacity_field)
+
+            if realtime_capacity == UnsetValue and realtime_free_capacity > parking_site_capacity:
+                setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
+                self.logger.warn(
+                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                    f'At {parking_site.original_uid} from {source.id}, '
+                    f'realtime_free_{capacity_field} {realtime_free_capacity} '
+                    f'was higher than {capacity_field} {parking_site_capacity}',
+                )
+            elif realtime_capacity != UnsetValue and realtime_free_capacity > realtime_capacity:
+                setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
+                self.logger.warn(
+                    LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                    f'At {parking_site.original_uid} from {source.id}, '
+                    f'realtime_free_{capacity_field} {realtime_free_capacity} '
+                    f'was higher than realtime_{capacity_field} {realtime_capacity}',
+                )
 
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
