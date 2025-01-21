@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.17.1
+
+Released 2025-01-21
+
+### Fixes
+
+* Fix issue with database fields which can be None
+
+
 ## 0.17.0
 
 Released 2025-01-21
