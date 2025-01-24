@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.17.3
+
+Released 2025-01-24
+
+### Fixes
+
+* [Better sources output and documentation](https://github.com/ParkenDD/park-api-v3/pull/231)
+
+
 ## 0.17.2
 
 Released 2025-01-21
