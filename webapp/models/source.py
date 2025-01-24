@@ -64,6 +64,14 @@ class Source(BaseModel):
     static_parking_site_error_count: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
     realtime_parking_site_error_count: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
 
+    def to_dict(self, *args, ignore: Optional[list[str]] = None, **kwargs) -> dict:
+        ignore = ignore or []
+        if self.static_status in [SourceStatus.PROVISIONED, SourceStatus.DISABLED]:
+            ignore += ['static_data_updated_at', 'static_parking_site_error_count']
+        if self.realtime_status in [SourceStatus.PROVISIONED, SourceStatus.DISABLED]:
+            ignore += ['realtime_data_updated_at', 'realtime_parking_site_error_count']
+        return super().to_dict(*args, ignore=ignore, **kwargs)
+
     @property
     def combined_status(self) -> SourceStatus:
         if self.static_status != SourceStatus.ACTIVE or self.realtime_status in [
