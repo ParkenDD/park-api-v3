@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.18.0
+
+### Features
+
+* [Switch to Alpine base image and Python 3.12](https://github.com/ParkenDD/park-api-v3/pull/237)
+
+
+### Fixes
+
+* [ParkAPI Sources: Add required attributes at several converters](https://github.com/ParkenDD/parkapi-sources-v3/pull/183)
+
+
+### Maintenance
+
+* [Several dependency updates](https://github.com/ParkenDD/park-api-v3/pull/237)
+
+
 ## 0.17.3
 
 Released 2025-01-24
