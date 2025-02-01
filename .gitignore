@@ -9,7 +9,7 @@ __pycache__/
 /htmlcov
 /reports
 /*.sql
-/celerybeat-schedule.db
+/celerybeat-schedule*
 
 /venv
 /logs/*
