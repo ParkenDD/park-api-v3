@@ -23,7 +23,7 @@ lxml~=5.3.0
 parkapi-sources~=0.16.1
 
 # required for converters
-beautifulsoup4~=4.12.3
+beautifulsoup4~=4.13.1
 pyproj~=3.7.0
 
 # binary butterfly shared libraries (https://git.sectio-aurea.org/public_libraries)
