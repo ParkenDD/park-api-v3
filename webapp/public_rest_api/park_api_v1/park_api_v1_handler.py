@@ -72,7 +72,7 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
                 lot['state'] = parking_site.realtime_opening_status.name.lower()
             elif parking_site.opening_hours:
                 oh = OpeningHours(parking_site.opening_hours)
-                lot['state'] = oh.state()
+                lot['state'] = str(oh.state())
             else:
                 lot['state'] = 'unknown'
 
