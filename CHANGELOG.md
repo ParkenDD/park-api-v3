@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.18.1
+
+### Fixes
+
+* [Hotfix ParkAPI OpeningTime output for ParkAPI v1](https://github.com/ParkenDD/park-api-v3/pull/241)
+
+
 ## 0.18.0
 
 ### Features
