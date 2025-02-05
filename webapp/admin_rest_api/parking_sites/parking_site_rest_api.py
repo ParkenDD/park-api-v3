@@ -25,6 +25,7 @@ class ParkingSitesBlueprint(AdminApiBaseBlueprint):
             **self.get_base_handler_dependencies(),
             parking_site_repository=dependencies.get_parking_site_repository(),
             matching_service=dependencies.get_matching_service(),
+            source_repository=dependencies.get_source_repository(),
         )
 
         self.add_url_rule(
@@ -89,7 +90,7 @@ class ParkingSiteDuplicatesGenerateMethodView(ParkingSiteBaseMethodView):
     def post(self):
         duplicate_input: GetDuplicatesInput = self.duplicate_validator.validate(self.request_helper.get_parsed_json())
 
-        return self.parking_site_handler.generate_duplicates(duplicate_input.old_duplicates, duplicate_input.radius)
+        return self.parking_site_handler.generate_duplicates(duplicate_input)
 
 
 class ParkingSiteDuplicatesApplyMethodView(ParkingSiteBaseMethodView):

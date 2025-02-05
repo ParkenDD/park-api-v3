@@ -4,20 +4,23 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import os
-import re
 
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 
+from tests.model_generator.parking_site import get_parking_site
+from tests.model_generator.source import get_source
 from webapp import launch
+from webapp.common.flask_app import App
+from webapp.common.sqlalchemy import SQLAlchemy
 from webapp.extensions import db as flask_sqlalchemy
-from webapp.models import BaseModel
+from webapp.models import BaseModel, ParkingSite, Source
 
 
-@pytest.fixture(scope='session')
-def db_noreset(flask_app: Flask):
+@pytest.fixture
+def db(flask_app: App) -> SQLAlchemy:
     """
     Yields the database as a session-scoped fixture without resetting any content.
 
@@ -28,19 +31,19 @@ def db_noreset(flask_app: Flask):
         yield flask_sqlalchemy
 
 
-def empty_tables(db_noreset, models: list[type[BaseModel]]):
+def empty_tables(empty_tables: SQLAlchemy, models: list[type[BaseModel]]) -> None:
     """
     Can be used to empty only the tables that are affected by a specific test
     """
-    db_noreset.session.close()
+    empty_tables.session.close()
     table_names = [model.__tablename__ for model in models]
-    with db_noreset.engine.connect() as conn:
+    with empty_tables.engine.connect() as conn:
         conn.execute(text(f'TRUNCATE {", ".join(table_names)} RESTART IDENTITY CASCADE;'))
         conn.commit()
 
 
 @pytest.fixture(scope='session')
-def flask_app(tmp_path_factory) -> Flask:
+def flask_app(tmp_path_factory) -> App:
     """
     Creates a Flask app instance configured for testing.
     """
@@ -50,21 +53,8 @@ def flask_app(tmp_path_factory) -> Flask:
 
     app = launch(testing=True)
 
-    # Create the database and the database tables
-    # db_path should be 'mysql+pymysql://root:root@mysql' if
-    # SQLALCHEMY_DATABASE_URI: 'mysql+pymysql://root:root@mysql/backend?charset=utf8mb4' is set in test_config.yaml
-    db_path: str = re.sub(r'/[^/]+$', '', app.config.get('SQLALCHEMY_DATABASE_URI'))
-
-    engine = create_engine(db_path)
-    # We use DROP + CREATE here because it's faster and more reliable in case of foreign keys
-    with engine.connect() as connection:
-        connection.execution_options(isolation_level='AUTOCOMMIT')
-        query_drop_db = 'DROP DATABASE IF EXISTS park_api;'
-        query_create_db = 'CREATE DATABASE park_api;'
-        connection.execute(text(query_drop_db))
-        connection.execute(text(query_create_db))
-
     with app.app_context():
+        flask_sqlalchemy.drop_all()
         flask_sqlalchemy.create_all()
         yield app
 
@@ -73,3 +63,26 @@ def flask_app(tmp_path_factory) -> Flask:
 def test_client(flask_app: Flask) -> FlaskClient:
     with flask_app.test_client() as client:
         yield client
+
+
+@pytest.fixture
+def multi_source_parking_site_test_data(db: SQLAlchemy) -> None:
+    source_1 = get_source(1)
+    source_2 = get_source(2)
+    source_3 = get_source(3)
+    db.session.add(source_1)
+    db.session.add(source_2)
+    db.session.add(source_3)
+    db.session.commit()
+
+    db.session.add(get_parking_site(counter=1, source_id=1))
+    db.session.add(get_parking_site(counter=2, source_id=1))
+    db.session.add(get_parking_site(counter=3, source_id=1))
+    db.session.add(get_parking_site(counter=4, source_id=2))
+    db.session.add(get_parking_site(counter=5, source_id=2))
+    db.session.add(get_parking_site(counter=6, source_id=3))
+    db.session.commit()
+
+    yield
+
+    empty_tables(db, models=[Source, ParkingSite])

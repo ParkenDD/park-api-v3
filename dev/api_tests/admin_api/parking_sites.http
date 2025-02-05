@@ -1,0 +1,29 @@
+### Get parking sites
+GET {{api_host}}/api/admin/v1/parking-sites
+Authorization: Basic {{admin_api_username}} {{admin_api_password}}
+
+
+### Get parking site
+GET {{api_host}}/api/admin/v1/parking-sites/1
+Authorization: Basic {{admin_api_username}} {{admin_api_password}}
+
+
+### Generate duplicates
+POST {{api_host}}/api/admin/v1/parking-sites/duplicates/generate
+Content-Type: application/json
+Authorization: Basic {{admin_api_username}} {{admin_api_password}}
+
+{
+  "radius": 100000
+}
+
+
+### Apply duplicates
+POST {{api_host}}/api/admin/v1/parking-sites/duplicates/apply
+Content-Type: application/json
+Content-Type: application/json
+Authorization: Basic {{admin_api_username}} {{admin_api_password}}
+
+[
+
+]

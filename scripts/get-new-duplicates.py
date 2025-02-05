@@ -29,7 +29,11 @@ def main():
     parser.add_argument('-u', '--url', default=DEFAULT_BASE_URL, help='Base URL')
     parser.add_argument('-r', '--radius', type=int, help='Set radius [m]')
     parser.add_argument(
-        '-s', '--silence', action='store_true', default=False, help='Silences the non-structured result message.'
+        '-s',
+        '--silence',
+        action='store_true',
+        default=False,
+        help='Silences the non-structured result message.',
     )
     parser.add_argument(
         '-n',
@@ -38,11 +42,15 @@ def main():
         help="New duplicates file. If not provides, duplicates will be printed to stdout. If it's the same as the old duplicates file, "
         'the old duplicates file will be updated.',
     )
+    parser.add_argument('-si', '--source-id', type=int, nargs='*', help='Source ID')
+    parser.add_argument('-su', '--source-uid', type=str, nargs='*', help='Source UID')
     args = parser.parse_args()
 
     username: str = args.username
     base_url: str = args.url
     silence: bool = args.silence
+    source_ids: list[int] | None = args.source_id
+    source_uids: list[str] | None = args.source_uid
 
     password = getpass(f'Password for {username}: ')
 
@@ -70,9 +78,16 @@ def main():
         old_duplicates = load_duplicates(old_duplicates_file_path)
 
     endpoint = f'{base_url}{DUPLICATES_BASE_PATH}/generate'
+
+    request_data = {'old_duplicates': old_duplicates, 'radius': radius}
+    if source_ids is not None:
+        request_data['source_ids'] = ','.join([str(source_id) for source_id in source_ids])
+    if source_uids is not None:
+        request_data['source_uids'] = ','.join(source_uids)
+
     requests_response = requests.post(
         url=endpoint,
-        json={'old_duplicates': old_duplicates, 'radius': radius},
+        json=request_data,
         auth=(username, password),
         headers={
             'Content-Type': 'application/json',
