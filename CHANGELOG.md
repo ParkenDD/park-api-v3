@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.19.0
+
+### Features
+
+* [Duplicate query: Add source_id and source_uid ](https://github.com/ParkenDD/park-api-v3/pull/242)
+
+
 ## 0.18.1
 
 ### Fixes
