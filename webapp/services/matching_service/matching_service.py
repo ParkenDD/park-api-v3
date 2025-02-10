@@ -53,13 +53,14 @@ class MatchingService(BaseService):
     def generate_duplicates(
         self,
         existing_matches: list[tuple[int, int]],
-        match_radius: Optional[int] = None,
+        match_radius: int | None = None,
+        source_ids: list[int] | None = None,
     ) -> list[DuplicatedParkingSite]:
         matches: list[tuple[ParkingSiteLocation, ParkingSiteLocation, float]] = []
         if match_radius is None:
             match_radius: int = self.config_helper.get('MATCH_RADIUS', 100)
 
-        parking_site_locations = self.parking_site_repository.fetch_parking_site_locations()
+        parking_site_locations = self.parking_site_repository.fetch_parking_site_locations(source_ids=source_ids)
         for i in range(len(parking_site_locations)):
             for j in range(i + 1, len(parking_site_locations)):
                 # If both datasets are from the same source: ignore possible match

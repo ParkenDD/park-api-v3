@@ -29,6 +29,11 @@ class SourceRepository(BaseRepository):
 
         return source
 
+    def fetch_source_ids_by_source_uids(self, source_uids: list[str]) -> list[int]:
+        sources = self.session.query(Source.id).filter(Source.uid.in_(source_uids)).all()
+
+        return [source_id for (source_id,) in sources]
+
     def save_source(self, source: Source, *, commit: bool = True):
         return self._save_resources(source, commit=commit)
 

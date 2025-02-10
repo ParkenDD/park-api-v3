@@ -13,7 +13,6 @@ from validataclass.validators import (
     BooleanValidator,
     EnumValidator,
     IntegerValidator,
-    ListValidator,
     NumericValidator,
     StringValidator,
 )
@@ -25,6 +24,7 @@ from validataclass_search_queries.filters import (
 )
 from validataclass_search_queries.pagination import CursorPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
+from validataclass_search_queries.validators import MultiSelectIntegerValidator, MultiSelectValidator
 
 from webapp.common.validation.list_validators import CommaSeparatedListValidator
 
@@ -32,9 +32,9 @@ from webapp.common.validation.list_validators import CommaSeparatedListValidator
 @search_query_dataclass
 class ParkingSiteBaseSearchInput(CursorPaginationMixin, BaseSearchQuery):
     source_id: Optional[int] = SearchParamEquals(), IntegerValidator()
-    not_source_ids: Optional[list[int]] = SearchParamCustom(), ListValidator(IntegerValidator())
+    not_source_ids: Optional[list[int]] = SearchParamCustom(), MultiSelectIntegerValidator(min_value=1)
     source_uid: Optional[str] = SearchParamEquals(), StringValidator()
-    source_uids: Optional[str] = SearchParamMultiSelect(), ListValidator(StringValidator())
+    source_uids: Optional[list[str]] = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
     name: Optional[str] = SearchParamContains(), StringValidator()
     ignore_duplicates: bool = SearchParamCustom(), BooleanValidator(allow_strings=True), Default(True)
     purpose: Optional[PurposeType] = SearchParamEquals(), EnumValidator(PurposeType)
