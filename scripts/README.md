@@ -16,6 +16,7 @@ If you have requests, you can run the script with two arguments:
 - the source uid which should be registered as user at `config.yaml` and should have a representation at ParkAPI-sources
 - the path to the file to push
 
+Afterward, the password will be asked in a secure way, then the upload progress begins.
 
 ### curl equivalent
 
