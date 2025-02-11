@@ -147,6 +147,12 @@ using following optional options:
 - `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For
   example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
 - `-s` to silence the status output. Using this, you can pipe the JSON output to other applications like `json_pp`.
+- `-si` to limit sources to a list of source ids. Has to be used like `-si 1 2 3`
+- `-su` to limit sources to a list of source uids. Has to be used like `-su source1 source2 source3`
+
+`-si` and `-su` are mutually exclusive and need to be set as the last parameter.
+`get-new-duplicates.py username -su source1 source2` works, `get-new-duplicates.py -su source1 source2 username` does
+not.
 
 
 ### Apply duplicates
@@ -200,7 +206,7 @@ You can use a system-installed version of requests, or you can create a virtual 
 ```bash
 cd scripts
 virtalenv venv
-pip install "requests~=2.31.0"
+pip install "requests~=2.32.3"
 source venv/bin/activate
 ```
 

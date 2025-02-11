@@ -7,7 +7,7 @@ environment for that:
 ```
 cd push-client
 virtalenv venv
-pip install "requests~=2.31.0"
+pip install "requests~=2.32.3"
 source venv/bin/activate
 python push-client.py
 ```
@@ -16,7 +16,6 @@ If you have requests, you can run the script with two arguments:
 - the source uid which should be registered as user at `config.yaml` and should have a representation at ParkAPI-sources
 - the path to the file to push
 
-Afterward, the password will be asked in a secure way, then the upload progress begins.
 
 ### curl equivalent
 
