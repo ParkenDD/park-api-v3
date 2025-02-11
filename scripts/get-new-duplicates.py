@@ -4,6 +4,8 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import argparse
+import re
+import string
 import sys
 from getpass import getpass
 from pathlib import Path
@@ -54,6 +56,11 @@ def main():
 
     password = getpass(f'Password for {username}: ')
 
+    # Remove weird copy-paste fragments
+    password = ''.join([c for c in password if c in string.printable])
+    password = re.sub(r'^\x5b.{1,3}\x7e', '', password)
+    password = re.sub(r'\x5b.{1,3}\x7e$', '', password)
+
     old_duplicates_file_path: Optional[Path] = (
         None if args.old_duplicates_file is None else Path(args.old_duplicates_file)
     )
@@ -81,9 +88,9 @@ def main():
 
     request_data = {'old_duplicates': old_duplicates, 'radius': radius}
     if source_ids is not None:
-        request_data['source_ids'] = ','.join([str(source_id) for source_id in source_ids])
+        request_data['source_ids'] = source_ids
     if source_uids is not None:
-        request_data['source_uids'] = ','.join(source_uids)
+        request_data['source_uids'] = source_uids
 
     requests_response = requests.post(
         url=endpoint,
@@ -95,6 +102,7 @@ def main():
         },
         timeout=300,
     )
+
     if requests_response.status_code != 200:
         sys.exit(f'Invalid http response code: {requests_response.status_code}: {requests_response.text}')
 

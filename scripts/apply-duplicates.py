@@ -4,6 +4,8 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import argparse
+import re
+import string
 import sys
 from getpass import getpass
 from pathlib import Path
@@ -31,6 +33,11 @@ def main():
     base_url: str = args.url
 
     password = getpass(f'Password for {username}: ')
+
+    # Remove weird copy-paste fragments
+    password = ''.join([c for c in password if c in string.printable])
+    password = re.sub(r'^\x5b.{1,3}\x7e', '', password)
+    password = re.sub(r'\x5b.{1,3}\x7e$', '', password)
 
     duplicates_file_path: Optional[Path] = None if args.duplicates_file is None else Path(args.duplicates_file)
 

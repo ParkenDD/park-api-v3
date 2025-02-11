@@ -7,7 +7,7 @@ environment for that:
 ```
 cd push-client
 virtalenv venv
-pip install "requests~=2.31.0"
+pip install "requests~=2.32.3"
 source venv/bin/activate
 python push-client.py
 ```

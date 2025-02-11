@@ -4,6 +4,8 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import argparse
+import re
+import string
 import sys
 from getpass import getpass
 from pathlib import Path
@@ -29,6 +31,11 @@ def main():
         sys.exit('Error: please add a file as second argument.')
 
     password = getpass(f'Password for source UID {source_uid}: ')
+
+    # Remove weird copy-paste fragments
+    password = ''.join([c for c in password if c in string.printable])
+    password = re.sub(r'^\x5b.{1,3}\x7e', '', password)
+    password = re.sub(r'\x5b.{1,3}\x7e$', '', password)
 
     file_ending = None
     for ending in DATA_TYPES:
