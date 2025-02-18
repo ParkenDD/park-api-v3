@@ -15,6 +15,12 @@ def empty_json_response():
 app = Flask('mocked_loki')
 
 
+@app.post('/otel')
+def loki_push_otel_logs():
+    print(f'<< {request.data}')
+    return empty_json_response(), 204
+
+
 @app.post('/loki/api/v1/push')
 def loki_push_logs():
     print(f'<< {request.data}')
