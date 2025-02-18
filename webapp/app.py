@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 import os
 
-from flask import request
+from flask import appcontext_pushed, request
 from flask_sqlalchemy.track_modifications import models_committed
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -34,6 +34,7 @@ def launch(testing: bool = False) -> App:
     )
     app.wsgi_app = ProxyFix(app.wsgi_app)
     configure_app(app, testing=testing)
+    configure_tracing(app)
     configure_extensions(app)
     configure_blueprints(app)
     configure_logging(app)
@@ -48,6 +49,14 @@ def configure_app(app: App, testing: bool = False) -> None:
     # Load config from YAML file
     config_loader = ConfigLoader()
     config_loader.configure_app(app, testing)
+
+
+def configure_tracing(app: App) -> None:
+    def configure_tracing_handler(*args, **kwargs):
+        context_helper = dependencies.get_context_helper()
+        context_helper.set_tracing_ids()
+
+    appcontext_pushed.connect(receiver=configure_tracing_handler, sender=app, weak=False)
 
 
 def configure_extensions(app: App) -> None:
