@@ -60,9 +60,17 @@ class MatchingService(BaseService):
         if match_radius is None:
             match_radius: int = self.config_helper.get('MATCH_RADIUS', 100)
 
-        parking_site_locations = self.parking_site_repository.fetch_parking_site_locations(source_ids=source_ids)
+        parking_site_locations = self.parking_site_repository.fetch_parking_site_locations()
         for i in range(len(parking_site_locations)):
             for j in range(i + 1, len(parking_site_locations)):
+                # If source_ids is set, we just want matches for these, so we continue for any other source id
+                if (
+                    source_ids is not None
+                    and parking_site_locations[i].source_id not in source_ids
+                    and parking_site_locations[j].source_id not in source_ids
+                ):
+                    continue
+
                 # If both datasets are from the same source: ignore possible match
                 if parking_site_locations[i].source_id == parking_site_locations[j].source_id:
                     continue

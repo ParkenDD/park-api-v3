@@ -45,7 +45,7 @@ class MatchingServiceTest:
         multi_source_parking_site_test_data: None,
         matching_service: MatchingService,
     ) -> None:
-        duplicates = matching_service.generate_duplicates(existing_matches=[], match_radius=25000, source_ids=[1, 2])
+        duplicates = matching_service.generate_duplicates(existing_matches=[], match_radius=25000, source_ids=[1])
         # As we just output duplicates where each site is at another source. and we have two selected sources, we
-        # expect two duplicates pairs, therefor four datasets
+        # expect one duplicates pair, because the other one is between source 2 and 3.
         assert len(duplicates) == 2
