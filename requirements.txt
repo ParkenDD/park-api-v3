@@ -26,7 +26,7 @@ parkapi-sources~=0.16.1
 beautifulsoup4~=4.12.3
 pyproj~=3.7.0
 
-# binary butterfly shared libraries (https://git.sectio-aurea.org/public_libraries)
---extra-index-url https://git.sectio-aurea.org/api/v4/groups/262/-/packages/pypi/simple
+# binary butterfly shared libraries (https://git.binary-butterfly.de/public_libraries)
+--extra-index-url https://git.binary-butterfly.de/api/v4/groups/262/-/packages/pypi/simple
 validataclass-search-queries~=0.5.1
 flask-openapi~=2.0.3
