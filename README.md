@@ -150,6 +150,10 @@ using following optional options:
 - `-si` to limit sources to a list of source ids. Has to be used like `-si 1 2 3`
 - `-su` to limit sources to a list of source uids. Has to be used like `-su source1 source2 source3`
 
+The source filter parameters `-si` and `-su` trigger a filter in which one of the parking sites has to be in this
+source list. For example, with `-si 1` you will get any duplicate between source 1 and some other source without a
+filter.
+
 `-si` and `-su` are mutually exclusive and need to be set as the last parameter.
 `get-new-duplicates.py username -su source1 source2` works, `get-new-duplicates.py -su source1 source2 username` does
 not.

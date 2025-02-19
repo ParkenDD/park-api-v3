@@ -156,7 +156,7 @@ class ParkingSiteRepository(BaseRepository):
             return query.filter(ParkingSite.duplicate_of_parking_site_id.is_(None))
         return super()._apply_bound_search_filter(query, bound_filter)
 
-    def fetch_parking_site_locations(self, source_ids: list[int] | None = None) -> list[ParkingSiteLocation]:
+    def fetch_parking_site_locations(self) -> list[ParkingSiteLocation]:
         query = self.session.query(
             ParkingSite.id,
             ParkingSite.lat,
@@ -164,8 +164,6 @@ class ParkingSiteRepository(BaseRepository):
             ParkingSite.source_id,
             ParkingSite.purpose,
         )
-        if source_ids is not None:
-            query = query.filter(ParkingSite.source_id.in_(source_ids))
 
         result: list[ParkingSiteLocation] = []
         for item in query.all():

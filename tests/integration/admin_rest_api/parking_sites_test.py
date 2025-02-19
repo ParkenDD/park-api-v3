@@ -21,7 +21,7 @@ def test_generate_duplicates_simple(
     assert result.status_code == 200
     duplicates = result.json
 
-    # As we just output duplicates where each site is at another source. and we have three sources, we expect
+    # As we just output duplicates where each site is at another source, and we have three sources, we expect
     # two duplicates pairs, therefor four datasets
     assert len(duplicates) == 4
 
@@ -35,13 +35,13 @@ def test_generate_duplicates_source_uids(
         auth=('dev', 'test'),
         json={
             'radius': 25000,
-            'source_uids': ['source-1', 'source-2'],
+            'source_uids': ['source-1'],
         },
     )
 
     assert result.status_code == 200
     duplicates = result.json
 
-    # As we just output duplicates where each site is at another source. and we have three sources, filtered to two,
-    # we expect one duplicates pairs
+    # As we just output duplicates where each site is at another source, and we have three sources, filtered to one,
+    # we expect two duplicates pairs, because the other pair is between source-2 and source-3
     assert len(duplicates) == 2
