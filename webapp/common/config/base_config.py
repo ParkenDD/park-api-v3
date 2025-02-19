@@ -18,6 +18,7 @@ class BaseConfig:
     PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
     LOG_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'logs'))
     TEMP_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'temp'))
+    DEBUG_DUMP_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'data', 'debug-dump'))
 
     REDIS_URL = 'redis://redis:6379/3'
     ENFORCE_CONFIG_VALUES = ['SQLALCHEMY_DATABASE_URI', 'CELERY_BROKER_URL']
@@ -25,7 +26,8 @@ class BaseConfig:
     REMOTE_SERVERS: dict = {}
     SERVER_AUTH_USERS: dict = {}
 
-    PARK_API_CONVERTER: []
+    PARK_API_CONVERTER: list = []
+    DEBUG_SOURCES: list = []
 
     OPENAPI_LOGIN_REQUIRED = False
 

@@ -14,6 +14,7 @@ from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteIn
 from validataclass.helpers import UnsetValue
 
 from webapp.common.logging.models import LogMessageType, LogTag
+from webapp.common.rest.exceptions import UnknownSourceException
 from webapp.models import ExternalIdentifier, ParkingSite, ParkingSiteHistory, Source, Tag
 from webapp.models.parking_site_group import ParkingSiteGroup
 from webapp.models.source import SourceStatus
@@ -53,13 +54,18 @@ class ParkingSiteGenericImportService(BaseService):
         park_api_source_uids: list[str] = []
         park_api_sources_config: dict[str, str] = {
             'STATIC_GEOJSON_BASE_URL': app.config['STATIC_GEOJSON_BASE_URL'],
+            'DEBUG_DUMP_DIR': app.config['DEBUG_DUMP_DIR'],
+            'DEBUG_SOURCES': app.config['DEBUG_SOURCES'],
         }
         for source_dict in app.config.get('PARK_API_CONVERTER', []):
             park_api_source_uids.append(source_dict['uid'])
             if 'env' in source_dict:
                 park_api_sources_config.update(source_dict['env'])
 
-        self.park_api_sources = ParkAPISources(converter_uids=park_api_source_uids, config=park_api_sources_config)
+        self.park_api_sources = ParkAPISources(
+            converter_uids=park_api_source_uids,
+            config=park_api_sources_config,
+        )
         self.park_api_sources.check_credentials()
 
     def update_sources_static(self):
@@ -127,6 +133,9 @@ class ParkingSiteGenericImportService(BaseService):
         self.source_repository.save_source(source)
 
     def get_upserted_source(self, source_uid: str) -> Source:
+        if source_uid not in self.park_api_sources.converter_by_uid:
+            raise UnknownSourceException(message=f'Source {source_uid} is not supported.')
+
         try:
             source = self.source_repository.fetch_source_by_uid(source_uid)
         except ObjectNotFoundException:
