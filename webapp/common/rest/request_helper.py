@@ -54,6 +54,12 @@ class RequestHelper:
     def get_path(self) -> str:
         return self.request.path
 
+    def get_method(self) -> str:
+        return self.request.method
+
+    def get_headers(self) -> dict:
+        return dict(self.request.headers)
+
     def get_client_ip(self):
         return self.request.headers.get('X-Forwarded-For', None)
 

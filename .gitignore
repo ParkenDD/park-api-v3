@@ -13,11 +13,11 @@ __pycache__/
 
 /venv
 /logs/*
-/temp
-/.env
-/files
+/temp/*
+/files/*
+/data/*
 
-!/**/.gitkeep
+/.env
 
 /config.yaml
 /config.secrets.yaml

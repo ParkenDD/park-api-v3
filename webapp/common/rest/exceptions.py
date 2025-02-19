@@ -45,3 +45,8 @@ class UnauthorizedException(RestApiException):
 class InvalidInputException(RestApiException):
     code = 'invalid_input'
     http_status = 400
+
+
+class UnknownSourceException(RestApiException):
+    code = 'unknown_source'
+    http_status = 400

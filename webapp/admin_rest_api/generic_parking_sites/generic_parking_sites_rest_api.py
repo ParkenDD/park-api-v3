@@ -3,7 +3,11 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from flask import jsonify
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+
+from flask import Response, jsonify
 from flask_openapi.decorator import ErrorResponse, Request, document
 from flask_openapi.schema import JsonSchema
 from parkapi_sources.exceptions import ImportParkingSiteException
@@ -21,6 +25,9 @@ class GenericParkingSitesBlueprint(AdminApiBaseBlueprint):
 
     def __init__(self):
         super().__init__('generic-parking-sites', __name__, url_prefix='/generic-parking-sites')
+
+        self.request_helper = dependencies.get_request_helper()
+        self.config_helper = dependencies.get_config_helper()
 
         self.generic_parking_sites_handler = GenericParkingSitesHandler(
             **self.get_base_handler_dependencies(),
@@ -62,6 +69,43 @@ class GenericParkingSitesBlueprint(AdminApiBaseBlueprint):
                 generic_parking_sites_handler=self.generic_parking_sites_handler,
             ),
         )
+
+        @self.after_request
+        def after_request(response: Response):
+            source_uid = self.request_helper.get_basicauth_username()
+
+            if source_uid is None or source_uid not in self.config_helper.get('DEBUG_SOURCES', []):
+                return response
+
+            debug_dump_dir = Path(self.config_helper.get('DEBUG_DUMP_DIR'), source_uid)
+            os.makedirs(debug_dump_dir, exist_ok=True)
+
+            metadata_file_path = Path(debug_dump_dir, f'{datetime.now(timezone.utc).isoformat()}-metadata')
+            request_body_file_path = Path(debug_dump_dir, f'{datetime.now(timezone.utc).isoformat()}-request-body')
+
+            metadata = [
+                f'URL: {self.request_helper.get_path()}',
+                f'Method: {self.request_helper.get_method()}',
+                f'HTTP Status: {response.status_code}',
+                '',
+                'Request Headers:',
+                *[f'{key}: {value}' for key, value in self.request_helper.get_headers().items()],
+                '',
+                'Response Headers:',
+                *[f'{key}: {value}' for key, value in response.headers.items()],
+                '',
+                'Response Body:',
+            ]
+            if response.data:
+                metadata.append(response.get_data(as_text=True))
+
+            with metadata_file_path.open('w') as metadata_file:
+                metadata_file.writelines('\n'.join(metadata))
+
+            with request_body_file_path.open('wb') as request_file:
+                request_file.write(self.request_helper.get_request_body())
+
+            return response
 
 
 class GenericParkingSitesMethodView(AdminApiBaseMethodView):

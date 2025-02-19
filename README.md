@@ -215,6 +215,33 @@ source venv/bin/activate
 ```
 
 
+## Debugging data sources
+
+It might happen that data sources show unexpected behaviour in deployed systems, and sometimes it's difficult to
+reproduce issues in dev environments. To help debugging, ParkAPI supports a request dump mechanism, which will work for
+pull- as well as for push-converters.
+
+The debug-mechanisms needs to config variables:
+
+- `DEBUG_DUMP_DIR` as the directory where dumps are saved to, defaults to `./data/debug-dump/`
+- `DEBUG_SOURCES` as a list of source UIDs which should be debugged, defaults to `[]`
+
+If you set a source at `DEBUG_SOURCES`, ParkAPI will create a subdirectory `./data/debug-dump/{source_uid}`, and will
+dump all communication from this converter in this folder. Per request, there will be two files:
+
+- `{datetime}-metadata` for the request metadata, like path, HTTP status and HTTP headers
+- `{datetime}-response-body` for pull converters / `{datetime}request-body` for push converters for the actual data dump
+
+The `response-body` / `request-body` can be used as test data at ParkAPI sources to find specific issues at the data.
+Or, the headers might give a good idea what actually happened when something failed.
+
+Please keep in mind that dumping will need quite some storage, as every request with the fill request and response
+body is dumped.
+
+Please also keep in mind that especially the HTTP headers might include sensitive data like credentials, so please
+handle them the same way you would handle a password. These files should never be part of a Github ticket, for example.
+
+
 ## Monitoring: Loki and Prometheus
 
 ParkAPI v3 provides a Prometheus endpoint at `/metrics` which helps to monitor the status of all data sources. It also
