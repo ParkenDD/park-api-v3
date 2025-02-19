@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.20.0
+
+Released 2025-02-19
+
+## Features
+
+* [Debug Mechanism](https://github.com/ParkenDD/park-api-v3/pull/250)
+* [ParkAPI Sources: Debug Mode for dumping full communication per source](https://github.com/ParkenDD/parkapi-sources-v3/pull/187)
+* [ParkAPI Sources: Add Aachen](https://github.com/ParkenDD/parkapi-sources-v3/pull/186)
+
+
+## Maintenance
+
+* [ParkAPI Sources: Datex2 Refactoring for good parent classes for any Datex2 source](https://github.com/ParkenDD/parkapi-sources-v3/pull/186)
+
+
+
 ## 0.19.0
 
 ### Features
