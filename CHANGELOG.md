@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.20.2
+
+Release 2025-02-22
+
+### Fixes
+
+* [ParkAPI Sources: introduce request helper](https://github.com/ParkenDD/parkapi-sources-v3/pull/190)
+
+
 ## 0.20.1
 
 Released 2025-02-19
