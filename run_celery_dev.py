@@ -11,7 +11,7 @@ from werkzeug._reloader import run_with_reloader
 def run():
     from webapp.entry_point_celery import celery
 
-    celery.worker_main(argv=['--quiet', 'worker'])
+    celery.worker_main(argv=['--quiet', 'worker', '-f', '/dev/null'])
 
 
 if __name__ == '__main__':
