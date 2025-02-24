@@ -25,7 +25,7 @@ class OTelHandler(Handler):
 
     def emit(self, record: LogRecord):
         try:
-            self.emitter(record, self.format(record))
+            self.emitter(record)
         except Exception:
             self.handleError(record)
 
