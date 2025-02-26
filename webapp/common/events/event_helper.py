@@ -3,11 +3,12 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
 from typing import Dict, List, Optional, Sequence
 
 from webapp.common.celery import CeleryHelper
 from webapp.common.contexts import ContextHelper
-from webapp.common.logging import Logger
+from webapp.common.logging import log
 from webapp.common.logging.models import LogMessageType
 
 from .delayed_events import trigger_delayed_event
@@ -15,17 +16,17 @@ from .enum import EventSource, EventType
 from .event import Event
 from .event_receiver import EventReceiver
 
+logger = logging.getLogger(__name__)
+
 
 class EventHelper:
     celery_helper: CeleryHelper
-    logger: Logger
     # event_receivers is a list with service classes. The service entrypoint has to be a method called run.
     event_receivers: Dict[EventType, List[EventReceiver]]
 
-    def __init__(self, celery_helper: CeleryHelper, context_helper: ContextHelper, logger: Logger):
+    def __init__(self, celery_helper: CeleryHelper, context_helper: ContextHelper):
         self.celery_helper = celery_helper
         self.context_helper = context_helper
-        self.logger = logger
         self.event_receivers = {}
 
     def _get_event_queue(self) -> list:
@@ -100,7 +101,9 @@ class EventHelper:
     ):
         for parameter in self.event_receivers[event_type][event_id].required_parameters:
             if parameter not in data:
-                self.logger.error(
+                log(
+                    logger,
+                    logging.ERROR,
                     LogMessageType.EXCEPTION,
                     (
                         f'got event {event_type} with missing required parameters: {data}, '

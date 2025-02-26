@@ -3,7 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import Any, Optional
 
 from flask import Response, jsonify
 from flask.views import MethodView
@@ -21,9 +21,6 @@ from webapp.common.unset_parameter import UnsetParameter
 from .exceptions import InputValidationException
 from .request_helper import RequestHelper
 
-if TYPE_CHECKING:
-    from webapp.common.logging import Logger
-
 
 class BaseMethodView(MethodView):
     """
@@ -33,18 +30,15 @@ class BaseMethodView(MethodView):
     """
 
     # Dependencies
-    logger: 'Logger'
     request_helper: RequestHelper
     config_helper: ConfigHelper
 
     def __init__(
         self,
         *,
-        logger: 'Logger',
         request_helper: RequestHelper,
         config_helper: ConfigHelper,
     ):
-        self.logger = logger
         self.request_helper = request_helper
         self.config_helper = config_helper
 

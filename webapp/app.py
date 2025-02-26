@@ -4,6 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import os
+from logging.config import dictConfig
 
 from flask import appcontext_pushed, request
 from flask_sqlalchemy.track_modifications import models_committed
@@ -50,10 +51,17 @@ def configure_app(app: App, config_overrides: dict | None = None) -> None:
     config_loader.configure_app(app, config_overrides)
 
 
+def configure_logging(app: App):
+    if not os.path.exists(app.config['LOG_DIR']):
+        os.makedirs(app.config['LOG_DIR'])
+
+    dictConfig(app.config['LOGGING'])
+
+
 def configure_tracing(app: App) -> None:
     def configure_tracing_handler(*args, **kwargs):
         context_helper = dependencies.get_context_helper()
-        context_helper.set_tracing_ids()
+        context_helper.set_default_tracing_ids()
 
     appcontext_pushed.connect(receiver=configure_tracing_handler, sender=app, weak=False)
 
@@ -90,18 +98,11 @@ def configure_events(app: App):
     @app.teardown_appcontext
     def teardown_appcontext(exception: BaseException | None):
         dependencies.get_event_helper().publish_events()
-        dependencies.get_logger().teardown_appcontext()
-
-
-def configure_logging(app: App) -> None:
-    if not os.path.exists(app.config['LOG_DIR']):
-        os.makedirs(app.config['LOG_DIR'])
 
 
 def configure_error_handlers(app: App):
     # ErrorDispatcher: Class that passes errors either to RestApiErrorHandler (returning JSON responses).
     error_handler_kwargs = {
-        'logger': dependencies.get_logger(),
         'db_session': dependencies.get_db_session(),
         'debug': bool(app.config['DEBUG']),
     }

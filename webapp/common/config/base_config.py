@@ -66,3 +66,66 @@ class BaseConfig:
     STATIC_IMPORT_PULL_HOUR = 1
     REALTIME_IMPORT_PULL_FREQUENCY = 5 * 60
     REALTIME_OUTDATED_AFTER_MINUTES = 30
+
+    # Default log config
+    LOGGING = {
+        'version': 1,
+        'formatters': {
+            'open_telemetry': {
+                '()': 'webapp.common.logging.open_telemetry_formatter.OpenTelemetryFormatter',
+                'prefix': 'park_api',
+                'service_name': 'ParkAPI',
+            },
+            'loki': {
+                '()': 'webapp.common.logging.loki_formatter.LokiFormatter',
+                'prefix': 'park_api',
+                'service_name': 'ParkAPI',
+            },
+        },
+        'handlers': {
+            'console_stdout': {
+                'class': 'logging.StreamHandler',
+                'level': 'INFO',
+                'formatter': 'open_telemetry',
+                'stream': 'ext://sys.stdout',
+            },
+            'console_stderr': {
+                'class': 'logging.StreamHandler',
+                'level': 'ERROR',
+                'formatter': 'open_telemetry',
+                'stream': 'ext://sys.stderr',
+            },
+            'open_telemetry_queue': {
+                'class': 'logging.handlers.QueueHandler',
+                'listener': 'webapp.common.logging.autostart_queue_listener.AutostartQueueListener',
+                'queue': 'queue.Queue',
+                'handlers': ['open_telemetry_push'],
+                'level': 'INFO',
+                'formatter': 'open_telemetry',
+            },
+            'open_telemetry_push': {
+                'class': 'webapp.common.logging.http_json_post_handler.HttpPostJsonHandler',
+                'url': 'http://mocked-loki:5000/otel',
+                'level': 'INFO',
+            },
+            'loki_queue': {
+                'class': 'logging.handlers.QueueHandler',
+                'listener': 'webapp.common.logging.autostart_queue_listener.AutostartQueueListener',
+                'queue': 'queue.Queue',
+                'handlers': ['loki_push'],
+                'level': 'INFO',
+                'formatter': 'loki',
+            },
+            'loki_push': {
+                'class': 'webapp.common.logging.http_json_post_handler.HttpPostJsonHandler',
+                'url': 'http://mocked-loki:5000/loki/api/v1/push',
+                'level': 'INFO',
+            },
+        },
+        'loggers': {
+            'webapp': {
+                'level': 'INFO',
+                'handlers': ['console_stdout'],
+            },
+        },
+    }

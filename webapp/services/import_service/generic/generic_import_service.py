@@ -3,6 +3,8 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
+from datetime import datetime, timezone
 from flask import Flask
 from parkapi_sources import ParkAPISources
 from parkapi_sources.converters.base_converter.pull import (
@@ -11,7 +13,9 @@ from parkapi_sources.converters.base_converter.pull import (
     PullConverter,
 )
 
-from webapp.common.logging.models import LogMessageType, LogTag
+from webapp.common.contexts import TelemetryContext
+from webapp.common.logging import log
+from webapp.common.logging.models import LogMessageType
 from webapp.common.rest.exceptions import UnknownSourceException
 from webapp.models import Source
 from webapp.models.source import SourceStatus
@@ -21,6 +25,8 @@ from webapp.services.base_service import BaseService
 
 from .generic_parking_site_import_service import GenericParkingSiteImportService
 from .generic_parking_spot_import_service import GenericParkingSpotImportService
+
+logger = logging.getLogger(__name__)
 
 
 class GenericImportService(BaseService):
@@ -77,7 +83,7 @@ class GenericImportService(BaseService):
                 self.update_source_realtime(source_uid)
 
     def update_source_static(self, source_uid: str):
-        self.logger.set_tag(LogTag.SOURCE, source_uid)
+        self.context_helper.set_telemetry_context(TelemetryContext.SOURCE, source_uid)
 
         source = self.get_upserted_source(source_uid)
         converter = self.park_api_sources.converter_by_uid[source_uid]
@@ -86,7 +92,12 @@ class GenericImportService(BaseService):
             try:
                 static_parking_site_inputs, static_parking_site_errors = converter.get_static_parking_sites()
             except Exception as e:
-                self.logger.warning(message_type=LogMessageType.FAILED_STATIC_SOURCE_HANDLING, message=str(e))
+                log(
+                    logger,
+                    logging.WARNING,
+                    LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
+                    str(e),
+                )
                 source.static_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
                 return
@@ -96,13 +107,23 @@ class GenericImportService(BaseService):
             )
 
             for static_parking_site_error in static_parking_site_errors:
-                self.logger.warning(LogMessageType.FAILED_STATIC_PARKING_SITE_HANDLING, str(static_parking_site_error))
+                log(
+                    logger,
+                    logging.WARNING,
+                    LogMessageType.FAILED_STATIC_PARKING_SITE_HANDLING,
+                    str(static_parking_site_error),
+                )
 
         if isinstance(converter, ParkingSpotPullConverter):
             try:
                 static_parking_spot_inputs, static_parking_spot_errors = converter.get_static_parking_spots()
             except Exception as e:
-                self.logger.warning(message_type=LogMessageType.FAILED_STATIC_SOURCE_HANDLING, message=str(e))
+                log(
+                    logger,
+                    logging.WARNING,
+                    LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
+                    str(e),
+                )
                 source.static_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
                 return
@@ -114,13 +135,18 @@ class GenericImportService(BaseService):
             )
 
             for static_parking_spot_error in static_parking_spot_errors:
-                self.logger.warning(LogMessageType.FAILED_STATIC_PARKING_SPOT_HANDLING, str(static_parking_spot_error))
+                log(
+                    logger,
+                    logging.WARNING,
+                    LogMessageType.FAILED_STATIC_PARKING_SPOT_HANDLING,
+                    str(static_parking_spot_error),
+                )
 
         source.static_status = SourceStatus.ACTIVE
         self.source_repository.save_source(source)
 
     def update_source_realtime(self, source_uid: str):
-        self.logger.set_tag(LogTag.SOURCE, source_uid)
+        self.context_helper.set_telemetry_context(TelemetryContext.SOURCE, source_uid)
 
         source = self.source_repository.fetch_source_by_uid(source_uid)
         converter = self.park_api_sources.converter_by_uid[source_uid]
@@ -137,7 +163,12 @@ class GenericImportService(BaseService):
             try:
                 realtime_parking_site_inputs, realtime_parking_site_errors = converter.get_realtime_parking_sites()
             except Exception as e:
-                self.logger.warning(message_type=LogMessageType.FAILED_REALTIME_SOURCE_HANDLING, message=str(e))
+                log(
+                    logger,
+                    logging.WARNING,
+                    LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
+                    str(e),
+                )
                 source.realtime_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
                 return
@@ -149,7 +180,10 @@ class GenericImportService(BaseService):
             )
 
             for realtime_parking_site_error in realtime_parking_site_errors:
-                self.logger.warning(
+
+                log(
+                    logger,
+                    logging.WARNING,
                     LogMessageType.FAILED_REALTIME_PARKING_SITE_HANDLING,
                     str(realtime_parking_site_error),
                 )
@@ -158,7 +192,12 @@ class GenericImportService(BaseService):
             try:
                 realtime_parking_spot_inputs, realtime_parking_spot_errors = converter.get_realtime_parking_spots()
             except Exception as e:
-                self.logger.warning(message_type=LogMessageType.FAILED_REALTIME_SOURCE_HANDLING, message=str(e))
+                log(
+                    logger,
+                    logging.WARNING,
+                    LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
+                    str(e),
+                )
                 source.realtime_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
                 return
@@ -170,7 +209,10 @@ class GenericImportService(BaseService):
             )
 
             for realtime_parking_spot_error in realtime_parking_spot_errors:
-                self.logger.warning(
+
+                log(
+                    logger,
+                    logging.WARNING,
                     LogMessageType.FAILED_REALTIME_PARKING_SPOT_HANDLING,
                     str(realtime_parking_spot_error),
                 )
