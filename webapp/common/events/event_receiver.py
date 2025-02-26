@@ -35,7 +35,6 @@ class EventReceiver(ABC):
         from webapp.dependencies import dependencies
 
         return {
-            'logger': dependencies.get_logger(),
             'config_helper': dependencies.get_config_helper(),
             'event_helper': dependencies.get_event_helper(),
         }

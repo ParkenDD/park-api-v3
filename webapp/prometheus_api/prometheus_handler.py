@@ -7,14 +7,12 @@ from datetime import datetime, timezone
 
 from webapp.common.config import ConfigHelper
 from webapp.common.events import EventHelper
-from webapp.common.logging import Logger
 from webapp.models.source import SourceStatus
 from webapp.prometheus_api.prometheus_models import Metrics, MetricType, ParkingSiteMetric, SourceMetric
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 
 
 class PrometheusHandler:
-    logger: Logger
     config_helper: ConfigHelper
     event_helper: EventHelper
     source_repository: SourceRepository
@@ -22,13 +20,11 @@ class PrometheusHandler:
 
     def __init__(
         self,
-        logger: Logger,
         config_helper: ConfigHelper,
         event_helper: EventHelper,
         source_repository: SourceRepository,
         parking_site_repository: ParkingSiteRepository,
     ):
-        self.logger = logger
         self.config_helper = config_helper
         self.event_helper = event_helper
         self.source_repository = source_repository

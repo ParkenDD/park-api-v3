@@ -8,7 +8,6 @@ from parkapi_sources.converters.base_converter.pull import PullConverter
 
 from webapp.common.celery import CeleryHelper
 from webapp.common.config import ConfigHelper
-from webapp.common.logging import Logger
 from webapp.extensions import celery
 
 from .generic_import_heartbeat_tasks import realtime_import_task, static_import_task
@@ -17,19 +16,16 @@ from .generic_import_service import ParkingSiteGenericImportService
 
 class GenericImportRunner:
     celery_helper: CeleryHelper
-    logger: Logger
     config_helper: ConfigHelper
     parking_site_generic_import_service: ParkingSiteGenericImportService
 
     def __init__(
         self,
         celery_helper: CeleryHelper,
-        logger: Logger,
         config_helper: ConfigHelper,
         parking_site_generic_import_service: ParkingSiteGenericImportService,
     ):
         self.celery_helper = celery_helper
-        self.logger = logger
         self.config_helper = config_helper
         self.parking_site_generic_import_service = parking_site_generic_import_service
 

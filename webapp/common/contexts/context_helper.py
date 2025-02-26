@@ -9,6 +9,8 @@ from typing import Optional
 from flask.ctx import AppContext, RequestContext, has_request_context
 from flask.globals import app_ctx, request_ctx
 
+from .context_models import TelemetryContext
+
 
 class ContextHelper:
     """
@@ -36,7 +38,14 @@ class ContextHelper:
         """
         return has_request_context()
 
-    def set_tracing_ids(self) -> None:
+    def set_default_tracing_ids(self) -> None:
         app_context = self.get_app_context()
+
         setattr(app_context, 'trace_id', secrets.token_hex(16))
         setattr(app_context, 'span_id', secrets.token_hex(8))
+
+    def set_telemetry_context(self, telemetry_context: TelemetryContext, value: str):
+        app_context = self.get_app_context()
+        if not hasattr(app_context, 'butterfly_butterfly_telemetry_context'):
+            app_context.butterfly_butterfly_telemetry_context = {}
+        app_context.butterfly_butterfly_telemetry_context[telemetry_context] = value
