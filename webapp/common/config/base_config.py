@@ -72,12 +72,12 @@ class BaseConfig:
         'version': 1,
         'formatters': {
             'open_telemetry': {
-                '()': 'webapp.common.logging.open_telemetry_formatter.OpenTelemetryFormatter',
+                '()': 'webapp.common.logging.formatter.FlaskOpenTelemetryFormatter',
                 'prefix': 'park_api',
                 'service_name': 'ParkAPI',
             },
             'loki': {
-                '()': 'webapp.common.logging.loki_formatter.LokiFormatter',
+                '()': 'webapp.common.logging.formatter.FlaskLokiFormatter',
                 'prefix': 'park_api',
                 'service_name': 'ParkAPI',
             },

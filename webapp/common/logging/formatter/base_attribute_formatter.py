@@ -11,9 +11,6 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any
 
-from flask import has_app_context
-from flask.globals import app_ctx
-
 from webapp.common.json import DefaultJSONEncoder
 
 
@@ -30,6 +27,9 @@ class BaseAttributeFormatter(logging.Formatter, ABC):
     def format(self, record: logging.LogRecord) -> str:
         return json.dumps(self.build_payload(record), cls=DefaultJSONEncoder)
 
+    def add_additional_attributes(self, record_attributes: dict[str, Any]):
+        pass
+
     @functools.lru_cache(256)  # noqa: B019
     def format_label(self, label: str | Enum) -> str | None:
         if isinstance(label, Enum):
@@ -42,9 +42,9 @@ class BaseAttributeFormatter(logging.Formatter, ABC):
         return f'{self.prefix}.{cleaned_label.lower()}'
 
     def build_attributes(self, record: logging.LogRecord) -> dict[str, Any]:
-        record_attributes = {}
-        if has_app_context() and hasattr(app_ctx, 'butterfly_butterfly_telemetry_context'):
-            record_attributes.update(getattr(app_ctx, 'butterfly_butterfly_telemetry_context'))
+        record_attributes: dict[str, Any] = {}
+
+        self.add_additional_attributes(record_attributes)
 
         if hasattr(record, 'attributes'):
             record_attributes.update(getattr(record, 'attributes'))
