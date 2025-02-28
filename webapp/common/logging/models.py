@@ -21,10 +21,3 @@ class LogMessageType(Enum):
     FAILED_REALTIME_PARKING_SITE_HANDLING = 'failed-realtime-parking-site-handling'
     DUPLICATE_HANDLING = 'duplicate-handling'
     MISC = 'misc'
-
-
-class LogTag(Enum):
-    SOURCE = 'source'
-    PARKING_SITE = 'parking-site'
-    INITIATOR = 'initiator'
-    USER = 'user'

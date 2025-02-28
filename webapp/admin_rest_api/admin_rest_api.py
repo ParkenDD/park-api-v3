@@ -3,16 +3,21 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
+
 from flask import Response, request
 
 from webapp.common.blueprint import Blueprint
-from webapp.common.logging import Logger
-from webapp.common.logging.models import LogMessageType, LogTag
+from webapp.common.contexts import TelemetryContext
+from webapp.common.logging import log
+from webapp.common.logging.models import LogMessageType
 from webapp.dependencies import dependencies
 
 from .base_blueprint import AdminApiBaseBlueprint
 from .generic_parking_sites import GenericParkingSitesBlueprint
 from .parking_sites import ParkingSitesBlueprint
+
+logger = logging.getLogger(__name__)
 
 
 class AdminRestApi(Blueprint):
@@ -32,8 +37,8 @@ class AdminRestApi(Blueprint):
 
         @self.before_request
         def before_request(*args, **kwargs):
-            logger: Logger = dependencies.get_logger()
-            logger.set_tag(LogTag.INITIATOR, 'admin-api')
+            context_helper = dependencies.get_context_helper()
+            context_helper.set_telemetry_context(TelemetryContext.INITIATOR, 'admin-api')
 
         @self.after_request
         def after_request(response: Response):
@@ -49,7 +54,6 @@ class AdminRestApi(Blueprint):
             if response.data and response.data.decode().strip():
                 log_fragments.append(f'<< {response.data.decode().strip()}')
 
-            logger: Logger = dependencies.get_logger()
-            logger.info(LogMessageType.REQUEST_IN, '\n'.join(log_fragments))
+            log(logger, logging.INFO, LogMessageType.REQUEST_IN, '\n'.join(log_fragments))
 
             return response
