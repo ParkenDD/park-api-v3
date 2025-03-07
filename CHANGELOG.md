@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.20.3
+
+Release 2025-03-07
+
+### Fixes
+
+* [ParkAPI Sources: Fix and reduce validation errors in converters](https://github.com/ParkenDD/parkapi-sources-v3/pull/191)
+
+
 ## 0.20.2
 
 Release 2025-02-22
