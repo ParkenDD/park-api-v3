@@ -202,7 +202,7 @@ Besides `PARK_API_CONVERTER`, there are a few other configuration options to set
    you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`. ENV vars overwrite
 
 
-### Development setup
+## Development setup
 
 ParkAPI provides some help to get a development environment. As you will need a PostgreSQL database for a working setup,
 the development setup is built on docker and docker compose. Additionally, there are some makefile targets for common
@@ -245,7 +245,7 @@ have a look at the [pre-commit-hook website](https://pre-commit.com). If you hav
 install the pre-commit-hook with `pre-commit install`.
 
 
-### Testing
+## Testing
 
 ParkAPI provides unit- and integration-tests. Unit tests run without any external dependencies, integration tests
 require at least a working Flask context, but most times external services like `postgresql` and / or `rabbitmq`. You
