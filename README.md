@@ -202,6 +202,60 @@ Besides `PARK_API_CONVERTER`, there are a few other configuration options to set
    you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`. ENV vars overwrite
 
 
+### Development setup
+
+ParkAPI provides some help to get a development environment. As you will need a PostgreSQL database for a working setup,
+the development setup is built on docker and docker compose. Additionally, there are some makefile targets for common
+tasks.
+
+The development setup is tested with common linux distributions with an installed `docker` and `docker compose`. MacOS
+will work, too, Windows not so much.
+
+The ParkAPI dev environment starts the following containers:
+
+- `flask`: the main application, reachable at `http://localhost:5000`
+- `worker`: the background worker, eg for pulling data sources
+- `worker-heartbeat`: a celery heartbeat, responsible for regular creating tasks for the worker
+- `flask-init-converters`: an init container which will create / update configured datasources in our database
+- `postgresql`: the database, reachable at `localhost:5432` (eg for looking into data using an SQL client)
+- `rabbitmq`: the queue connecting `flask`, `worker-heartbeat` and `worker`
+- `mocked-loki`: a small flask service for mocking loki, outputting every data pushed to stdout
+
+The following makefile targets help with regular tasks. All of them are just shortcuts to commands you can run
+manually, too. For further details, please have a look at the `Makefile`.
+
+- `make first-start`: shortcut to create a working dev environment. Pulls and builds images, copies and migrates the database
+- `make docker-up` or just `make`: starts all containers in foreground, which is helpful to get all logs
+- `make docker-up-detached`: starts all containers in background
+- `make docker-down`: stops all containers
+- `make docker-purge`: purges all containers including volumes, good for a fresh start
+- `make docker-rebuild`: rebuilds local python image
+- `make docker-logs`: outputs container logs, supports `SERVICE` for limit to a specific service, eg `make docker-logs SERVICE=flask`
+- `make docker-shell`: get a shell inside the `flask` docker container, helpful for debugging in container / flask scope
+- `make apply-migrations`: applies database migrations to the database
+- `make downgrade-migrations`: downgrades the database by one migration
+- `make generate-migration MSG="my new migration"`: creates a new database migration
+- `make test-unit`: runs all unit tests
+- `make test-integration`: runs all integration tests
+- `make lint-fix`: runs the formatter / linter and tries to fix issues
+- `make lint-check`: runs the formatter / linter and checks for issues
+
+Additionally, there is a pre-commit-hook, which also helps with linting. For more information and tutorials, please
+have a look at the [pre-commit-hook website](https://pre-commit.com). If you have a working pre-commit setup, you can
+install the pre-commit-hook with `pre-commit install`.
+
+
+### Testing
+
+ParkAPI provides unit- and integration-tests. Unit tests run without any external dependencies, integration tests
+require at least a working Flask context, but most times external services like `postgresql` and / or `rabbitmq`. You
+can run the tests with the makefile targets above.
+
+ParkAPI testing is based on [pytest](https://docs.pytest.org/en/stable/). There are some fixtures which will help to
+write tests, especially a flask test client which will reset the database for any new test run. Please have a look at
+the `conftest.py` files for more details.
+
+
 ## Prepare scripts environment
 
 In order to use the scripts located in `scripts`, you will need [python requests](https://pypi.org/project/requests/).

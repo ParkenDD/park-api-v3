@@ -1,8 +1,6 @@
 DOCKER_COMPOSE = docker compose -f docker-compose.yml -f docker-compose.override.yml
 FLASK_RUN = $(DOCKER_COMPOSE) run --rm flask
 
-DOCKER_REGISTRY = ghcr.io
-
 # Separate environment for running integration tests
 TESTING_COMPOSE_PROJECT_NAME = park-api_integrationtests
 TESTING_DOCKER_COMPOSE = $(DOCKER_COMPOSE) -p $(TESTING_COMPOSE_PROJECT_NAME)
@@ -34,16 +32,11 @@ config.yaml:
 # --------------------
 
 .PHONY: first-start
-first-start: config docker-login docker-build apply-migrations
+first-start: config docker-build apply-migrations
 	$(DOCKER_COMPOSE) down
 	@echo
 	@echo 'Database is all set up! \o/'
 	@echo 'You can now start the project with "make docker-up"'
-
-# Login to Docker registry
-.PHONY: docker-login
-docker-login:
-	docker login $(DOCKER_REGISTRY)
 
 # Builds and starts all docker containers
 .PHONY: docker-up
@@ -139,7 +132,7 @@ generate-migration: config
 # Clean up "volatile" files (caches, test reports, venv, generated assets, ...)
 .PHONY: clean
 clean: docker-down
-	rm -rf node_modules/ logs/ venv/ static/js/ static/webpack-assets.json reports/ .pytest_cache .coverage .npm
+	rm -rf logs/ venv/ reports/ .pytest_cache .coverage
 
 # Clean up whole environment (like "clean", but also removes config files and database files)
 .PHONY: clean-all
