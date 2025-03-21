@@ -70,7 +70,7 @@ park_api_v1_parking_site_schema = JsonSchema(
                     'capacity': IntegerField(
                         description='Capacity including all used sparking spots and without longterm parking spots.',
                     ),
-                    'public_url': UriField(required=False),
+                    'url': UriField(required=False),
                     'opening_hours': StringField(required=False, description='In OSM opening_hours format'),
                     'fee_hours': StringField(
                         required=False,
