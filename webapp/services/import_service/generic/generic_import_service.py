@@ -3,6 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
 import traceback
 from datetime import datetime, timezone
 
@@ -13,7 +14,9 @@ from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
 from validataclass.helpers import UnsetValue
 
-from webapp.common.logging.models import LogMessageType, LogTag
+from webapp.common.contexts import TelemetryContext
+from webapp.common.logging import log
+from webapp.common.logging.models import LogMessageType
 from webapp.common.rest.exceptions import UnknownSourceException
 from webapp.models import ExternalIdentifier, ParkingSite, ParkingSiteHistory, Source, Tag
 from webapp.models.parking_site_group import ParkingSiteGroup
@@ -26,6 +29,8 @@ from webapp.repositories import (
 )
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.base_service import BaseService
+
+logger = logging.getLogger(__name__)
 
 
 class ParkingSiteGenericImportService(BaseService):
@@ -79,7 +84,7 @@ class ParkingSiteGenericImportService(BaseService):
                 self.update_source_realtime(source_uid)
 
     def update_source_static(self, source_uid: str):
-        self.logger.set_tag(LogTag.SOURCE, source_uid)
+        self.context_helper.set_telemetry_context(TelemetryContext.SOURCE, source_uid)
 
         source = self.get_upserted_source(source_uid)
         converter: PullConverter = self.park_api_sources.converter_by_uid[source_uid]  # type: ignore
@@ -87,7 +92,12 @@ class ParkingSiteGenericImportService(BaseService):
         try:
             static_parking_site_inputs, static_parking_site_errors = converter.get_static_parking_sites()
         except Exception as e:
-            self.logger.warning(message_type=LogMessageType.FAILED_STATIC_SOURCE_HANDLING, message=str(e))
+            log(
+                logger,
+                logging.WARNING,
+                LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
+                str(e),
+            )
             source.static_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
@@ -95,14 +105,19 @@ class ParkingSiteGenericImportService(BaseService):
         self.handle_static_import_results(source, static_parking_site_inputs, static_parking_site_errors)
 
         for static_parking_site_error in static_parking_site_errors:
-            self.logger.warning(LogMessageType.FAILED_STATIC_PARKING_SITE_HANDLING, str(static_parking_site_error))
+            log(
+                logger,
+                logging.WARNING,
+                LogMessageType.FAILED_STATIC_PARKING_SITE_HANDLING,
+                str(static_parking_site_error),
+            )
 
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
         source.static_status = SourceStatus.ACTIVE
         self.source_repository.save_source(source)
 
     def update_source_realtime(self, source_uid: str):
-        self.logger.set_tag(LogTag.SOURCE, source_uid)
+        self.context_helper.set_telemetry_context(TelemetryContext.SOURCE, source_uid)
 
         source = self.source_repository.fetch_source_by_uid(source_uid)
         converter: PullConverter = self.park_api_sources.converter_by_uid[source_uid]  # type: ignore
@@ -118,7 +133,8 @@ class ParkingSiteGenericImportService(BaseService):
         try:
             realtime_parking_site_inputs, realtime_parking_site_errors = converter.get_realtime_parking_sites()
         except Exception as e:
-            self.logger.warning(message_type=LogMessageType.FAILED_REALTIME_SOURCE_HANDLING, message=str(e))
+            log(logger, logging.WARNING, LogMessageType.FAILED_REALTIME_SOURCE_HANDLING, str(e))
+
             source.realtime_status = SourceStatus.FAILED
             self.source_repository.save_source(source)
             return
@@ -126,7 +142,12 @@ class ParkingSiteGenericImportService(BaseService):
         self.handle_realtime_import_results(source, realtime_parking_site_inputs, realtime_parking_site_errors)
 
         for realtime_parking_site_error in realtime_parking_site_errors:
-            self.logger.warning(LogMessageType.FAILED_REALTIME_PARKING_SITE_HANDLING, str(realtime_parking_site_error))
+            log(
+                logger,
+                logging.WARNING,
+                LogMessageType.FAILED_REALTIME_PARKING_SITE_HANDLING,
+                str(realtime_parking_site_error),
+            )
 
         source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
         source.realtime_status = SourceStatus.ACTIVE
@@ -166,7 +187,9 @@ class ParkingSiteGenericImportService(BaseService):
             try:
                 self._save_static_parking_site_input(source, static_parking_site_input, existing_parking_site_ids)
             except:
-                self.logger.warning(
+                log(
+                    logger,
+                    logging.WARNING,
                     LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
                     f'Unhandled exception at dataset {static_parking_site_input}: {traceback.format_exc()}',
                 )
@@ -275,7 +298,9 @@ class ParkingSiteGenericImportService(BaseService):
                 realtime_parking_site_error_count += 1
             except:
                 realtime_parking_site_error_count += 1
-                self.logger.warning(
+                log(
+                    logger,
+                    logging.WARNING,
                     LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
                     f'Unhandled exception at dataset {realtime_parking_site_input}: {traceback.format_exc()}',
                 )
@@ -321,7 +346,9 @@ class ParkingSiteGenericImportService(BaseService):
             if realtime_capacity is UnsetValue or realtime_capacity is None:
                 if realtime_free_capacity > parking_site_capacity:
                     setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
-                    self.logger.warning(
+                    log(
+                        logger,
+                        logging.WARNING,
                         LogMessageType.FAILED_PARKING_SITE_HANDLING,
                         f'At {parking_site.original_uid} from {source.id}, '
                         f'realtime_free_{capacity_field} {realtime_free_capacity} '
@@ -331,7 +358,9 @@ class ParkingSiteGenericImportService(BaseService):
             if realtime_capacity is not UnsetValue and realtime_capacity is not None:
                 if realtime_free_capacity > realtime_capacity:
                     setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
-                    self.logger.warning(
+                    log(
+                        logger,
+                        logging.WARNING,
                         LogMessageType.FAILED_PARKING_SITE_HANDLING,
                         f'At {parking_site.original_uid} from {source.id}, '
                         f'realtime_free_{capacity_field} {realtime_free_capacity} '
