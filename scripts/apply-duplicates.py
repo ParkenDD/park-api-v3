@@ -44,12 +44,15 @@ def main():
     # Check if duplicate file exists
     if not duplicates_file_path.is_file():
         sys.exit('Error: please provide a valid duplicate file path.')
-    duplicates = load_duplicates(duplicates_file_path, ignore=True)
+    ignore_combinations, keep_combinations = load_duplicates(duplicates_file_path)
 
     endpoint = f'{base_url}{DUPLICATES_BASE_PATH}/apply'
     requests_response = requests.post(
         url=endpoint,
-        json=duplicates,
+        json={
+            'ignore': ignore_combinations,
+            'keep': keep_combinations,
+        },
         auth=(username, password),
         headers={
             'Content-Type': 'application/json',
