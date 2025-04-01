@@ -59,3 +59,7 @@ class BaseConfig:
 
     # set
     STATIC_GEOJSON_BASE_URL = 'https://raw.githubusercontent.com/ParkenDD/parkapi-sources-v3/main/data/'
+
+    STATIC_IMPORT_PULL_MINUTE = 0
+    STATIC_IMPORT_PULL_HOUR = 1
+    REALTIME_IMPORT_PULL_FREQUENCY = 5 * 60

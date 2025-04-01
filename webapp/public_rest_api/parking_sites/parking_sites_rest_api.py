@@ -10,29 +10,24 @@ from flask_openapi.decorator import (
     Parameter,
     Response,
     ResponseData,
-    Schema,
     SchemaListReference,
     SchemaReference,
     document,
 )
 from flask_openapi.schema import ArrayField, BooleanField, EnumField, IntegerField, NumericField, StringField
-from parkapi_sources.models.enums import PurposeType
 from validataclass.validators import DataclassValidator
 
+from parkapi_sources.models.enums import PurposeType
 from webapp.dependencies import dependencies
 from webapp.models import ParkingSite, ParkingSiteHistory
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.parking_sites.parking_sites_handler import ParkingSiteHandler
-from webapp.public_rest_api.parking_sites.parking_sites_schema import (
-    parking_site_example,
-    parking_site_history_example,
-    parking_site_history_schema,
-    parking_site_schema,
-)
 from webapp.public_rest_api.parking_sites.parking_sites_validators import ParkingSiteHistorySearchQueryInput
-from webapp.public_rest_api.sources.source_schema import source_example, source_schema
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
+from webapp.shared.parking_site.parking_sites_schema import parking_site_component
+from webapp.shared.parking_site_history.parking_sites_schema import parking_site_history_component
+from webapp.shared.sources.source_schema import source_component
 
 
 class ParkingSiteBlueprint(PublicApiBaseBlueprint):
@@ -127,10 +122,7 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
                 )
             )
         ],
-        components=[
-            Schema('Source', schema=source_schema, example=source_example),
-            Schema('ParkingSite', schema=parking_site_schema, example=parking_site_example),
-        ],
+        components=[source_component, parking_site_component],
     )
     def get(self):
         search_query = self.validate_query_args(self.parking_site_search_query_validator)
@@ -154,10 +146,7 @@ class ParkingSiteItemMethodView(ParkingSiteBaseMethodView):
                 )
             )
         ],
-        components=[
-            Schema('Source', schema=source_schema, example=source_example),
-            Schema('ParkingSite', schema=parking_site_schema, example=parking_site_example),
-        ],
+        components=[source_component, parking_site_component, parking_site_history_component],
     )
     def get(self, parking_site_id: int):
         parking_site = self.parking_site_handler.get_parking_site_item(parking_site_id)
@@ -179,9 +168,7 @@ class ParkingSiteHistoryListMethodView(ParkingSiteBaseMethodView):
                 )
             )
         ],
-        components=[
-            Schema('ParkingSiteHistory', schema=parking_site_history_schema, example=parking_site_history_example),
-        ],
+        components=[source_component, parking_site_component, parking_site_history_component],
     )
     def get(self, parking_site_id: int):
         search_query = self.validate_query_args(self.parking_site_history_search_query_validator)

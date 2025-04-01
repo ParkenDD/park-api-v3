@@ -45,8 +45,6 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
         if source.public_url:
             result['public_url'] = source.public_url
 
-        # TODO: handle attributions
-
         return result
 
     def get_parking_site_list_as_dict(self, search_query: ParkingSiteBaseSearchInput) -> dict:
@@ -72,12 +70,14 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
 
             if parking_site.opening_hours:
                 oh = OpeningHours(parking_site.opening_hours)
-                lot['latest_data']['status'] = oh.state()
+                lot['latest_data']['status'] = str(oh.state())
 
             if parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None:
-                capacity = (
-                    parking_site.capacity if parking_site.realtime_capacity is None else parking_site.realtime_capacity
-                )
+                if parking_site.realtime_capacity is None:
+                    capacity = parking_site.capacity
+                else:
+                    capacity = parking_site.realtime_capacity
+
                 if capacity:
                     lot['latest_data']['timestamp'] = parking_site.realtime_data_updated_at
                     lot['latest_data']['capacity'] = capacity
@@ -88,7 +88,6 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
             lots.append(lot)
 
         return {
-            # TODO: define if we should paginate
             'count': len(lots),
             'next': None,
             'previous': None,

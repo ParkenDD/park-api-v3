@@ -19,8 +19,8 @@ from webapp.models import Source
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.sources.source_handler import SourceHandler
-from webapp.public_rest_api.sources.source_schema import source_example, source_schema
 from webapp.public_rest_api.sources.source_validators import SourceSearchQueryInput
+from webapp.shared.sources.source_schema import source_example, source_schema
 
 
 class SourceBlueprint(PublicApiBaseBlueprint):

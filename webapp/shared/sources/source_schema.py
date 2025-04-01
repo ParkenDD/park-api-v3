@@ -3,6 +3,7 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from flask_openapi.decorator import Schema
 from flask_openapi.schema import DateTimeField, EnumField, IntegerField, JsonSchema, StringField, UriField
 
 from webapp.models.source import SourceStatus
@@ -31,3 +32,6 @@ source_schema = JsonSchema(
 
 
 source_example = {}
+
+
+source_component = Schema('Source', source_schema, source_example)
