@@ -6,10 +6,10 @@ Use of this source code is governed by an MIT-style license that can be found in
 import traceback
 from datetime import datetime, timezone
 
-from validataclass.helpers import UnsetValue
-
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
+from validataclass.helpers import UnsetValue
+
 from webapp.common.logging.models import LogMessageType
 from webapp.models import ExternalIdentifier, ParkingSite, ParkingSiteHistory, Source, Tag
 from webapp.models.parking_site_group import ParkingSiteGroup

@@ -9,6 +9,7 @@ from decimal import Decimal
 
 from parkapi_sources.models import RealtimeParkingSpotInput, StaticParkingSpotInput
 from parkapi_sources.models.enums import PurposeType
+
 from webapp.models import ParkingSpot
 from webapp.models.parking_spot import ParkingSpotStatus
 

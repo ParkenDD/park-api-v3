@@ -17,8 +17,8 @@ from flask_openapi.schema import (
     StringField,
     UriField,
 )
-
 from parkapi_sources.models.enums import ExternalIdentifierType, PurposeType, SupervisionType
+
 from webapp.models.parking_site import OpeningStatus, ParkAndRideType, ParkingSiteType
 
 parking_site_base_properties = {

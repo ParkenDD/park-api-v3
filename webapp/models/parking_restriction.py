@@ -5,11 +5,10 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from typing import TYPE_CHECKING, Optional
 
+from parkapi_sources.models.enums import ParkingAudience
 from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy import Enum as SqlalchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from parkapi_sources.models.enums import ParkingAudience
 
 from .base import BaseModel
 

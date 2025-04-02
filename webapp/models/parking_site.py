@@ -7,6 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Optional
 
+from parkapi_sources.models.enums import OpeningStatus, ParkAndRideType, ParkingSiteType, PurposeType, SupervisionType
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -25,7 +26,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import Index
 from sqlalchemy_utc import UtcDateTime
 
-from parkapi_sources.models.enums import OpeningStatus, ParkAndRideType, ParkingSiteType, PurposeType, SupervisionType
 from webapp.common.dataclass import filter_unset_value_and_none
 from webapp.common.sqlalchemy.point import Point
 from webapp.extensions import db

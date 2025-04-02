@@ -4,8 +4,8 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from celery.schedules import crontab
-
 from parkapi_sources.converters.base_converter.pull import PullConverter
+
 from webapp.common.celery import CeleryHelper
 from webapp.common.config import ConfigHelper
 from webapp.common.logging import Logger

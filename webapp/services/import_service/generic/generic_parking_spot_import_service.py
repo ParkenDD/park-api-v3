@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from parkapi_sources import ParkAPISources
 from parkapi_sources.exceptions import ImportParkingSpotException
 from parkapi_sources.models import RealtimeParkingSpotInput, StaticParkingSpotInput
+
 from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingRestriction, ParkingSpot, Source
 from webapp.models.source import SourceStatus

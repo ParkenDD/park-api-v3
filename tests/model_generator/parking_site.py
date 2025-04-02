@@ -7,6 +7,7 @@ from copy import deepcopy
 from decimal import Decimal
 
 from parkapi_sources.models.enums import ParkingSiteType, PurposeType
+
 from webapp.models import ParkingSite
 
 

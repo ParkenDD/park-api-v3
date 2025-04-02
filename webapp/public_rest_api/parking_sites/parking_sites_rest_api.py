@@ -15,9 +15,9 @@ from flask_openapi.decorator import (
     document,
 )
 from flask_openapi.schema import ArrayField, BooleanField, EnumField, IntegerField, NumericField, StringField
+from parkapi_sources.models.enums import PurposeType
 from validataclass.validators import DataclassValidator
 
-from parkapi_sources.models.enums import PurposeType
 from webapp.dependencies import dependencies
 from webapp.models import ParkingSite, ParkingSiteHistory
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint

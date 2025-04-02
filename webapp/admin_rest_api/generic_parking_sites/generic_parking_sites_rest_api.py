@@ -10,9 +10,9 @@ from pathlib import Path
 from flask import Response, jsonify
 from flask_openapi.decorator import ErrorResponse, Request, document
 from flask_openapi.schema import JsonSchema
-
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
+
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
 from webapp.admin_rest_api.generic_parking_sites.generic_parking_site_schema import generic_parking_site_response
 from webapp.admin_rest_api.generic_parking_sites.generic_parking_sites_handler import GenericParkingSitesHandler

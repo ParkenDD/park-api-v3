@@ -6,13 +6,13 @@ Use of this source code is governed by an MIT-style license that can be found in
 from dataclasses import dataclass
 from typing import Optional
 
+from parkapi_sources.models.enums import PurposeType
 from sqlalchemy import func, select
 from sqlalchemy.orm import Query, joinedload, selectinload
 from validataclass_search_queries.filters import BoundSearchFilter
 from validataclass_search_queries.pagination import PaginatedResult
 from validataclass_search_queries.search_queries import BaseSearchQuery
 
-from parkapi_sources.models.enums import PurposeType
 from webapp.models import ParkingSite, Source
 from webapp.repositories import BaseRepository
 
