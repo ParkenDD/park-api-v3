@@ -6,10 +6,10 @@ Use of this source code is governed by an MIT-style license that can be found in
 from datetime import datetime, timezone
 
 from flask import Flask
-
 from parkapi_sources import ParkAPISources
-from parkapi_sources.converters.base_converter.parking_spot_base_converter import ParkingSpotBaseConverter
+from parkapi_sources.converters.base_converter import ParkingSpotBaseConverter
 from parkapi_sources.converters.base_converter.pull import PullConverter
+
 from webapp.common.logging.models import LogMessageType, LogTag
 from webapp.common.rest.exceptions import UnknownSourceException
 from webapp.models import Source

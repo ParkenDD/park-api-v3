@@ -68,13 +68,11 @@ jobs:
     services:
       postgresql:
         image: postgis/postgis:15-3.5-alpine
-
         env:
-          POSTGRES_USER=park-api
-          POSTGRES_PASSWORD=development
-          POSTGRES_DB=park-api
-          PGUSER=park-api
-
+          POSTGRES_USER: park-api
+          POSTGRES_PASSWORD: development
+          POSTGRES_DB: park-api
+          PGUSER: park-api
         options: >-
           --health-cmd pg_isready
           --health-interval 10s

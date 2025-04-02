@@ -7,13 +7,13 @@ from copy import deepcopy
 from unittest.mock import ANY
 
 import pytest
-
-from parkapi_sources.converters.base_converter.parking_spot_base_converter import ParkingSpotBaseConverter
+from parkapi_sources.converters.base_converter import ParkingSpotBaseConverter
 from parkapi_sources.converters.base_converter.pull import PullConverter
 from parkapi_sources.exceptions import ImportParkingSpotException
 from parkapi_sources.models import RealtimeParkingSpotInput, SourceInfo, StaticParkingSpotInput
 from parkapi_sources.models.enums import ParkingSpotStatus
 from parkapi_sources.util import ConfigHelper, RequestHelper
+
 from tests.integration.services.import_service.generic.parking_spot_response_data import (
     CREATE_PARKING_SPOT_REALTIME_DATA,
     CREATE_PARKING_SPOT_STATIC_DATA,
