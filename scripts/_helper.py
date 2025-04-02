@@ -7,8 +7,9 @@ import csv
 from pathlib import Path
 
 
-def load_duplicates(duplicates_file_path: Path, ignore: bool = False) -> list[tuple[int, int]]:
-    old_duplicates: list[tuple[int, int]] = []
+def load_duplicates(duplicates_file_path: Path) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
+    ignore_combinations: list[tuple[int, int]] = []
+    keep_combinations: list[tuple[int, int]] = []
     first = True
     with open(duplicates_file_path, newline='') as duplicates_file:
         rows = csv.reader(duplicates_file)
@@ -18,10 +19,16 @@ def load_duplicates(duplicates_file_path: Path, ignore: bool = False) -> list[tu
                 first = False
                 continue
             # For applying, we just want to get ignored datasets
-            if ignore and row[2] != 'IGNORE':
+            if not row[0]:
                 continue
-            old_duplicates.append((int(row[0]), int(row[1])))
-    return old_duplicates
+            if row[2] == 'IGNORE':
+                ignore_combinations.append((int(row[0]), int(row[1])))
+            elif row[2] == 'KEEP':
+                keep_combinations.append((int(row[0]), int(row[1])))
+            else:
+                raise ValueError(f'row has invalid status value {row[2]}')
+
+    return ignore_combinations, keep_combinations
 
 
 def save_duplicates(duplicates_file_path: Path, items: list[dict], append: bool = False):

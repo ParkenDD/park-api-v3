@@ -3,7 +3,7 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from validataclass.validators import DataclassValidator, IntegerValidator, ListValidator
+from validataclass.validators import DataclassValidator
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
 from webapp.common.json import empty_json_response
@@ -11,7 +11,7 @@ from webapp.dependencies import dependencies
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 from .parking_site_handler import ParkingSiteHandler
-from .parking_site_validators import GetDuplicatesInput
+from .parking_site_validators import ApplyDuplicatesInput, GetDuplicatesInput
 
 
 class ParkingSitesBlueprint(AdminApiBaseBlueprint):
@@ -94,11 +94,11 @@ class ParkingSiteDuplicatesGenerateMethodView(ParkingSiteBaseMethodView):
 
 
 class ParkingSiteDuplicatesApplyMethodView(ParkingSiteBaseMethodView):
-    duplicate_ids_validator = ListValidator(ListValidator(IntegerValidator(), min_length=2, max_length=2))
+    apply_duplicate_validator = DataclassValidator(ApplyDuplicatesInput)
 
     def post(self):
-        duplicate_ids: list[list[int]] = self.duplicate_ids_validator.validate(self.request_helper.get_parsed_json())
+        apply_duplicate_input: ApplyDuplicatesInput = self.validate_request(self.apply_duplicate_validator)
 
-        self.parking_site_handler.apply_duplicates(duplicate_ids)
+        self.parking_site_handler.apply_duplicates(apply_duplicate_input)
 
         return empty_json_response(), 204

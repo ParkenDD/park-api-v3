@@ -82,7 +82,8 @@ def main():
     else:
         if not old_duplicates_file_path.is_file():
             sys.exit('Error: please provide a valid duplicate file path.')
-        old_duplicates = load_duplicates(old_duplicates_file_path)
+        ignore_combinations, keep_combinations = load_duplicates(old_duplicates_file_path)
+        old_duplicates = ignore_combinations + keep_combinations
 
     endpoint = f'{base_url}{DUPLICATES_BASE_PATH}/generate'
 

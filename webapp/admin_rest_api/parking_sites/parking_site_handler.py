@@ -6,7 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from validataclass_search_queries.pagination import PaginatedResult
 
 from webapp.admin_rest_api import AdminApiBaseHandler
-from webapp.admin_rest_api.parking_sites.parking_site_validators import GetDuplicatesInput
+from webapp.admin_rest_api.parking_sites.parking_site_validators import ApplyDuplicatesInput, GetDuplicatesInput
 from webapp.models import ParkingSite
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.services.matching_service import DuplicatedParkingSite, MatchingService
@@ -54,7 +54,5 @@ class ParkingSiteHandler(AdminApiBaseHandler):
             source_ids=source_ids,
         )
 
-    def apply_duplicates(self, duplicate_ids: list[list[int]]) -> list[DuplicatedParkingSite]:
-        duplicate_ids: list[tuple[int, int]] = [(duplicate[0], duplicate[1]) for duplicate in duplicate_ids]
-
-        return self.matching_service.apply_duplicates(duplicate_ids)
+    def apply_duplicates(self, apply_duplicate_input: ApplyDuplicatesInput) -> list[DuplicatedParkingSite]:
+        return self.matching_service.apply_duplicates(apply_duplicate_input.keep, apply_duplicate_input.ignore)

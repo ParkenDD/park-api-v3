@@ -100,12 +100,19 @@ class MatchingService(BaseService):
 
         return duplicates
 
-    def apply_duplicates(self, duplicates: list[tuple[int, int]]):
-        for parking_site_id, duplicate_parking_site_id in duplicates:
-            parking_site = self.parking_site_repository.fetch_parking_site_by_id(parking_site_id)
-            duplicate_parking_site = self.parking_site_repository.fetch_parking_site_by_id(duplicate_parking_site_id)
-            duplicate_parking_site.duplicate_of_parking_site_id = parking_site.id
-            self.parking_site_repository.save_parking_site(duplicate_parking_site)
+    def apply_duplicates(self, keep: list[list[int]], ignore: list[list[int]]):
+        for keep_parking_site_id, keep_duplicate_parking_site_id in keep:
+            keep_parking_site = self.parking_site_repository.fetch_parking_site_by_id(keep_parking_site_id)
+            keep_parking_site.duplicate_of_parking_site_id = None
+            self.parking_site_repository.save_parking_site(keep_parking_site)
+
+        for ignore_parking_site_id, ignore_duplicate_parking_site_id in ignore:
+            ignore_parking_site = self.parking_site_repository.fetch_parking_site_by_id(ignore_parking_site_id)
+            duplicate_parking_site = self.parking_site_repository.fetch_parking_site_by_id(
+                ignore_duplicate_parking_site_id
+            )
+            ignore_parking_site.duplicate_of_parking_site_id = duplicate_parking_site.id
+            self.parking_site_repository.save_parking_site(ignore_parking_site)
 
     def parking_site_to_duplicate(
         self,
