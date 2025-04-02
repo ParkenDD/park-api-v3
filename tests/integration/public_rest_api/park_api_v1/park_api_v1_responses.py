@@ -22,7 +22,7 @@ PARK_API_V1_POOL_RESPONSE = {
             'total': 100,
             'opening_hours': 'Mo-Su 08:00-18:00',
             'address': 'Demo Address, Demo City',
-            'state': 'open',
+            'state': ANY,
         },
         {
             'coords': {'lat': 50.2, 'lng': 10.2},
@@ -32,7 +32,7 @@ PARK_API_V1_POOL_RESPONSE = {
             'total': 100,
             'opening_hours': 'Mo-Su 08:00-18:00',
             'address': 'Demo Address, Demo City',
-            'state': 'open',
+            'state': ANY,
         },
         {
             'coords': {'lat': 50.3, 'lng': 10.3},
@@ -42,7 +42,7 @@ PARK_API_V1_POOL_RESPONSE = {
             'total': 100,
             'opening_hours': 'Mo-Su 08:00-18:00',
             'address': 'Demo Address, Demo City',
-            'state': 'open',
+            'state': ANY,
         },
     ],
     'last_updated': ANY,

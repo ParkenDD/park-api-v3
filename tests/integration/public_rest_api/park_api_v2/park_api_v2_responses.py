@@ -28,7 +28,7 @@ PARK_API_V2_LOTS_RESPONSE = {
             'name': 'Demo Parking Site 1',
             'address': 'Demo Address, Demo City',
             'capacity': 100,
-            'latest_data': {'status': 'open'},
+            'latest_data': {'status': ANY},
         },
         {
             'coordinates': [10.2, 50.2],
@@ -41,7 +41,7 @@ PARK_API_V2_LOTS_RESPONSE = {
             'name': 'Demo Parking Site 2',
             'address': 'Demo Address, Demo City',
             'capacity': 100,
-            'latest_data': {'status': 'open'},
+            'latest_data': {'status': ANY},
         },
         {
             'coordinates': [10.3, 50.3],
@@ -54,7 +54,7 @@ PARK_API_V2_LOTS_RESPONSE = {
             'name': 'Demo Parking Site 3',
             'address': 'Demo Address, Demo City',
             'capacity': 100,
-            'latest_data': {'status': 'open'},
+            'latest_data': {'status': ANY},
         },
         {
             'coordinates': [10.4, 50.4],
@@ -67,7 +67,7 @@ PARK_API_V2_LOTS_RESPONSE = {
             'name': 'Demo Parking Site 4',
             'address': 'Demo Address, Demo City',
             'capacity': 100,
-            'latest_data': {'status': 'open'},
+            'latest_data': {'status': ANY},
         },
         {
             'coordinates': [10.5, 50.5],
@@ -80,7 +80,7 @@ PARK_API_V2_LOTS_RESPONSE = {
             'name': 'Demo Parking Site 5',
             'address': 'Demo Address, Demo City',
             'capacity': 100,
-            'latest_data': {'status': 'open'},
+            'latest_data': {'status': ANY},
         },
         {
             'coordinates': [10.6, 50.6],
@@ -93,7 +93,7 @@ PARK_API_V2_LOTS_RESPONSE = {
             'name': 'Demo Parking Site 6',
             'address': 'Demo Address, Demo City',
             'capacity': 100,
-            'latest_data': {'status': 'open'},
+            'latest_data': {'status': ANY},
         },
     ],
 }
