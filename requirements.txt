@@ -20,7 +20,7 @@ openpyxl~=3.1.5
 opening-hours-py~=1.0.3
 kombu~=5.4.2
 lxml~=5.3.1
-parkapi-sources~=0.17.3
+parkapi-sources~=0.17.4
 
 # required for converters
 beautifulsoup4~=4.13.3
