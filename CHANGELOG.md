@@ -7,7 +7,7 @@
 * [ParkAPI Sources: Update pum_bw mapping and data](https://github.com/ParkenDD/parkapi-sources-v3/pull/197)
 * [ParkAPI Sources: Changed source_url for herrenberg_bike](https://github.com/ParkenDD/parkapi-sources-v3/pull/194)
 * [Fixed bug in setting realtime_free_capacity greater than capacity](https://github.com/ParkenDD/park-api-v3/pull/263)
-* [https://github.com/ParkenDD/park-api-v3/pull/267](https://github.com/ParkenDD/park-api-v3/pull/267)
+* [support unsetting duplicates](https://github.com/ParkenDD/park-api-v3/pull/267)
 
 
 ## 0.20.3
