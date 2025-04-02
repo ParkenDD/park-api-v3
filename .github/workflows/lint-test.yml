@@ -78,7 +78,7 @@ jobs:
           --health-retries 5
 
     env:
-      PARK_API_SQLALCHEMY_DATABASE_URI: 'postgresql://park-api:development@localhost/park-api'
+      CONFIG_FILE: 'tests/ci_testing_config.yml'
 
     steps:
     - name: set timezone

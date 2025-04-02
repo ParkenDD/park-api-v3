@@ -1,0 +1,9 @@
+# Example config file for development
+PROJECT_URL: 'http://localhost:5000'
+
+SECRET_KEY: 'random-key'
+SQLALCHEMY_DATABASE_URI: 'postgresql://park-api:development@localhost/park-api'
+
+CELERY_BROKER_URL: 'amqp://rabbitmq'
+
+PARK_API_CONVERTER: []
