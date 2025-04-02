@@ -27,7 +27,7 @@ def flask_app() -> Generator[App, None, None]:
     """
 
     # Load default development config instead of config.yaml for testing to avoid issues with local setups
-    os.environ['CONFIG_FILE'] = 'config_dist_dev.yaml'
+    os.environ['CONFIG_FILE'] = os.environ.get('TEST_CONFIG_FILE', 'config_dist_dev.yaml')
 
     app = launch(testing=True)
 
