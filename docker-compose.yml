@@ -53,7 +53,7 @@ services:
     command: ["flask", "source", "init-converters"]
 
   postgresql:
-    image: postgis/postgis:15-3.4
+    image: postgis/postgis:15-3.5-alpine
     volumes:
       - postgresql:/var/lib/postgresql/data/
     environment:

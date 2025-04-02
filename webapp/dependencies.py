@@ -20,9 +20,11 @@ from webapp.repositories import (
     ParkingSiteGroupRepository,
     ParkingSiteHistoryRepository,
     ParkingSiteRepository,
+    ParkingSpotRepository,
     SourceRepository,
 )
-from webapp.services.import_service import ParkingSiteGenericImportService
+from webapp.services.import_service import GenericImportService
+from webapp.services.import_service.generic import GenericParkingSiteImportService, GenericParkingSpotImportService
 from webapp.services.matching_service import MatchingService
 from webapp.services.sqlalchemy_service import SqlalchemyService
 
@@ -139,6 +141,10 @@ class Dependencies:
         )
 
     @cache_dependency
+    def get_parking_spot_repository(self) -> ParkingSpotRepository:
+        return self._create_repository(ParkingSpotRepository)
+
+    @cache_dependency
     def get_parking_site_repository(self) -> ParkingSiteRepository:
         return self._create_repository(ParkingSiteRepository)
 
@@ -168,12 +174,29 @@ class Dependencies:
         )
 
     @cache_dependency
-    def get_parking_site_generic_import_service(self) -> ParkingSiteGenericImportService:
-        return ParkingSiteGenericImportService(
+    def get_generic_parking_site_import_service(self) -> GenericParkingSiteImportService:
+        return GenericParkingSiteImportService(
             source_repository=self.get_source_repository(),
             parking_site_repository=self.get_parking_site_repository(),
             parking_site_history_repository=self.get_parking_site_history_repository(),
             parking_site_group_repository=self.get_parking_site_group_repository(),
+            **self.get_base_service_dependencies(),
+        )
+
+    @cache_dependency
+    def get_generic_parking_spot_import_service(self) -> GenericParkingSpotImportService:
+        return GenericParkingSpotImportService(
+            source_repository=self.get_source_repository(),
+            parking_spot_repository=self.get_parking_spot_repository(),
+            **self.get_base_service_dependencies(),
+        )
+
+    @cache_dependency
+    def get_generic_import_service(self) -> GenericImportService:
+        return GenericImportService(
+            source_repository=self.get_source_repository(),
+            generic_parking_site_import_service=self.get_generic_parking_site_import_service(),
+            generic_parking_spot_import_service=self.get_generic_parking_spot_import_service(),
             **self.get_base_service_dependencies(),
         )
 
@@ -192,7 +215,7 @@ class Dependencies:
             celery_helper=self.get_celery_helper(),
             logger=self.get_logger(),
             config_helper=self.get_config_helper(),
-            parking_site_generic_import_service=self.get_parking_site_generic_import_service(),
+            generic_import_service=self.get_generic_import_service(),
         )
 
 

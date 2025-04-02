@@ -10,6 +10,7 @@ from .datex2 import Datex2Blueprint
 from .park_api_v1 import ParkApiV1Blueprint
 from .park_api_v2 import ParkApiV2Blueprint
 from .parking_sites import ParkingSiteBlueprint
+from .parking_spots import ParkingSpotBlueprint
 from .sources import SourceBlueprint
 
 
@@ -20,6 +21,7 @@ class PublicRestApi(Blueprint):
         Datex2Blueprint,
         ParkApiV1Blueprint,
         ParkApiV2Blueprint,
+        ParkingSpotBlueprint,
         ParkingSiteBlueprint,
         SourceBlueprint,
     ]

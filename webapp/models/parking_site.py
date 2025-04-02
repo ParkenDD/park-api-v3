@@ -11,6 +11,7 @@ from parkapi_sources.models.enums import OpeningStatus, ParkAndRideType, Parking
 from sqlalchemy import (
     BigInteger,
     Boolean,
+    ForeignKey,
     Integer,
     Numeric,
     String,
@@ -25,6 +26,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.schema import Index
 from sqlalchemy_utc import UtcDateTime
 
+from webapp.common.dataclass import filter_unset_value_and_none
 from webapp.common.sqlalchemy.point import Point
 from webapp.extensions import db
 
@@ -32,8 +34,10 @@ from .base import BaseModel
 
 if TYPE_CHECKING:
     from .external_identifier import ExternalIdentifier
+    from .parking_restriction import ParkingRestriction
     from .parking_site_group import ParkingSiteGroup
     from .parking_site_history import ParkingSiteHistory
+    from .parking_spot import ParkingSpot
     from .source import Source
     from .tag import Tag
 
@@ -54,32 +58,42 @@ class ParkingSite(BaseModel):
     external_identifiers: Mapped[list['ExternalIdentifier']] = relationship(
         'ExternalIdentifier',
         back_populates='parking_site',
-        cascade='all, delete, delete-orphan',
+        cascade='all, delete-orphan',
     )
     tags: Mapped[list['Tag']] = relationship(
         'Tag',
         back_populates='parking_site',
-        cascade='all, delete, delete-orphan',
+        cascade='all, delete-orphan',
+    )
+    parking_spots: Mapped[list['ParkingSpot']] = relationship(
+        'ParkingSpot',
+        back_populates='parking_site',
+        cascade='all, delete-orphan',
+    )
+    restricted_to: Mapped[list['ParkingRestriction']] = relationship(
+        'ParkingRestriction',
+        back_populates='parking_site',
+        cascade='all, delete-orphan',
     )
     parking_site_history: Mapped[list['ParkingSiteHistory']] = relationship(
         'ParkingSiteHistory',
         back_populates='parking_site',
-        cascade='all, delete, delete-orphan',
+        cascade='all, delete-orphan',
     )
     parking_site_group: Mapped['ParkingSiteGroup'] = relationship(
         'ParkingSiteGroup',
         back_populates='parking_sites',
     )
 
-    source_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('source.id'), nullable=False)
+    source_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('source.id'), nullable=False)
     parking_site_group_id: Mapped[Optional[int]] = mapped_column(
         BigInteger,
-        db.ForeignKey('parking_site_group.id'),
+        ForeignKey('parking_site_group.id'),
         nullable=True,
     )
     duplicate_of_parking_site_id: Mapped[Optional[int]] = mapped_column(
         BigInteger,
-        db.ForeignKey('parking_site.id'),
+        ForeignKey('parking_site.id'),
         nullable=True,
     )
     original_uid: Mapped[str] = mapped_column(String(256), index=True, nullable=False)
@@ -161,7 +175,6 @@ class ParkingSite(BaseModel):
         ignore.append('parking_site_group_id')
 
         result = super().to_dict(fields, ignore)
-        result = {key: value for key, value in result.items() if value is not None}
 
         # Add legacy field is_supervised
         if self.supervision_type is not None:
@@ -174,6 +187,7 @@ class ParkingSite(BaseModel):
                     'type': external_identifier.type,
                     'value': external_identifier.value,
                 })
+
         if include_tags and len(self.tags):
             result['tags'] = []
             for tag in self.tags:
@@ -184,11 +198,13 @@ class ParkingSite(BaseModel):
                 ignore=['parking_site_id'],
             )
 
-        if not self.has_realtime_data:
-            return {key: value for key, value in result.items() if not key.startswith('realtime_')}
-
         # If we don't have realtime support, we don't need realtime data
-        return result
+        if not self.has_realtime_data:
+            return filter_unset_value_and_none(
+                {key: value for key, value in result.items() if not key.startswith('realtime_')},
+            )
+
+        return filter_unset_value_and_none(result)
 
     @hybrid_property
     def park_and_ride_type(self) -> Mapped[Optional[list[ParkAndRideType]]]:

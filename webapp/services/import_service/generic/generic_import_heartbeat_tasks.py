@@ -9,11 +9,11 @@ from webapp.extensions import celery
 
 @celery.task()
 def static_import_task(source: str):
-    parking_site_import_generic_service = dependencies.get_parking_site_generic_import_service()
-    parking_site_import_generic_service.update_source_static(source)
+    generic_import_generic_service = dependencies.get_generic_import_service()
+    generic_import_generic_service.update_source_static(source)
 
 
 @celery.task()
 def realtime_import_task(source: str):
-    parking_site_import_generic_service = dependencies.get_parking_site_generic_import_service()
-    parking_site_import_generic_service.update_source_realtime(source)
+    generic_import_generic_service = dependencies.get_generic_import_service()
+    generic_import_generic_service.update_source_realtime(source)

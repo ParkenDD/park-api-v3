@@ -34,7 +34,7 @@ class GenericParkingSitesBlueprint(AdminApiBaseBlueprint):
             parking_site_repository=dependencies.get_parking_site_repository(),
             parking_site_history_repository=dependencies.get_parking_site_history_repository(),
             source_repository=dependencies.get_source_repository(),
-            parking_site_generic_import_service=dependencies.get_parking_site_generic_import_service(),
+            generic_import_service=dependencies.get_generic_import_service(),
         )
 
         self.add_url_rule(

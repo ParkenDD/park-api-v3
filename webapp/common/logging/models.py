@@ -19,6 +19,8 @@ class LogMessageType(Enum):
     FAILED_PARKING_SITE_HANDLING = 'failed-parking-site-handling'
     FAILED_STATIC_PARKING_SITE_HANDLING = 'failed-static-parking-site-handling'
     FAILED_REALTIME_PARKING_SITE_HANDLING = 'failed-realtime-parking-site-handling'
+    FAILED_STATIC_PARKING_SPOT_HANDLING = 'failed-static-parking-spot-handling'
+    FAILED_REALTIME_PARKING_SPOT_HANDLING = 'failed-realtime-parking-spot-handling'
     DUPLICATE_HANDLING = 'duplicate-handling'
     MISC = 'misc'
 
@@ -26,5 +28,6 @@ class LogMessageType(Enum):
 class LogTag(Enum):
     SOURCE = 'source'
     PARKING_SITE = 'parking-site'
+    PARKING_SPOT = 'parking-spot'
     INITIATOR = 'initiator'
     USER = 'user'

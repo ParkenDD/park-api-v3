@@ -15,7 +15,6 @@ from validataclass_search_queries.search_queries import BaseSearchQuery
 
 from webapp.models import ParkingSite, Source
 from webapp.repositories import BaseRepository
-from webapp.repositories.exceptions import ObjectNotFoundException
 
 
 @dataclass
@@ -80,21 +79,19 @@ class ParkingSiteRepository(BaseRepository):
         return query.all()
 
     def fetch_parking_site_by_source_id_and_external_uid(self, source_id: int, original_uid: str) -> ParkingSite:
-        parking_site: Optional[ParkingSite] = (
+        parking_site: ParkingSite | None = (
             self.session.query(ParkingSite)
             .filter(ParkingSite.source_id == source_id)
             .filter(ParkingSite.original_uid == original_uid)
             .first()
         )
 
-        if not parking_site:
-            raise ObjectNotFoundException(
-                message=f'ParkingSite with source id {source_id} and original_uid {original_uid} not found',
-            )
+        return self._or_raise(
+            parking_site,
+            f'ParkingSite with source id {source_id} and original_uid {original_uid} not found',
+        )
 
-        return parking_site
-
-    def fetch_parking_sites_ids_by_source_id(self, source_id: int) -> list[int]:
+    def fetch_parking_site_ids_by_source_id(self, source_id: int) -> list[int]:
         return self.session.scalars(select(ParkingSite.id).where(ParkingSite.source_id == source_id)).all()
 
     def save_parking_site(self, parking_site: ParkingSite, *, commit: bool = True):

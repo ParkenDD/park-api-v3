@@ -16,6 +16,7 @@ from .base import BaseModel
 if TYPE_CHECKING:
     from .parking_site import ParkingSite
     from .parking_site_group import ParkingSiteGroup
+    from .parking_spot import ParkingSpot
 
 
 class SourceStatus(PythonEnum):
@@ -35,6 +36,11 @@ class Source(BaseModel):
     )
     parking_site_groups: Mapped[list['ParkingSiteGroup']] = relationship(
         'ParkingSiteGroup',
+        back_populates='source',
+        cascade='all, delete, delete-orphan',
+    )
+    parking_spots: Mapped[list['ParkingSpot']] = relationship(
+        'ParkingSpot',
         back_populates='source',
         cascade='all, delete, delete-orphan',
     )

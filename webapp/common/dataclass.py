@@ -25,6 +25,20 @@ def filter_unset_value(data: Any) -> Any:
     return data
 
 
+def filter_unset_value_and_none(data: Any) -> Any:
+    if isinstance(data, dict):
+        return {
+            key: filter_unset_value_and_none(value)
+            for key, value in data.items()
+            if value is not UnsetValue and value is not None
+        }
+
+    if isinstance(data, list):
+        return [filter_unset_value_and_none(item) for item in data if item is not UnsetValue and item is not None]
+
+    return data
+
+
 class DataclassMixin:
     def to_dict(self):
         return filter_unset_value(recursive_to_dict(self))

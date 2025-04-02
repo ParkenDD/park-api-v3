@@ -23,7 +23,7 @@ class ConfigLoader:
         # Load base config (containing constants and default values)
         app.config.from_object(BaseConfig)
 
-        # load all OCPDB-prefixed values from prefixed ENV
+        # load all PARK_API-prefixed values from prefixed ENV
         app.config.from_prefixed_env('PARK_API')
 
         # load postgresql credentials from env

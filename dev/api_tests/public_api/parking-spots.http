@@ -1,0 +1,10 @@
+### List parking sites
+GET {{api_host}}/api/public/v3/parking-spots
+
+
+### List parking sites with name filter
+GET {{api_host}}/api/public/v3/parking-spots?name=Bahnhof
+
+
+### Get single parking site
+GET {{api_host}}/api/public/v3/parking-spots/1
