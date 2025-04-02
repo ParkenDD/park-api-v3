@@ -21,9 +21,6 @@ jobs:
       run: pip install -r requirements.txt -r requirements-dev.txt
 
     - name: lint using ruff
-      # We could also use the official GitHub Actions integration.
-      # https://beta.ruff.rs/docs/usage/#github-action
-      # uses: chartboost/ruff-action@v1
       run: ruff check --output-format github ./webapp ./tests ./migrations
 
   test-unit:
@@ -31,12 +28,10 @@ jobs:
 
     container: python:3.12
 
-    steps:
-    - name: set timezone
-      uses: szenius/set-timezone@v2.0
-      with:
-        timezoneLinux: "Europe/Berlin"
+    env:
+      TZ: Europe/Berlin
 
+    steps:
     - name: checkout
       uses: actions/checkout@v4
 
@@ -50,6 +45,9 @@ jobs:
     runs-on: ubuntu-latest
 
     container: python:3.12
+
+    env:
+      TZ: Europe/Berlin
 
     services:
       postgresql:
@@ -66,11 +64,6 @@ jobs:
           --health-retries 5
 
     steps:
-    - name: set timezone
-      uses: szenius/set-timezone@v2.0
-      with:
-        timezoneLinux: "Europe/Berlin"
-
     - name: checkout
       uses: actions/checkout@v4
 
