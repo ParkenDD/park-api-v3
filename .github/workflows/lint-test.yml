@@ -1,4 +1,4 @@
-name: lint
+name: lint, run unit tests, run integration tests
 
 on:
   pull_request:
