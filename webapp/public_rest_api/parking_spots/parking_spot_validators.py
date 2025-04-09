@@ -23,7 +23,7 @@ class ParkingSpotSearchInput(CursorPaginationMixin, BaseSearchQuery):
 
     lat: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon: Optional[Decimal] = SearchParamCustom(), NumericValidator()
-    radius: Optional[Decimal] = SearchParamCustom(), IntegerValidator(allow_strings=True)
+    radius: Optional[int] = SearchParamCustom(), IntegerValidator(allow_strings=True)
 
     def __post_init__(self):
         if (self.lat is not None or self.lon is not None or self.radius is not None) and not (

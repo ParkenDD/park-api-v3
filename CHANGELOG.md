@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.21.0
+
+This release is a major change, as it introduces parking spots. The new parking spot endpoint can be accessed via
+`/api/public/v3/parking-spots`, you will find the documentation at
+`/documentation/public.html#/paths/v3-parking-spots/get`.
+
+Additionally, the project introduces integration tests via CI and multiple automated endpoint tests.
+
+### Features
+
+* [Parking spots and integration tests](https://github.com/ParkenDD/park-api-v3/pull/268)
+* [ParkAPI Sources: Friedrichshafen Sensors](https://github.com/ParkenDD/parkapi-sources-v3/pull/198)
+
+
 ## 0.20.4
 
 ### Fixes
