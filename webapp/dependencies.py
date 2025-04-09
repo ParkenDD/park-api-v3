@@ -12,7 +12,6 @@ from sqlalchemy.orm import scoped_session
 from webapp.common.celery import CeleryHelper
 from webapp.common.config import ConfigHelper
 from webapp.common.contexts import ContextHelper
-from webapp.common.logging import Logger
 from webapp.common.remote_helper import RemoteHelper
 from webapp.common.rest import RequestHelper
 from webapp.repositories import (
@@ -73,14 +72,6 @@ class Dependencies:
     def __init__(self):
         self._cached_dependencies = {}
 
-    # Common
-    @cache_dependency
-    def get_logger(self) -> 'Logger':
-        return Logger(
-            context_helper=self.get_context_helper(),
-            config_helper=self.get_config_helper(),
-        )
-
     @cache_dependency
     def get_celery_helper(self) -> CeleryHelper:
         return CeleryHelper()
@@ -92,7 +83,6 @@ class Dependencies:
     @cache_dependency
     def get_remote_helper(self) -> RemoteHelper:
         return RemoteHelper(
-            logger=self.get_logger(),
             config_helper=self.get_config_helper(),
         )
 
@@ -121,7 +111,6 @@ class Dependencies:
 
         return EventHelper(
             celery_helper=self.get_celery_helper(),
-            logger=self.get_logger(),
             context_helper=self.get_context_helper(),
         )
 
@@ -162,7 +151,7 @@ class Dependencies:
 
     def get_base_service_dependencies(self) -> dict:
         return {
-            'logger': self.get_logger(),
+            'context_helper': self.get_context_helper(),
             'config_helper': self.get_config_helper(),
             'event_helper': self.get_event_helper(),
         }
@@ -213,7 +202,6 @@ class Dependencies:
 
         return GenericImportRunner(
             celery_helper=self.get_celery_helper(),
-            logger=self.get_logger(),
             config_helper=self.get_config_helper(),
             generic_import_service=self.get_generic_import_service(),
         )
