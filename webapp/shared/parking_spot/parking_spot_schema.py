@@ -33,6 +33,8 @@ parking_spot_schema = JsonSchema(
         'original_uid': StringField(maxLength=256, description='Unique Identifier in original system.'),
         'lat': DecimalField(precision=10, scale=7),
         'lon': DecimalField(precision=10, scale=7),
+        'name': StringField(required=False),
+        'purpose': EnumField(enum=ParkingSpotStatus),
         'geojson': ObjectField(
             required=False,
             description='ParkingSite GeoJSON geometry',

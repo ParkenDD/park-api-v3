@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Query, joinedload, selectinload
 from validataclass_search_queries.filters import BoundSearchFilter
 from validataclass_search_queries.pagination import PaginatedResult
@@ -58,6 +58,39 @@ class ParkingSpotRepository(BaseRepository[ParkingSpot]):
 
     def delete_parking_spot(self, parking_spot: ParkingSpot, *, commit: bool = True):
         self._delete_resources(parking_spot, commit=commit)
+
+    def _filter_by_search_query(self, query: Query, search_query: Optional[BaseSearchQuery]) -> Query:
+        if search_query is None:
+            return query
+
+        # Apply all search filters one-by-one
+        for _param_name, bound_filter in search_query.get_search_filters():
+            if _param_name in ['radius', 'lat', 'lon']:
+                continue
+            query = self._apply_bound_search_filter(query, bound_filter)
+
+        if getattr(search_query, 'radius') and getattr(search_query, 'lat') and getattr(search_query, 'lon'):
+            radius = float(getattr(search_query, 'radius'))
+            lat = float(getattr(search_query, 'lat'))
+            lon = float(getattr(search_query, 'lon'))
+
+            engine_name = self.session.connection().dialect.name
+            if engine_name == 'postgresql':
+                distance_function = func.ST_DistanceSphere(
+                    ParkingSpot.geometry,
+                    func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326),
+                )
+            elif engine_name == 'mysql':
+                distance_function = func.ST_DISTANCE_SPHERE(
+                    ParkingSpot.geometry,
+                    func.ST_GeomFromText(f'POINT({lon} {lat})', 4326),
+                )
+            else:
+                raise NotImplementedError('The application just supports mysql, mariadb and postgresql.')
+
+            query = query.filter(distance_function < int(radius))
+
+        return query
 
     def _apply_bound_search_filter(self, query: Query, bound_filter: BoundSearchFilter) -> Query:
         if bound_filter.param_name == 'source_uid':
