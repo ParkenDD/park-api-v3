@@ -1,0 +1,74 @@
+name: lint, run unit tests, run integration tests
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+  # make workflow "callable" by others
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    container: python:3.12
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: pip install
+      run: pip install -r requirements.txt -r requirements-dev.txt
+
+    - name: lint using ruff
+      run: ruff check --output-format github ./webapp ./tests ./migrations
+
+  test-unit:
+    runs-on: ubuntu-latest
+
+    container: python:3.12
+
+    env:
+      TZ: Europe/Berlin
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: pip install
+      run: pip install -r requirements.txt -r requirements-dev.txt
+
+    - name: run pytest
+      run: python -m pytest tests/unit
+
+  test-integration:
+    runs-on: ubuntu-latest
+
+    container: python:3.12
+
+    env:
+      TZ: Europe/Berlin
+
+    services:
+      postgresql:
+        image: postgis/postgis:15-3.5-alpine
+        env:
+          POSTGRES_USER: park-api
+          POSTGRES_PASSWORD: development
+          POSTGRES_DB: park-api
+          PGUSER: park-api
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4
+
+    - name: pip install
+      run: pip install -r requirements.txt -r requirements-dev.txt
+
+    - name: run pytest
+      run: python -m pytest tests/integration

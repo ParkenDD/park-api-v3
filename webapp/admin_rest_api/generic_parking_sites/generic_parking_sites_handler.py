@@ -17,14 +17,14 @@ from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.common.rest.exceptions import InvalidInputException
 from webapp.models import Source
 from webapp.repositories import ParkingSiteHistoryRepository, ParkingSiteRepository, SourceRepository
-from webapp.services.import_service import ParkingSiteGenericImportService
+from webapp.services.import_service import GenericImportService
 
 
 class GenericParkingSitesHandler(AdminApiBaseHandler):
     source_repository: SourceRepository
     parking_site_repository: ParkingSiteRepository
     parking_site_history_repository: ParkingSiteHistoryRepository
-    parking_site_generic_import_service: ParkingSiteGenericImportService
+    generic_import_service: GenericImportService
 
     def __init__(
         self,
@@ -32,24 +32,22 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         source_repository: SourceRepository,
         parking_site_repository: ParkingSiteRepository,
         parking_site_history_repository: ParkingSiteHistoryRepository,
-        parking_site_generic_import_service: ParkingSiteGenericImportService,
+        generic_import_service: GenericImportService,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.source_repository = source_repository
         self.parking_site_repository = parking_site_repository
         self.parking_site_history_repository = parking_site_history_repository
-        self.parking_site_generic_import_service = parking_site_generic_import_service
+        self.generic_import_service = generic_import_service
 
     def handle_json_data(
         self,
         source_uid: str,
         data: dict | list,
     ) -> tuple[list[StaticParkingSiteInput | RealtimeParkingSiteInput], list[ImportParkingSiteException]]:
-        source = self.parking_site_generic_import_service.get_upserted_source(source_uid)
-        import_service: JsonConverter = self.parking_site_generic_import_service.park_api_sources.converter_by_uid[
-            source_uid
-        ]  # type: ignore
+        source = self.generic_import_service.get_upserted_source(source_uid)
+        import_service: JsonConverter = self.generic_import_service.park_api_sources.converter_by_uid[source_uid]  # type: ignore
 
         parking_site_inputs, parking_site_errors = import_service.handle_json(data)
 
@@ -60,10 +58,8 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
     def handle_xml_data(
         self, source_uid: str, data: bytes
     ) -> tuple[list[StaticParkingSiteInput | RealtimeParkingSiteInput], list[ImportParkingSiteException]]:
-        source = self.parking_site_generic_import_service.get_upserted_source(source_uid)
-        import_service: XmlConverter = self.parking_site_generic_import_service.park_api_sources.converter_by_uid[
-            source_uid
-        ]  # type: ignore
+        source = self.generic_import_service.get_upserted_source(source_uid)
+        import_service: XmlConverter = self.generic_import_service.park_api_sources.converter_by_uid[source_uid]  # type: ignore
 
         try:
             root_element = etree.fromstring(data, parser=etree.XMLParser(resolve_entities=False))  # noqa: S320
@@ -79,10 +75,8 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
     def handle_csv_data(
         self, source_uid: str, data: str
     ) -> tuple[list[StaticParkingSiteInput | RealtimeParkingSiteInput], list[ImportParkingSiteException]]:
-        source = self.parking_site_generic_import_service.get_upserted_source(source_uid)
-        import_service: CsvConverter = self.parking_site_generic_import_service.park_api_sources.converter_by_uid[
-            source_uid
-        ]  # type: ignore
+        source = self.generic_import_service.get_upserted_source(source_uid)
+        import_service: CsvConverter = self.generic_import_service.park_api_sources.converter_by_uid[source_uid]  # type: ignore
 
         try:
             parking_site_inputs, parking_site_errors = import_service.handle_csv_string(StringIO(data))
@@ -98,10 +92,8 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         source_uid: str,
         data: bytes,
     ) -> tuple[list[StaticParkingSiteInput | RealtimeParkingSiteInput], list[ImportParkingSiteException]]:
-        source = self.parking_site_generic_import_service.get_upserted_source(source_uid)
-        import_service: XlsxConverter = self.parking_site_generic_import_service.park_api_sources.converter_by_uid[
-            source_uid
-        ]  # type: ignore
+        source = self.generic_import_service.get_upserted_source(source_uid)
+        import_service: XlsxConverter = self.generic_import_service.park_api_sources.converter_by_uid[source_uid]  # type: ignore
 
         try:
             workbook = load_workbook(filename=BytesIO(data))
@@ -129,7 +121,7 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         static_parking_site_inputs = [item for item in parking_site_inputs if isinstance(item, StaticParkingSiteInput)]
 
         if len(static_parking_site_inputs):
-            self.parking_site_generic_import_service.handle_static_import_results(
+            self.generic_import_service.generic_parking_site_import_service.handle_static_import_results(
                 source,
                 static_parking_site_inputs,
                 parking_site_errors,
@@ -140,7 +132,7 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
         ]
 
         if len(realtime_parking_site_inputs):
-            self.parking_site_generic_import_service.handle_realtime_import_results(
+            self.generic_import_service.generic_parking_site_import_service.handle_realtime_import_results(
                 source, realtime_parking_site_inputs, parking_site_errors
             )
 
