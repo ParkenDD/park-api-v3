@@ -26,6 +26,7 @@ from webapp.public_rest_api.parking_sites.parking_sites_handler import ParkingSi
 from webapp.public_rest_api.parking_sites.parking_sites_validators import ParkingSiteHistorySearchQueryInput
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 from webapp.shared.parking_site.parking_sites_schema import parking_site_component
+from webapp.shared.parking_site_group.parking_sites_group_schema import parking_site_group_component
 from webapp.shared.parking_site_history.parking_sites_schema import parking_site_history_component
 from webapp.shared.sources.source_schema import source_component
 
@@ -122,7 +123,7 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
                 )
             )
         ],
-        components=[source_component, parking_site_component],
+        components=[source_component, parking_site_component, parking_site_group_component],
     )
     def get(self):
         search_query = self.validate_query_args(self.parking_site_search_query_validator)
@@ -146,7 +147,12 @@ class ParkingSiteItemMethodView(ParkingSiteBaseMethodView):
                 )
             )
         ],
-        components=[source_component, parking_site_component, parking_site_history_component],
+        components=[
+            source_component,
+            parking_site_component,
+            parking_site_group_component,
+            parking_site_history_component,
+        ],
     )
     def get(self, parking_site_id: int):
         parking_site = self.parking_site_handler.get_parking_site_item(parking_site_id)
@@ -168,7 +174,12 @@ class ParkingSiteHistoryListMethodView(ParkingSiteBaseMethodView):
                 )
             )
         ],
-        components=[source_component, parking_site_component, parking_site_history_component],
+        components=[
+            source_component,
+            parking_site_component,
+            parking_site_group_component,
+            parking_site_history_component,
+        ],
     )
     def get(self, parking_site_id: int):
         search_query = self.validate_query_args(self.parking_site_history_search_query_validator)

@@ -25,15 +25,15 @@ from webapp.status_rest_api import StatusRestApi
 __all__ = ['launch']
 
 
-def launch(testing: bool = False) -> App:
-    app = App(
+def launch(app_class: type[App] = App, config_overrides: dict | None = None) -> App:
+    app = app_class(
         BaseConfig.PROJECT_NAME,
         instance_path=BaseConfig.INSTANCE_FOLDER_PATH,
         instance_relative_config=True,
         template_folder=os.path.join(BaseConfig.PROJECT_ROOT, 'templates'),
     )
     app.wsgi_app = ProxyFix(app.wsgi_app)
-    configure_app(app, testing=testing)
+    configure_app(app, config_overrides=config_overrides)
     configure_extensions(app)
     configure_blueprints(app)
     configure_logging(app)
@@ -44,10 +44,9 @@ def launch(testing: bool = False) -> App:
     return app
 
 
-def configure_app(app: App, testing: bool = False) -> None:
-    # Load config from YAML file
+def configure_app(app: App, config_overrides: dict | None = None) -> None:
     config_loader = ConfigLoader()
-    config_loader.configure_app(app, testing)
+    config_loader.configure_app(app, config_overrides)
 
 
 def configure_extensions(app: App) -> None:

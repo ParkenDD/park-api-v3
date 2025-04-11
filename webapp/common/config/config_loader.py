@@ -16,7 +16,7 @@ from .base_config import BaseConfig
 
 class ConfigLoader:
     @staticmethod
-    def configure_app(app: Flask, testing: bool = False) -> None:
+    def configure_app(app: Flask, config_overrides: dict | None = None) -> None:
         """
         Initializes the app config with default values and loads the actual config from a YAML file.
         """
@@ -62,10 +62,10 @@ class ConfigLoader:
             for key, server in app.config['REMOTE_SERVERS'].items()
         }
 
+        if config_overrides is not None:
+            app.config.update(config_overrides)
+
         # Ensure that important config values are set
         config_check = [key for key in app.config['ENFORCE_CONFIG_VALUES'] if key not in app.config]
         if len(config_check) > 0:
             raise Exception(f'missing config values: {", ".join(config_check)}')
-
-        if testing:
-            app.config['TESTING'] = True

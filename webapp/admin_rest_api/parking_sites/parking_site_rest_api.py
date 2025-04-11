@@ -3,6 +3,9 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from http import HTTPStatus
+
+from flask_openapi.decorator import EmptyResponse, ErrorResponse, document
 from validataclass.validators import DataclassValidator
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
@@ -11,6 +14,11 @@ from webapp.dependencies import dependencies
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 from .parking_site_handler import ParkingSiteHandler
+from .parking_site_schema import (
+    apply_parking_site_duplicates_request,
+    generate_parking_site_duplicates_request,
+    generate_parking_site_duplicates_response,
+)
 from .parking_site_validators import ApplyDuplicatesInput, GetDuplicatesInput
 
 
@@ -87,18 +95,30 @@ class ParkingSiteMethodView(ParkingSiteBaseMethodView):
 class ParkingSiteDuplicatesGenerateMethodView(ParkingSiteBaseMethodView):
     duplicate_validator = DataclassValidator(GetDuplicatesInput)
 
+    @document(
+        description='Generate ParkingSite duplicates.',
+        request=generate_parking_site_duplicates_request,
+        response=[generate_parking_site_duplicates_response, ErrorResponse(error_codes=[400, 401])],
+    )
     def post(self):
         duplicate_input: GetDuplicatesInput = self.duplicate_validator.validate(self.request_helper.get_parsed_json())
 
-        return self.parking_site_handler.generate_duplicates(duplicate_input)
+        duplicate_items = self.parking_site_handler.generate_duplicates(duplicate_input)
+
+        return {'items': duplicate_items, 'total_count': len(duplicate_items)}, HTTPStatus.OK
 
 
 class ParkingSiteDuplicatesApplyMethodView(ParkingSiteBaseMethodView):
     apply_duplicate_validator = DataclassValidator(ApplyDuplicatesInput)
 
+    @document(
+        description='Apply ParkingSite duplicates.',
+        request=apply_parking_site_duplicates_request,
+        response=[EmptyResponse(), ErrorResponse(error_codes=[400, 401])],
+    )
     def post(self):
         apply_duplicate_input: ApplyDuplicatesInput = self.validate_request(self.apply_duplicate_validator)
 
         self.parking_site_handler.apply_duplicates(apply_duplicate_input)
 
-        return empty_json_response(), 204
+        return empty_json_response(), HTTPStatus.NO_CONTENT

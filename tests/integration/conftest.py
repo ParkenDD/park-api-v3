@@ -4,11 +4,15 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import os
-from typing import Generator
+from typing import Any, Generator
 
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
+from flask_openapi.generator import generate_openapi
+from openapi_core import OpenAPI
+from openapi_core.contrib.werkzeug import WerkzeugOpenAPIRequest, WerkzeugOpenAPIResponse
+from werkzeug.test import TestResponse
 
 from tests.model_generator.parking_site import get_parking_site, get_parking_site_by_counter
 from tests.model_generator.parking_spot import get_parking_spot, get_parking_spot_by_counter
@@ -20,6 +24,34 @@ from webapp.extensions import db as flask_sqlalchemy
 from webapp.models import ParkingSite, ParkingSpot
 
 
+class OpenApiFlaskClient(FlaskClient):
+    openapi_realm: str | None = None
+
+    def __init__(self, *args: Any, openapi_realm: str | None = None, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.openapi_realm = openapi_realm
+
+    def open(self, *args: Any, **kwargs: Any) -> TestResponse:
+        response = super().open(*args, **kwargs)
+
+        if self.openapi_realm is None:
+            return response
+
+        openapi = OpenAPI.from_dict(generate_openapi(self.openapi_realm))
+
+        openapi.validate_response(WerkzeugOpenAPIRequest(response.request), WerkzeugOpenAPIResponse(response))
+
+        return response
+
+
+class OpenApiApp(App):
+    """
+    Flask application extended with OpenApiFlaskClient
+    """
+
+    test_client_class = OpenApiFlaskClient
+
+
 @pytest.fixture
 def flask_app() -> Generator[App, None, None]:
     """
@@ -29,7 +61,14 @@ def flask_app() -> Generator[App, None, None]:
     # Load default development config instead of config.yaml for testing to avoid issues with local setups
     os.environ['CONFIG_FILE'] = os.environ.get('TEST_CONFIG_FILE', 'config_dist_dev.yaml')
 
-    app = launch(testing=True)
+    app = launch(
+        app_class=OpenApiApp,
+        config_overrides={
+            'TESTING': True,
+            'DEBUG': True,
+            'SERVER_NAME': 'localhost:5000',
+        },
+    )
 
     with app.app_context():
         flask_sqlalchemy.drop_all()

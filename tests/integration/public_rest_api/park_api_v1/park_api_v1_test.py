@@ -11,15 +11,16 @@ from tests.integration.public_rest_api.park_api_v1.park_api_v1_responses import 
 )
 
 
-def test_get_v1_index(test_client: FlaskClient, multi_source_parking_site_test_data: None) -> None:
-    response = test_client.get(path='/api/public/v1')
+def test_get_v1_index(public_api_test_client: FlaskClient, multi_source_parking_site_test_data: None) -> None:
+    response = public_api_test_client.get(path='/api/public/v1')
 
     assert response.status_code == 200
     assert response.json == PARK_API_V1_INDEX_RESPONSE
 
 
-def test_get_v1_pool(test_client: FlaskClient, multi_source_parking_site_test_data: None) -> None:
-    response = test_client.get(path='/api/public/v1/source-1')
+def test_get_v1_pool(public_api_test_client: FlaskClient, multi_source_parking_site_test_data: None) -> None:
+    response = public_api_test_client.get(path='/api/public/v1/source-1')
 
     assert response.status_code == 200
+    assert response.json['lots'][0] == PARK_API_V1_POOL_RESPONSE['lots'][0]
     assert response.json == PARK_API_V1_POOL_RESPONSE

@@ -4,12 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from flask import jsonify
-from flask_openapi.decorator import (
-    Parameter,
-    Response,
-    ResponseData,
-    document,
-)
+from flask_openapi.decorator import Parameter, document
 from flask_openapi.schema import StringField
 from validataclass.validators import DataclassValidator
 
@@ -18,10 +13,8 @@ from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.park_api_v1.park_api_v1_handler import ParkApiV1Handler
 from webapp.public_rest_api.park_api_v1.park_api_v1_schema import (
-    park_api_v1_parking_site_example,
-    park_api_v1_parking_site_schema,
-    park_api_v1_sources_example,
-    park_api_v1_sources_schema,
+    park_api_v1_parking_site_response,
+    park_api_v1_sources_response,
 )
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
 
@@ -69,7 +62,7 @@ class ParkApiV1BaseMethodView(PublicApiBaseMethodView):
 class ParkApiV1SourceMethodView(ParkApiV1BaseMethodView):
     @document(
         description='Get ParkApi V1 Sources.',
-        response=[Response(ResponseData(park_api_v1_sources_schema, park_api_v1_sources_example))],
+        response=[park_api_v1_sources_response],
     )
     def get(self):
         result = self.park_api_v1_handler.get_sources_as_dict()
@@ -88,7 +81,7 @@ class ParkApiV1ParkingSiteMethodView(ParkApiV1BaseMethodView):
                 schema=StringField(minLength=1, maxLength=256, example='example-city'),
             )
         ],
-        response=[Response(ResponseData(park_api_v1_parking_site_schema, park_api_v1_parking_site_example))],
+        response=[park_api_v1_parking_site_response],
     )
     def get(self, pool_id: str):
         search_query = self.parking_site_search_query_validator.validate(

@@ -11,16 +11,16 @@ from tests.integration.public_rest_api.parking_spot.parking_spot_responses impor
 )
 
 
-def test_get_parking_spot_list(test_client: FlaskClient, multi_source_parking_spot_test_data: None) -> None:
-    response = test_client.get(path='/api/public/v3/parking-spots')
+def test_get_parking_spot_list(public_api_test_client: FlaskClient, multi_source_parking_spot_test_data: None) -> None:
+    response = public_api_test_client.get(path='/api/public/v3/parking-spots')
 
     assert response.json['items'][1] == PARKING_SPOT_LIST_RESPONSE['items'][1]
     assert response.status_code == 200
     assert response.json == PARKING_SPOT_LIST_RESPONSE
 
 
-def test_get_parking_spot_item(test_client: FlaskClient, multi_source_parking_spot_test_data: None) -> None:
-    response = test_client.get(path='/api/public/v3/parking-spots/1')
+def test_get_parking_spot_item(public_api_test_client: FlaskClient, multi_source_parking_spot_test_data: None) -> None:
+    response = public_api_test_client.get(path='/api/public/v3/parking-spots/1')
 
     assert response.status_code == 200
     assert response.json == PARKING_SPOT_ITEM_RESPONSE

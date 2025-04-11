@@ -1,6 +1,6 @@
 # Example config file for development
 
-PROJECT_URL: 'http://localhost:5006'
+PROJECT_URL: 'http://localhost:5000'
 
 DEBUG: true
 

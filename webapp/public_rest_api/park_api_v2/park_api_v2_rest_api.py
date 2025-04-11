@@ -4,7 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from flask import jsonify
-from flask_openapi.decorator import Parameter, Response, ResponseData, document
+from flask_openapi.decorator import Parameter, document
 from flask_openapi.schema import ArrayField, DecimalField, IntegerField, StringField
 from validataclass.validators import DataclassValidator
 
@@ -13,10 +13,8 @@ from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.park_api_v2.park_api_v2_handler import ParkApiV2Handler
 from webapp.public_rest_api.park_api_v2.park_api_v2_schema import (
-    park_api_v2_parking_sites_example,
-    park_api_v2_parking_sites_schema,
-    park_api_v2_source_example,
-    park_api_v2_source_schema,
+    park_api_v2_parking_sites_response,
+    park_api_v2_source_response,
 )
 
 from .park_api_v2_validator import ParkApiV2SearchInput
@@ -75,7 +73,7 @@ class ParkApiV2PoolsMethodView(ParkApiV2BaseMethodView):
                 ),
             )
         ],
-        response=[Response(ResponseData(park_api_v2_source_schema, park_api_v2_source_example))],
+        response=[park_api_v2_source_response],
     )
     def get(self, pool_id: str):
         response = self.park_api_v2_handler.get_source_as_dict(pool_id)
@@ -97,7 +95,7 @@ class ParkApiV2LotsMethodView(ParkApiV2BaseMethodView):
             ),
             Parameter('radius', schema=IntegerField()),
         ],
-        response=[Response(ResponseData(park_api_v2_parking_sites_schema, park_api_v2_parking_sites_example))],
+        response=[park_api_v2_parking_sites_response],
     )
     def get(self):
         search_query = self.validate_query_args(self.parking_site_search_query_validator)

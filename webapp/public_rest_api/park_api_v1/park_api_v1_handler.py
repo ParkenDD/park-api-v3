@@ -16,7 +16,7 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
 
     key_mapping: dict[str, str] = {
         'name': 'name',
-        'id': 'original_uid',
+        'original_uid': 'id',
         'capacity': 'total',
         'public_url': 'url',
         'opening_hours': 'opening_hours',
@@ -60,11 +60,12 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
                     'lng': float(parking_site.lon),
                 },
                 'lot_type': self.type_mapping.get(parking_site.type, 'unknown'),
+                'forecast': False,
             }
-            for source_key, target_key in self.key_mapping.items():
+            for source_key, destination_key in self.key_mapping.items():
                 if getattr(parking_site, source_key) is None or getattr(parking_site, source_key) == '':
                     continue
-                lot[target_key] = getattr(parking_site, source_key)
+                lot[destination_key] = getattr(parking_site, source_key)
 
             if parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None:
                 lot['free'] = parking_site.realtime_free_capacity
