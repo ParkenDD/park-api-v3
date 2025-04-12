@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.21.1
+
+This release introduces automated OpenAPI docs testing in integration tests.
+
+### Fixes
+
+* [Better OpenAPI documentation with automated OpenAPI testing with documentation fixes](https://github.com/ParkenDD/park-api-v3/pull/271)
+
+
 ## 0.21.0
 
 This release is a major change, as it introduces parking spots. The new parking spot endpoint can be accessed via
