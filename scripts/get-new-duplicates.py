@@ -107,7 +107,7 @@ def main():
     if requests_response.status_code != 200:
         sys.exit(f'Invalid http response code: {requests_response.status_code}: {requests_response.text}')
 
-    response_items: list[dict] = requests_response.json()
+    response_items: list[dict] = requests_response.json()['items']
 
     if args.new_duplicates_file is None:
         print(requests_response.text)  # noqa: T201

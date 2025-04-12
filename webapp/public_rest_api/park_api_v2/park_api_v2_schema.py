@@ -3,6 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from flask_openapi.decorator import Response, ResponseData
 from flask_openapi.schema import (
     AnyOfField,
     ArrayField,
@@ -41,6 +42,9 @@ park_api_v2_source_example = {
 }
 
 
+park_api_v2_source_response = Response(ResponseData(park_api_v2_source_schema, park_api_v2_source_example))
+
+
 park_api_v2_parking_sites_schema = JsonSchema(
     title='ParkAPI V2 Parking Sites Response',
     properties={
@@ -59,26 +63,27 @@ park_api_v2_parking_sites_schema = JsonSchema(
                     'latest_data': ObjectField(
                         properties={
                             'timestamp': DateTimeField(),
-                            'lot_timestamp': DateTimeField(),
-                            'status': AnyOfField(allowed_values=['open', 'closed']),
-                            'num_free': IntegerField(),
-                            'capacity': IntegerField(),
-                            'num_occupied': IntegerField(),
-                            'percent_free': NumericField(),
+                            'lot_timestamp': DateTimeField(required=False),
+                            'status': AnyOfField(allowed_values=['open', 'closed'], required=False),
+                            'num_free': IntegerField(required=False),
+                            'capacity': IntegerField(required=False),
+                            'num_occupied': IntegerField(required=False),
+                            'percent_free': NumericField(required=False),
                         },
+                        required=False,
                     ),
                     'date_created': DateTimeField(),
                     'date_updated': DateTimeField(),
-                    'lot_id': StringField(maxLength=1),
+                    'lot_id': StringField(minLength=1),
                     'name': StringField(),
-                    'address': StringField(),
+                    'address': StringField(required=False),
                     'type': AnyOfField(allowed_values=['street', 'lot', 'underground', 'garage']),
                     'max_capacity': IntegerField(),
                     'has_live_capacity': BooleanField(),
-                    'public_url': UriField(),
-                    'source_url': UriField(),
-                }
-            )
+                    'public_url': UriField(required=False),
+                    'source_url': UriField(required=False),
+                },
+            ),
         ),
     },
 )
@@ -97,7 +102,6 @@ park_api_v2_parking_sites_example = {
             ],
             'latest_data': {
                 'timestamp': '2021-11-26T10:08:30',
-                'lot_timestamp': None,
                 'status': 'open',
                 'num_free': 6,
                 'capacity': 70,
@@ -117,3 +121,7 @@ park_api_v2_parking_sites_example = {
         },
     ],
 }
+
+park_api_v2_parking_sites_response = Response(
+    ResponseData(park_api_v2_parking_sites_schema, park_api_v2_parking_sites_example),
+)

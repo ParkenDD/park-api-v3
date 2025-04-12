@@ -3,6 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from flask_openapi.decorator import Response, ResponseData
 from flask_openapi.schema import (
     AnyOfField,
     ArrayField,
@@ -40,6 +41,9 @@ park_api_v1_sources_example = {
 }
 
 
+park_api_v1_sources_response = Response(ResponseData(park_api_v1_sources_schema, park_api_v1_sources_example))
+
+
 park_api_v1_parking_site_schema = JsonSchema(
     title='ParkAPI V1 Parking Sites Response',
     properties={
@@ -54,8 +58,8 @@ park_api_v1_parking_site_schema = JsonSchema(
                         },
                     ),
                     'forecast': BooleanField(
-                        description='If the data source offers a forecast. Is not available at this service and documented just for '
-                        'compatibility reasons.'
+                        description='If the data source offers a forecast. Is not available at this service and '
+                        'documented just for compatibility reasons.'
                     ),
                     'lot_type': AnyOfField(
                         allowed_values=['street', 'lot', 'underground', 'garage'],
@@ -67,22 +71,22 @@ park_api_v1_parking_site_schema = JsonSchema(
                         minLength=1,
                         maxLength=256,
                     ),
-                    'capacity': IntegerField(
+                    'total': IntegerField(
                         description='Capacity including all used sparking spots and without longterm parking spots.',
                     ),
                     'url': UriField(required=False),
                     'opening_hours': StringField(required=False, description='In OSM opening_hours format'),
                     'fee_hours': StringField(
                         required=False,
-                        description='In OSM opening_hours format. Is not available at this service and documented just for compatibility '
-                        'reasons.',
+                        description='In OSM opening_hours format. Is not available at this service and documented just '
+                        'for compatibility reasons.',
                     ),
                     'address': StringField(
                         required=False,
                         description='Contains a full address with street, house number, postcode and address',
                     ),
                     'free': IntegerField(required=False),
-                    'status': AnyOfField(allowed_values=['open', 'closed', 'nodata', 'unknown']),
+                    'status': AnyOfField(allowed_values=['open', 'closed', 'nodata', 'unknown'], required=False),
                 },
             ),
         ),
@@ -116,3 +120,8 @@ park_api_v1_parking_site_example = {
         },
     ],
 }
+
+
+park_api_v1_parking_site_response = Response(
+    ResponseData(park_api_v1_parking_site_schema, park_api_v1_parking_site_example),
+)

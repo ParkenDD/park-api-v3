@@ -4,6 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from copy import deepcopy
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from parkapi_sources.models.enums import ParkingSiteType, PurposeType
@@ -26,6 +27,7 @@ def get_parking_site(**kwargs) -> ParkingSite:
         'lon': Decimal('10.0'),
         'opening_hours': 'Mo-Su 08:00-18:00',
         'capacity': 100,
+        'static_data_updated_at': datetime.now(tz=timezone.utc),
     }
 
     data = deepcopy(base_data)

@@ -3,6 +3,8 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from typing import Any
+
 from opening_hours import OpeningHours  # noqa
 
 from webapp.models.parking_site import ParkingSiteType
@@ -52,34 +54,34 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
 
         lots = []
         for parking_site in parking_sites:
-            lot = {
+            lot: dict[str, Any] = {
                 'coordinates': [float(parking_site.lon), float(parking_site.lat)],
                 'has_live_capacity': parking_site.has_realtime_data,
                 'pool_id': parking_site.source.uid,
                 'type': self.type_mapping.get(parking_site.type, 'unknown'),
             }
-            for key in self.key_mapping:
-                if getattr(parking_site, key) is None or getattr(parking_site, key) == '':
+            for source_key, destination_key in self.key_mapping.items():
+                if getattr(parking_site, source_key) is None or getattr(parking_site, source_key) == '':
                     continue
-                lot[key] = getattr(parking_site, key)
+                lot[destination_key] = getattr(parking_site, source_key)
 
             if parking_site.opening_hours or (
                 parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None
             ):
-                lot['latest_data'] = {}
+                lot['latest_data'] = {'timestamp': parking_site.modified_at}
 
             if parking_site.opening_hours:
                 oh = OpeningHours(parking_site.opening_hours)
                 lot['latest_data']['status'] = str(oh.state())
 
             if parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None:
+                lot['latest_data']['lot_timestamp'] = (parking_site.realtime_data_updated_at,)
                 if parking_site.realtime_capacity is None:
                     capacity = parking_site.capacity
                 else:
                     capacity = parking_site.realtime_capacity
 
                 if capacity:
-                    lot['latest_data']['timestamp'] = parking_site.realtime_data_updated_at
                     lot['latest_data']['capacity'] = capacity
                     lot['latest_data']['num_free'] = parking_site.realtime_free_capacity
                     lot['latest_data']['num_occupied'] = capacity - parking_site.realtime_free_capacity

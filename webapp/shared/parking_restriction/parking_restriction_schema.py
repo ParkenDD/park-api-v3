@@ -31,7 +31,7 @@ parking_restriction_schema = JsonSchema(
             required=False,
             description='If type is not set, all audiences are restricted.',
         ),
-        'hours': StringField(required=False, maxLength=512, description='Ppening times in OSM format'),
+        'hours': StringField(required=False, maxLength=512, description='Opening times in OSM format'),
         'max_stay': StringField(
             required=False,
             maxLength=256,

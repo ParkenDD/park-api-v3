@@ -8,9 +8,9 @@ from flask.testing import FlaskClient
 
 def test_generate_duplicates_simple(
     multi_source_parking_site_test_data: None,
-    test_client: FlaskClient,
+    admin_api_test_client: FlaskClient,
 ) -> None:
-    result = test_client.post(
+    result = admin_api_test_client.post(
         '/api/admin/v1/parking-sites/duplicates/generate',
         auth=('dev', 'test'),
         json={
@@ -19,7 +19,7 @@ def test_generate_duplicates_simple(
     )
 
     assert result.status_code == 200
-    duplicates = result.json
+    duplicates = result.json['items']
 
     # As we just output duplicates where each site is at another source, and we have three sources, we expect
     # two duplicates pairs, therefor four datasets
@@ -28,9 +28,9 @@ def test_generate_duplicates_simple(
 
 def test_generate_duplicates_source_uids(
     multi_source_parking_site_test_data: None,
-    test_client: FlaskClient,
+    admin_api_test_client: FlaskClient,
 ) -> None:
-    result = test_client.post(
+    result = admin_api_test_client.post(
         '/api/admin/v1/parking-sites/duplicates/generate',
         auth=('dev', 'test'),
         json={
@@ -40,7 +40,7 @@ def test_generate_duplicates_source_uids(
     )
 
     assert result.status_code == 200
-    duplicates = result.json
+    duplicates = result.json['items']
 
     # As we just output duplicates where each site is at another source, and we have three sources, filtered to one,
     # we expect two duplicates pairs, because the other pair is between source-2 and source-3

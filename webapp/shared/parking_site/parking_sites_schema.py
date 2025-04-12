@@ -121,7 +121,7 @@ parking_site_schema = JsonSchema(
             ),
             required=False,
         ),
-        'group': Reference(obj='ParkingSiteGroup'),
+        'group': Reference(obj='ParkingSiteGroup', required=False),
         'tags': ArrayField(items=StringField(maxLength=256), required=False),
         'opening_hours': StringField(maxLength=512, required=False, description='OSM opening_hours format'),
         **parking_site_base_properties,
