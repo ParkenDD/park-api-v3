@@ -30,7 +30,7 @@ parking_site_base_properties = {
     'static_data_updated_at': DateTimeField(
         description='Last time static fields were updated. Can be set by the client.',
     ),
-    'capacity': IntegerField(minimum=0),
+    'capacity': IntegerField(minimum=0, description='Should include all specialized capacities.'),
     'capacity_disabled': IntegerField(minimum=0, required=False),
     'capacity_woman': IntegerField(minimum=0, required=False),
     'capacity_family': IntegerField(minimum=0, required=False),
