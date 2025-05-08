@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.21.2
+
+### Fixes
+
+* [Fixes realtime updates at heartbeat mechanism](https://github.com/ParkenDD/park-api-v3/pull/282)
+
+
 ## 0.21.1
 
 This release introduces automated OpenAPI docs testing in integration tests.
