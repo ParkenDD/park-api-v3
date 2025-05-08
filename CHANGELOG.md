@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.21.3
+
+### Fixes
+
+* Fixes migration in 0.21.2
+
+
 ## 0.21.2
 
 ### Fixes

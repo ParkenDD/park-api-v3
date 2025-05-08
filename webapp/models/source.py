@@ -67,10 +67,10 @@ class Source(BaseModel):
         default=SourceStatus.PROVISIONED,
     )
 
-    static_parking_site_error_count: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
-    realtime_parking_site_error_count: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
-    static_parking_spot_error_count: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
-    realtime_parking_spot_error_count: Mapped[int] = mapped_column(Integer(), nullable=False, default=0)
+    static_parking_site_error_count: Mapped[int | None] = mapped_column(Integer(), nullable=True, default=0)
+    realtime_parking_site_error_count: Mapped[int | None] = mapped_column(Integer(), nullable=True, default=0)
+    static_parking_spot_error_count: Mapped[int | None] = mapped_column(Integer(), nullable=True, default=0)
+    realtime_parking_spot_error_count: Mapped[int | None] = mapped_column(Integer(), nullable=True, default=0)
 
     def to_dict(self, *args, ignore: Optional[list[str]] = None, **kwargs) -> dict:
         ignore = ignore or []
