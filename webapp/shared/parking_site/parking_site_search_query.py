@@ -31,7 +31,7 @@ from webapp.common.validation.list_validators import CommaSeparatedListValidator
 
 @search_query_dataclass
 class ParkingSiteBaseSearchInput(CursorPaginationMixin, BaseSearchQuery):
-    source_id: Optional[int] = SearchParamEquals(), IntegerValidator()
+    source_id: Optional[int] = SearchParamEquals(), IntegerValidator(allow_strings=True)
     not_source_ids: Optional[list[int]] = SearchParamCustom(), MultiSelectIntegerValidator(min_value=1)
     source_uid: Optional[str] = SearchParamEquals(), StringValidator()
     source_uids: Optional[list[str]] = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
@@ -48,7 +48,7 @@ class ParkingSiteSearchInput(ParkingSiteBaseSearchInput):
     # radius: Optional[Decimal] = SearchParamCustom(), IntegerValidator(allow_strings=True)
 
     # TODO: delete these two compatibility fields and enable radius above after a few weeks of adaption time: issue #134
-    location: Optional[list[Decimal, Decimal]] = SearchParamCustom(), CommaSeparatedListValidator(NumericValidator())
+    location: Optional[list[Decimal]] = SearchParamCustom(), CommaSeparatedListValidator(NumericValidator())
     radius: Optional[Decimal] = SearchParamCustom(), NumericValidator()
 
     def __post_init__(self):

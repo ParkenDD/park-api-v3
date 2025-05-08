@@ -16,6 +16,7 @@ from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteIn
 from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.common.rest.exceptions import InvalidInputException
 from webapp.models import Source
+from webapp.models.source import SourceStatus
 from webapp.repositories import ParkingSiteHistoryRepository, ParkingSiteRepository, SourceRepository
 from webapp.services.import_service import GenericImportService
 
@@ -126,6 +127,7 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
                 static_parking_site_inputs,
                 parking_site_errors,
             )
+            source.static_status = SourceStatus.ACTIVE
 
         realtime_parking_site_inputs = [
             item for item in parking_site_inputs if isinstance(item, RealtimeParkingSiteInput)
@@ -133,7 +135,10 @@ class GenericParkingSitesHandler(AdminApiBaseHandler):
 
         if len(realtime_parking_site_inputs):
             self.generic_import_service.generic_parking_site_import_service.handle_realtime_import_results(
-                source, realtime_parking_site_inputs, parking_site_errors
+                source,
+                realtime_parking_site_inputs,
+                parking_site_errors,
             )
+            source.realtime_status = SourceStatus.ACTIVE
 
-        self.parking_site_repository.commit_transaction()
+        self.source_repository.save_source(source)
