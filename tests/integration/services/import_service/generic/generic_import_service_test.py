@@ -7,8 +7,7 @@ from copy import deepcopy
 from unittest.mock import ANY
 
 import pytest
-from parkapi_sources.converters.base_converter import ParkingSpotBaseConverter
-from parkapi_sources.converters.base_converter.pull import PullConverter
+from parkapi_sources.converters.base_converter.pull import ParkingSpotPullConverter
 from parkapi_sources.exceptions import ImportParkingSpotException
 from parkapi_sources.models import RealtimeParkingSpotInput, SourceInfo, StaticParkingSpotInput
 from parkapi_sources.models.enums import ParkingSpotStatus
@@ -28,7 +27,7 @@ from webapp.models import ParkingSpot
 from webapp.services.import_service.generic import GenericImportService
 
 
-class ParkingSpotTestPullConverter(PullConverter, ParkingSpotBaseConverter):
+class ParkingSpotTestPullConverter(ParkingSpotPullConverter):
     source_info = SourceInfo(
         uid='source',
         name='Test',
