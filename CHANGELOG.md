@@ -1,6 +1,17 @@
 # Changelog
 
+## 0.22.0
+
+Released 2025-05-10
+
+### Features
+
+* [better realtime monitoring](https://github.com/ParkenDD/park-api-v3/pull/283)
+
+
 ## 0.21.3
+
+Released 2025-05-08
 
 ### Fixes
 
@@ -9,12 +20,16 @@
 
 ## 0.21.2
 
+Released 2025-05-08
+
 ### Fixes
 
 * [Fixes realtime updates at heartbeat mechanism](https://github.com/ParkenDD/park-api-v3/pull/282)
 
 
 ## 0.21.1
+
+Released 2025-04-12
 
 This release introduces automated OpenAPI docs testing in integration tests.
 
@@ -24,6 +39,8 @@ This release introduces automated OpenAPI docs testing in integration tests.
 
 
 ## 0.21.0
+
+Released 2025-04-09
 
 This release is a major change, as it introduces parking spots. The new parking spot endpoint can be accessed via
 `/api/public/v3/parking-spots`, you will find the documentation at
@@ -38,6 +55,8 @@ Additionally, the project introduces integration tests via CI and multiple autom
 
 
 ## 0.20.4
+
+Released 2025-04-02
 
 ### Fixes
 
