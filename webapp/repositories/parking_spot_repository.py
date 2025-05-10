@@ -3,6 +3,7 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import func, select
@@ -52,6 +53,15 @@ class ParkingSpotRepository(BaseRepository[ParkingSpot]):
             parking_spot,
             f'ParkingSpot with source id {source_id} and original_uid {original_uid} not found',
         )
+
+    def fetch_realtime_outdated_parking_spot_count_by_source(self, older_then: datetime) -> dict[int, int]:
+        query = self.session.query(ParkingSpot.source_id, func.count(ParkingSpot.id))
+
+        query = query.filter(ParkingSpot.realtime_data_updated_at < older_then)
+
+        result = query.group_by(ParkingSpot.source_id).all()
+
+        return {key: value for key, value in result}
 
     def save_parking_spot(self, parking_spot: ParkingSpot, *, commit: bool = True):
         self._save_resources(parking_spot, commit=commit)

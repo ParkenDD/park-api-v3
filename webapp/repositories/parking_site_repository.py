@@ -4,6 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Optional
 
 from parkapi_sources.models.enums import PurposeType
@@ -93,6 +94,15 @@ class ParkingSiteRepository(BaseRepository):
 
     def fetch_parking_site_ids_by_source_id(self, source_id: int) -> list[int]:
         return self.session.scalars(select(ParkingSite.id).where(ParkingSite.source_id == source_id)).all()
+
+    def fetch_realtime_outdated_parking_site_count_by_source(self, older_then: datetime) -> dict[int, int]:
+        query = self.session.query(ParkingSite.source_id, func.count(ParkingSite.id))
+
+        query = query.filter(ParkingSite.realtime_data_updated_at < older_then)
+
+        result = query.group_by(ParkingSite.source_id).all()
+
+        return {key: value for key, value in result}
 
     def save_parking_site(self, parking_site: ParkingSite, *, commit: bool = True):
         self._save_resources(parking_site, commit=commit)
