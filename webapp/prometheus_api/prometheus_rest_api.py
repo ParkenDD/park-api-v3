@@ -19,8 +19,9 @@ class PrometheusRestApi(Blueprint):
 
         prometheus_handler = PrometheusHandler(
             **self.get_base_handler_dependencies(),
-            parking_site_repository=dependencies.get_parking_site_repository(),
             source_repository=dependencies.get_source_repository(),
+            parking_site_repository=dependencies.get_parking_site_repository(),
+            parking_spot_repository=dependencies.get_parking_spot_repository(),
         )
 
         self.add_url_rule(

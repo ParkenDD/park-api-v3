@@ -3,6 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -21,24 +22,37 @@ from validataclass_search_queries.filters import (
     SearchParamCustom,
     SearchParamEquals,
     SearchParamMultiSelect,
+    SearchParamSince,
+    SearchParamUntil,
 )
 from validataclass_search_queries.pagination import CursorPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
 from validataclass_search_queries.validators import MultiSelectIntegerValidator, MultiSelectValidator
 
+from webapp.common.validation import DateTimeToUtcValidator
 from webapp.common.validation.list_validators import CommaSeparatedListValidator
 
 
 @search_query_dataclass
 class ParkingSiteBaseSearchInput(CursorPaginationMixin, BaseSearchQuery):
-    source_id: Optional[int] = SearchParamEquals(), IntegerValidator(allow_strings=True)
-    not_source_ids: Optional[list[int]] = SearchParamCustom(), MultiSelectIntegerValidator(min_value=1)
-    source_uid: Optional[str] = SearchParamEquals(), StringValidator()
-    source_uids: Optional[list[str]] = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
-    name: Optional[str] = SearchParamContains(), StringValidator()
+    source_id: int | None = SearchParamEquals(), IntegerValidator(allow_strings=True)
+    not_source_ids: list[int] | None = SearchParamCustom(), MultiSelectIntegerValidator(min_value=1)
+    source_uid: str | None = SearchParamEquals(), StringValidator()
+    source_uids: list[str] | None = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
+    name: str | None = SearchParamContains(), StringValidator()
     ignore_duplicates: bool = SearchParamCustom(), BooleanValidator(allow_strings=True), Default(True)
-    purpose: Optional[PurposeType] = SearchParamEquals(), EnumValidator(PurposeType)
-    limit: Optional[int] = PaginationLimitValidator(max_value=1000), Default(None)
+    purpose: PurposeType | None = SearchParamEquals(), EnumValidator(PurposeType)
+    limit: int | None = PaginationLimitValidator(max_value=1000), Default(None)
+    static_data_updated_at_since: datetime | None = SearchParamSince('static_data_updated_at'), DateTimeToUtcValidator()
+    static_data_updated_at_until: datetime | None = SearchParamUntil('static_data_updated_at'), DateTimeToUtcValidator()
+    realtime_data_updated_at_since: datetime | None = (
+        SearchParamSince('realtime_data_updated_at'),
+        DateTimeToUtcValidator(),
+    )
+    realtime_data_updated_at_until: datetime | None = (
+        SearchParamUntil('realtime_data_updated_at'),
+        DateTimeToUtcValidator(),
+    )
 
 
 @search_query_dataclass
