@@ -123,24 +123,26 @@ class PrometheusHandler:
                         value=int((datetime.now(tz=timezone.utc) - source.static_data_updated_at).total_seconds()),
                     )
                 )
-            source_static_parking_site_errors.metrics.append(
-                SourceMetric(
-                    source=source.uid,
-                    value=source.static_parking_site_error_count,
+            if source.static_parking_site_error_count is not None:
+                source_static_parking_site_errors.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=source.static_parking_site_error_count,
+                    )
                 )
-            )
-            legacy_source_static_parking_site_errors.metrics.append(
-                SourceMetric(
-                    source=source.uid,
-                    value=source.static_parking_site_error_count,
+                legacy_source_static_parking_site_errors.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=source.static_parking_site_error_count,
+                    )
                 )
-            )
-            source_static_parking_spot_errors.metrics.append(
-                SourceMetric(
-                    source=source.uid,
-                    value=source.static_parking_spot_error_count,
+            if source.static_parking_spot_error_count is not None:
+                source_static_parking_spot_errors.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=source.static_parking_spot_error_count,
+                    )
                 )
-            )
             failed_static_sources.metrics.append(
                 SourceMetric(
                     source=source.uid,
@@ -158,24 +160,26 @@ class PrometheusHandler:
                         value=int((datetime.now(tz=timezone.utc) - source.realtime_data_updated_at).total_seconds()),
                     )
                 )
-            source_realtime_parking_site_errors.metrics.append(
-                SourceMetric(
-                    source=source.uid,
-                    value=source.realtime_parking_site_error_count,
+            if source.realtime_parking_site_error_count is not None:
+                source_realtime_parking_site_errors.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=source.realtime_parking_site_error_count,
+                    )
                 )
-            )
-            legacy_source_realtime_parking_site_errors.metrics.append(
-                SourceMetric(
-                    source=source.uid,
-                    value=source.realtime_parking_site_error_count,
+                legacy_source_realtime_parking_site_errors.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=source.realtime_parking_site_error_count,
+                    )
                 )
-            )
-            source_realtime_parking_spot_errors.metrics.append(
-                SourceMetric(
-                    source=source.uid,
-                    value=source.realtime_parking_spot_error_count,
+            if source.realtime_parking_spot_error_count is not None:
+                source_realtime_parking_spot_errors.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=source.realtime_parking_spot_error_count,
+                    )
                 )
-            )
             failed_realtime_sources.metrics.append(
                 SourceMetric(
                     source=source.uid,
