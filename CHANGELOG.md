@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.22.1
+
+Released 2025-05-10
+
+### Features
+
+* [ensure valid metrics](https://github.com/ParkenDD/park-api-v3/pull/284)
+
+
 ## 0.22.0
 
 Released 2025-05-10
