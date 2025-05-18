@@ -1,6 +1,5 @@
 # Keep the Docker build context small to speed up builds. This is really all we need in the Dockerfile.
 *
 !webapp
-!runsocketioserverproduction.py
 !requirements.txt
 !requirements-dev.txt

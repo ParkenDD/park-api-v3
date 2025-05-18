@@ -8,7 +8,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import TYPE_CHECKING, Optional
 
-from parkapi_sources.models.enums import ParkingSpotStatus, PurposeType
+from parkapi_sources.models.enums import ParkingSpotStatus, ParkingSpotType, PurposeType
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -65,6 +65,9 @@ class ParkingSpot(BaseModel):
     original_uid: Mapped[str] = mapped_column(String(256), index=True, nullable=False)
 
     name: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    type: Mapped[ParkingSpotType | None] = mapped_column(SqlalchemyEnum(ParkingSpotType), nullable=True)
+    address: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     lat: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=7), nullable=False)
     lon: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=7), nullable=False)
     _geojson: Mapped[str | None] = mapped_column('geojson', Text, nullable=True)

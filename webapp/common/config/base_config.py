@@ -19,6 +19,7 @@ class BaseConfig:
     LOG_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'logs'))
     TEMP_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'temp'))
     DEBUG_DUMP_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'data', 'debug-dump'))
+    PARKING_SITE_PATCH_DIR = os.path.abspath(os.path.join(PROJECT_ROOT, os.pardir, 'data', 'patches', 'parking-sites'))
 
     REDIS_URL = 'redis://redis:6379/3'
     ENFORCE_CONFIG_VALUES = ['SQLALCHEMY_DATABASE_URI', 'CELERY_BROKER_URL']

@@ -1,31 +1,28 @@
-Flask~=3.1.0
+Flask~=3.1.1
 Flask-Failsafe~=0.2
 Flask-Migrate~=4.1.0
 Flask-SQLAlchemy~=3.1.1
-SQLAlchemy~=2.0.40
+SQLAlchemy~=2.0.41
 SQLAlchemy-Utc~=0.14.0
-pytz~=2025.1
+pytz~=2025.2
 psycopg2-binary~=2.9.10
 pymysql~=1.1.1
 requests~=2.32.3
 alembic~=1.15.2
 gunicorn~=23.0.0
 pyyaml~=6.0.2
-celery~=5.4.0
+celery~=5.5.2
 werkzeug~=3.1.3
 validataclass~=0.11.0
-python-dotenv~=1.0.1
-click~=8.1.8
+python-dotenv~=1.1.0
+click~=8.2.0
 openpyxl~=3.1.5
 opening-hours-py~=1.1.2
-kombu~=5.4.2
-lxml~=5.3.1
-parkapi-sources~=0.18.2
+kombu~=5.5.3
+lxml~=5.4.0
+parkapi-sources~=0.19.3
 isodate~=0.7.2
 
-# required for converters
-beautifulsoup4~=4.13.3
-pyproj~=3.7.1
 
 # binary butterfly shared libraries (https://git.binary-butterfly.de/public_libraries)
 --extra-index-url https://git.binary-butterfly.de/api/v4/groups/262/-/packages/pypi/simple
