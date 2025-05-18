@@ -115,7 +115,7 @@ def main():
         new_duplicates_file_path: Path = Path(args.new_duplicates_file)
         save_duplicates(
             new_duplicates_file_path,
-            requests_response.json(),
+            response_items,
             append=old_duplicates_file_path == new_duplicates_file_path,
         )
 
