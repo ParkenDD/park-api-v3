@@ -1,0 +1,10 @@
+{
+  "uid": "source",
+  "name": "Demo Source",
+  "has_realtime_data": true,
+  "timezone": "Europe/Berlin",
+  "public_url": "https://demo.source.com",
+  "attribution_license": "CC BY-SA 4.0",
+  "attribution_url": "https://demo.source.com/attribution",
+  "attribution_contributor": "Demo Contributor"
+}

@@ -199,7 +199,41 @@ Besides `PARK_API_CONVERTER`, there are a few other configuration options to set
 
 1) You can create a config file called `config.yaml` in your root folder.
 2) You can set any config value by env var, but you have to prefix the config name with `PARKAPI_` then. For example,
-   you can configure `SECRET_KEY` using the env var `$PARKAPI_SECRET_KEY`. ENV vars overwrite
+   you can configure `SECRET_KEY` using the env var `PARKAPI_SECRET_KEY`. ENV vars overwrite
+
+### Source configuration
+
+The config key `PARK_API_CONVERTER`, a list of dicts, provides the source config.
+
+```yaml
+PARK_API_CONVERTER:
+  - uid: pull_converter
+  - uid: push_converter
+    hash: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+  - uid: generic_converter
+    hash: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+    generic_source: true
+  - uid: env_var_converter
+    env:
+      PARK_API_DEMO_ENV_VAR: demo_env_value
+      PARK_API_OTHER_DEMO_ENV_VAR: other_demo_env_value
+```
+
+* `pull_converter` is an example for a simple pull converter. If the pull converter works without credentials,
+  one does not need any additional parameters. The converter `uid` has to be available
+  [at ParkAPI Sources](https://github.com/ParkenDD/parkapi-sources-v3).
+* `push_converter` is an example for a simple push converter. This enables a BasicAuth user. You will need a `hash`,
+  which is a SHA256-hash of the BasicAuth password. The `uid` will be used as BasicAuth username. The converter `uid`
+  has to be available [at ParkAPI Sources](https://github.com/ParkenDD/parkapi-sources-v3).
+* `generic_converter` is an example for a generic converter using the REST API endpoints, not needing
+  a converter provided by ParkAPI Sources. Credentials work pretty much the same as described in
+  `push_converter`.
+* `env_var_converter` is an example for a converter needing additional information to work, usually credentials. You
+  can look up these env vars at the specific ParkAPI sources converter.
+
+Additionally, you can add source UIDs to `DEBUG_SOURCES`. This enables a debug mode, where all requests are dumped to
+a path which is defined at `DEBUG_DUMP_DIR`, defaulting to `data/debug-dump`. Especially at realtime sources, this
+might end up into a lot of data dumped to your disk, so use this mechanism with caution (or plenty of storage space).
 
 
 ## Development setup

@@ -21,7 +21,6 @@ Authorization: Basic {{admin_api_username}} {{admin_api_password}}
 ### Apply duplicates
 POST {{api_host}}/api/admin/v1/parking-sites/duplicates/apply
 Content-Type: application/json
-Content-Type: application/json
 Authorization: Basic {{admin_api_username}} {{admin_api_password}}
 
 [

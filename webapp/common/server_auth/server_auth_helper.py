@@ -5,6 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from flask import Request
 
+from webapp.common.config import ConfigHelper
 from webapp.common.contexts import ContextHelper
 
 from .exceptions import ServerApiMissingRoleException, ServerApiUnauthorizedException
@@ -16,12 +17,23 @@ class ServerAuthHelper:
     Helper class for server API authentication via Basic Auth.
     """
 
-    server_auth_users: ServerAuthDatabase
+    _server_auth_users: ServerAuthDatabase | None = None
+    config_helper: ConfigHelper
     context_helper: ContextHelper
 
-    def __init__(self, *, server_auth_users: ServerAuthDatabase, context_helper: ContextHelper):
-        self.server_auth_users = server_auth_users
+    def __init__(self, *, config_helper: ConfigHelper, context_helper: ContextHelper):
+        self.config_helper = config_helper
         self.context_helper = context_helper
+
+    @property
+    def server_auth_users(self) -> ServerAuthDatabase:
+        if self._server_auth_users is None:
+            self._server_auth_users = ServerAuthDatabase.create_from_config(
+                users_from_config=self.config_helper.get('SERVER_AUTH_USERS'),
+                converters_from_config=self.config_helper.get('PARK_API_CONVERTER'),
+            )
+
+        return self._server_auth_users
 
     def authenticate_request(self, request: Request) -> None:
         """
