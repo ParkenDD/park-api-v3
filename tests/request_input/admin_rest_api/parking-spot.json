@@ -1,0 +1,18 @@
+{
+    "uid": "demo-parking-spot",
+    "lat": "49.48538098889669",
+    "lon": "8.462879182254758",
+    "purpose": "CAR",
+    "type": "ON_STREET",
+    "name": "A1 4",
+    "address": "A1 4, 68159 Mannheim",
+    "restricted_to": [
+      {
+        "type": "DISABLED"
+      }
+    ],
+    "has_realtime_data": true,
+    "realtime_status": "TAKEN",
+    "static_data_updated_at": "2025-05-20T13:55:33+02:00",
+    "realtime_data_updated_at": "2025-05-20T13:55:33+02:00"
+  }

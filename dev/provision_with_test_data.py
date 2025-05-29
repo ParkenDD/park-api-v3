@@ -6,7 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from flask import current_app
 
 from tests.model_generator.parking_site import get_parking_site
-from tests.model_generator.source import get_source
+from tests.model_generator.source import get_source_by_counter
 from webapp import launch
 from webapp.extensions import db
 
@@ -20,9 +20,9 @@ def provision_with_test_data():
     db.drop_all()
     db.create_all()
 
-    source_1 = get_source(1)
-    source_2 = get_source(2)
-    source_3 = get_source(3)
+    source_1 = get_source_by_counter(1)
+    source_2 = get_source_by_counter(2)
+    source_3 = get_source_by_counter(3)
     db.session.add(source_1)
     db.session.add(source_2)
     db.session.add(source_3)

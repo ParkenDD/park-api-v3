@@ -52,6 +52,8 @@ class GenericImportService(BaseService):
             'DEBUG_SOURCES': app.config['DEBUG_SOURCES'],
         }
         for source_dict in app.config.get('PARK_API_CONVERTER', []):
+            if source_dict.get('generic_source') is True:
+                continue
             park_api_source_uids.append(source_dict['uid'])
             if 'env' in source_dict:
                 park_api_sources_config.update(source_dict['env'])

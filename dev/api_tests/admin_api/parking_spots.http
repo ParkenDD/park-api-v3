@@ -1,0 +1,6 @@
+### Upsert ParkingSpot
+POST {{api_host}}/api/admin/v1/parking-spots
+Content-Type: application/json
+Authorization: Basic {{source_api_username}} {{source_api_password}}
+
+< ../../tests/request_input/admin_rest_api/parking-spot.json

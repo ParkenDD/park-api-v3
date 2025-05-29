@@ -14,18 +14,13 @@ from webapp.common.logging.models import LogMessageType
 from webapp.models import ExternalIdentifier, ParkingSite, ParkingSiteHistory, Source, Tag
 from webapp.models.parking_site_group import ParkingSiteGroup
 from webapp.models.source import SourceStatus
-from webapp.repositories import (
-    ParkingSiteGroupRepository,
-    ParkingSiteHistoryRepository,
-    ParkingSiteRepository,
-    SourceRepository,
-)
+from webapp.repositories import ParkingSiteGroupRepository, ParkingSiteHistoryRepository, ParkingSiteRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
-from webapp.services.base_service import BaseService
+
+from .generic_base_import_service import GenericBaseImportService
 
 
-class GenericParkingSiteImportService(BaseService):
-    source_repository: SourceRepository
+class GenericParkingSiteImportService(GenericBaseImportService):
     parking_site_repository: ParkingSiteRepository
     parking_site_history_repository: ParkingSiteHistoryRepository
     parking_site_group_repository: ParkingSiteGroupRepository
@@ -33,14 +28,12 @@ class GenericParkingSiteImportService(BaseService):
     def __init__(
         self,
         *args,
-        source_repository: SourceRepository,
         parking_site_repository: ParkingSiteRepository,
         parking_site_history_repository: ParkingSiteHistoryRepository,
         parking_site_group_repository: ParkingSiteGroupRepository,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
-        self.source_repository = source_repository
         self.parking_site_repository = parking_site_repository
         self.parking_site_history_repository = parking_site_history_repository
         self.parking_site_group_repository = parking_site_group_repository

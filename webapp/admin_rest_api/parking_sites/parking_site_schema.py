@@ -69,9 +69,10 @@ generate_parking_site_duplicates_response_schema = JsonSchema(
                     'photo_url': UriField(nullable=True),
                     'public_url': UriField(nullable=True),
                     'opening_hours': StringField(nullable=True),
-                }
-            )
-        )
+                },
+            ),
+        ),
+        'total_count': IntegerField(minimum=0),
     },
 )
 

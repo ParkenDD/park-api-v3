@@ -7,9 +7,7 @@ import hmac
 from dataclasses import dataclass
 from enum import Enum
 from hashlib import sha256
-from typing import Dict, List
-
-from flask import Config
+from typing import Dict, List, Self
 
 from .exceptions import ServerApiUnauthorizedException
 
@@ -19,6 +17,7 @@ class ServerAuthRole(Enum):
     Roles a server API user can have.
     """
 
+    ADMIN = 'admin'
     PUSH_CLIENT = 'push-client'
 
 
@@ -43,7 +42,7 @@ class ServerAuthUser:
             raise Exception('invalid server auth config')
 
     @classmethod
-    def create_from_dict(cls, username: str, data: dict) -> 'ServerAuthUser':
+    def create_from_dict(cls, username: str, data: dict) -> Self:
         """
         Creates a ServerAuthUser object from a raw dictionary (with keys "hash" and "roles").
         """
@@ -71,22 +70,21 @@ class ServerAuthDatabase:
         self._users = server_auth_users
 
     @classmethod
-    def create_from_config(cls, config: Config) -> 'ServerAuthDatabase':
+    def create_from_config(cls, users_from_config: dict, converters_from_config: list[dict]) -> Self:
         """
         Parses the "SERVER_AUTH_USERS" and "PARK_API_CONVERTER" dictionary from the app config and creates a ServerAuthDatabase from it.
         """
-        users_from_config = config.get('SERVER_AUTH_USERS')
         users_parsed = {
             username: ServerAuthUser.create_from_dict(username, userdata)
             for username, userdata in users_from_config.items()
         }
 
         # Add additional users from converters
-        converters_from_config = config.get('PARK_API_CONVERTER')
         for converter in converters_from_config:
             # Just converters with hash are push converters which can be used as credentials
             if not converter.get('hash'):
                 continue
+
             users_parsed[converter['uid']] = ServerAuthUser(
                 username=converter['uid'],
                 password_hash=converter['hash'],

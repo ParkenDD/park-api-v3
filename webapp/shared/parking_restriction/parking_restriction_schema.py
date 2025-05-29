@@ -40,6 +40,24 @@ parking_restriction_schema = JsonSchema(
     },
 )
 
-parking_restriction_example = {}
+parking_restriction_example = {
+    'source_id': 5,
+    'original_uid': 'demo-parking-spot',
+    'name': 'A1 4',
+    'type': 'ON_STREET',
+    'address': 'A1 4, 68159 Mannheim',
+    'lat': '49.4853810',
+    'lon': '8.4628792',
+    'purpose': 'CAR',
+    'realtime_status': 'TAKEN',
+    'static_data_updated_at': '2025-05-20T11:55:33Z',
+    'realtime_data_updated_at': '2025-05-20T11:55:33Z',
+    'has_realtime_data': True,
+    'id': 476,
+    'created_at': '2025-05-29T09:13:52Z',
+    'modified_at': '2025-05-29T09:15:42Z',
+    'restricted_to': [{'type': 'DISABLED'}],
+}
+
 
 parking_restriction_component = Schema('ParkingRestriction', parking_restriction_schema, parking_restriction_example)

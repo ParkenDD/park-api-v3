@@ -6,7 +6,6 @@ Use of this source code is governed by an MIT-style license that can be found in
 import functools
 from typing import TYPE_CHECKING, Callable, Type, TypeVar
 
-from flask import current_app
 from sqlalchemy.orm import scoped_session
 
 from webapp.common.celery import CeleryHelper
@@ -15,6 +14,7 @@ from webapp.common.contexts import ContextHelper
 from webapp.common.logging import Logger
 from webapp.common.remote_helper import RemoteHelper
 from webapp.common.rest import RequestHelper
+from webapp.common.server_auth import ServerAuthHelper
 from webapp.repositories import (
     BaseRepository,
     ParkingSiteGroupRepository,
@@ -30,7 +30,6 @@ from webapp.services.sqlalchemy_service import SqlalchemyService
 
 if TYPE_CHECKING:
     from webapp.common.events import EventHelper
-    from webapp.common.server_auth import ServerAuthHelper
     from webapp.services.import_service.generic.generic_import_runner import GenericImportRunner
 
 
@@ -105,13 +104,9 @@ class Dependencies:
         return RequestHelper()
 
     @cache_dependency
-    def get_server_auth_helper(self) -> 'ServerAuthHelper':
-        # Avoid import loops ...
-        from webapp.common.server_auth import ServerAuthDatabase, ServerAuthHelper
-
-        server_auth_users = ServerAuthDatabase.create_from_config(current_app.config)
+    def get_server_auth_helper(self) -> ServerAuthHelper:
         return ServerAuthHelper(
-            server_auth_users=server_auth_users,
+            config_helper=self.get_config_helper(),
             context_helper=self.get_context_helper(),
         )
 

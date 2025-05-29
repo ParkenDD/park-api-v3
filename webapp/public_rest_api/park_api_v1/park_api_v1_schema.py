@@ -26,6 +26,7 @@ park_api_v1_sources_schema = JsonSchema(
         'cities': ObjectField(
             properties={},
             description='An object with Names as key and source uids ans value.',
+            additionalProperties=True,
         ),
     },
 )
@@ -86,7 +87,7 @@ park_api_v1_parking_site_schema = JsonSchema(
                         description='Contains a full address with street, house number, postcode and address',
                     ),
                     'free': IntegerField(required=False),
-                    'status': AnyOfField(allowed_values=['open', 'closed', 'nodata', 'unknown'], required=False),
+                    'state': AnyOfField(allowed_values=['open', 'closed', 'nodata', 'unknown'], required=False),
                 },
             ),
         ),
