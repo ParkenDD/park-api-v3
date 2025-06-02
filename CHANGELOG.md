@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.24.0
+
+Released 2025-06-02
+
+### Features
+
+* [Sources + ParkingSpot Admin REST API](https://github.com/ParkenDD/park-api-v3/pull/293)
+
+
 ## 0.23.1
 
 Released 2025-06-02
