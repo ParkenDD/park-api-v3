@@ -71,6 +71,13 @@ worker, are required to run.
 If you want to create new data sources, please have a look at
 [ParkAPI-sources' README.md](https://github.com/ParkenDD/parkapi-sources-v3?tab=readme-ov-file#write-a-new-converter).
 
+Per default, static data will be fetched every night at 1 am, and realtime data will be fetched every 5 minutes. You
+can change the static moment using the config vars `STATIC_IMPORT_PULL_HOUR` and `STATIC_IMPORT_PULL_MINUTE`, and
+the realtime frequency using `REALTIME_IMPORT_PULL_FREQUENCY`, which should be in seconds. Additionally, you can set
+`REALTIME_OUTDATED_AFTER_MINUTES`, which will flag sources at outdated in our Prometheus endpoint after the defined
+amount of time. It defaults to 30 minutes.
+
+
 ## Push services
 
 Push services are ParkAPIv3 endpoints which other clients send data to. This is the recommended way of
@@ -199,7 +206,8 @@ Besides `PARK_API_CONVERTER`, there are a few other configuration options to set
 
 1) You can create a config file called `config.yaml` in your root folder.
 2) You can set any config value by env var, but you have to prefix the config name with `PARKAPI_` then. For example,
-   you can configure `SECRET_KEY` using the env var `PARKAPI_SECRET_KEY`. ENV vars overwrite
+   you can configure `SECRET_KEY` using the env var `PARKAPI_SECRET_KEY`. ENV vars overwrite values given via config
+   file.
 
 ### Source configuration
 
