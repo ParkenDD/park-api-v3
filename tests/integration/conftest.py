@@ -4,16 +4,13 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import os
-from typing import Any, Generator
+from typing import Generator
 
 import pytest
 from flask import Flask
 from flask.testing import FlaskClient
-from flask_openapi.generator import generate_openapi
-from openapi_core import OpenAPI
-from openapi_core.contrib.werkzeug import WerkzeugOpenAPIRequest, WerkzeugOpenAPIResponse
-from werkzeug.test import TestResponse
 
+from tests.integration.helpers import OpenApiApp
 from tests.model_generator.parking_site import get_parking_site, get_parking_site_by_counter
 from tests.model_generator.parking_spot import get_parking_spot, get_parking_spot_by_counter
 from tests.model_generator.source import get_source, get_source_by_counter
@@ -22,34 +19,6 @@ from webapp.common.flask_app import App
 from webapp.common.sqlalchemy import SQLAlchemy
 from webapp.extensions import db as flask_sqlalchemy
 from webapp.models import ParkingSite, ParkingSpot
-
-
-class OpenApiFlaskClient(FlaskClient):
-    openapi_realm: str | None = None
-
-    def __init__(self, *args: Any, openapi_realm: str | None = None, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self.openapi_realm = openapi_realm
-
-    def open(self, *args: Any, **kwargs: Any) -> TestResponse:
-        response = super().open(*args, **kwargs)
-
-        if self.openapi_realm is None:
-            return response
-
-        openapi = OpenAPI.from_dict(generate_openapi(self.openapi_realm))
-
-        openapi.validate_response(WerkzeugOpenAPIRequest(response.request), WerkzeugOpenAPIResponse(response))
-
-        return response
-
-
-class OpenApiApp(App):
-    """
-    Flask application extended with OpenApiFlaskClient
-    """
-
-    test_client_class = OpenApiFlaskClient
 
 
 @pytest.fixture

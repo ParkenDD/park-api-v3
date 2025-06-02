@@ -13,6 +13,8 @@ from webapp.dependencies import dependencies
 from .base_blueprint import AdminApiBaseBlueprint
 from .generic_parking_sites import GenericParkingSitesBlueprint
 from .parking_sites import ParkingSitesBlueprint
+from .parking_spots import ParkingSpotBlueprint
+from .sources import SourceBlueprint
 
 
 class AdminRestApi(Blueprint):
@@ -22,6 +24,8 @@ class AdminRestApi(Blueprint):
     blueprints_classes: list[type[AdminApiBaseBlueprint]] = [
         GenericParkingSitesBlueprint,
         ParkingSitesBlueprint,
+        ParkingSpotBlueprint,
+        SourceBlueprint,
     ]
 
     def __init__(self):

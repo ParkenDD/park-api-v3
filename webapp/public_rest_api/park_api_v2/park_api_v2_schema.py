@@ -50,6 +50,7 @@ park_api_v2_parking_sites_schema = JsonSchema(
     properties={
         'count': IntegerField(minimum=0),
         'next': UriField(required=False, nullable=True),
+        'previous': UriField(required=False, nullable=True),
         'results': ArrayField(
             items=ObjectField(
                 properties={

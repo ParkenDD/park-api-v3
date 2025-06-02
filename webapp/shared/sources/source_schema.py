@@ -30,8 +30,19 @@ source_schema = JsonSchema(
     },
 )
 
-
-source_example = {}
+source_example = {
+    'uid': 'demo-source',
+    'name': 'Demo Source',
+    'public_url': 'https://demo.source.com',
+    'attribution_license': 'CC BY-SA 4.0',
+    'attribution_contributor': 'Demo Contributor',
+    'attribution_url': 'https://demo.source.com/attribution',
+    'static_status': 'PROVISIONED',
+    'realtime_status': 'PROVISIONED',
+    'id': 4,
+    'created_at': '2025-05-29T08:11:16Z',
+    'modified_at': '2025-05-29T08:11:16Z',
+}
 
 
 source_component = Schema('Source', source_schema, source_example)
