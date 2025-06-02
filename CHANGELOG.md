@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.23.1
+
+Released 2025-06-02
+
+### Fixes
+
+* [ParkAPI Sources: Extend static data to Freiburg](https://github.com/ParkenDD/parkapi-sources-v3/pull/226)
+
+
 ## 0.23.0
 
 Released 2025-05-18
