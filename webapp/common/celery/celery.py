@@ -6,15 +6,24 @@ This helper class is inspired by Robpol86's Flask-Celery-Helper: https://github.
 """
 
 import json
+import logging
 from abc import ABC
 from typing import Callable
 
-from celery import Celery, Task, _state
+from celery import Celery, Task, _state, platforms
 from flask import Flask
 from kombu.serialization import register
 
+from webapp.common.contexts import TelemetryContext
 from webapp.common.json import DefaultJSONEncoder
-from webapp.common.logging.models import LogMessageType, LogTag
+from webapp.common.logging import log
+from webapp.common.logging.models import LogMessageType
+
+logger = logging.getLogger(__name__)
+
+# Monkeypatch invalid warning: in docker containers, the script fails to detect that it's not root
+platforms._warn_or_raise_security_error = lambda *args, **kwargs: None
+platforms.check_privileges = lambda *args, **kwargs: None
 
 
 class CeleryState:
@@ -91,6 +100,7 @@ class LogErrorsCelery(Celery):
             app.import_name,
             broker=app.config['CELERY_BROKER_URL'],
             broker_connection_retry_on_startup=True,
+            worker_hijack_root_logger=False,
         )
 
         class ContextTask(Task, ABC):
@@ -98,18 +108,17 @@ class LogErrorsCelery(Celery):
                 with app.app_context():
                     from webapp.dependencies import dependencies
 
-                    dependencies.get_logger().set_tag(LogTag.INITIATOR, 'celery')
+                    dependencies.get_context_helper().set_telemetry_context(TelemetryContext.INITIATOR, 'celery')
+
                     return self.run(*args, **kwargs)
 
             def on_failure(self, exc, _task_id, _args, _kwargs, exc_info):
-                with app.app_context():
-                    # late import to avoid import loops
-                    from webapp.dependencies import dependencies
-
-                    dependencies.get_logger().critical(
-                        LogMessageType.EXCEPTION,
-                        f'{str(exc).strip()}: {str(exc_info).strip()}',
-                    )
+                log(
+                    logger,
+                    logging.ERROR,
+                    LogMessageType.EXCEPTION,
+                    f'{str(exc).strip()}: {str(exc_info).strip()}',
+                )
 
         ContextTask.abstract = True
         self.Task = ContextTask
