@@ -16,7 +16,6 @@ from kombu.serialization import register
 
 from webapp.common.contexts import TelemetryContext
 from webapp.common.json import DefaultJSONEncoder
-from webapp.common.logging import log
 from webapp.common.logging.models import LogMessageType
 
 logger = logging.getLogger(__name__)
@@ -113,11 +112,9 @@ class LogErrorsCelery(Celery):
                     return self.run(*args, **kwargs)
 
             def on_failure(self, exc, _task_id, _args, _kwargs, exc_info):
-                log(
-                    logger,
-                    logging.ERROR,
-                    LogMessageType.EXCEPTION,
+                logger.error(
                     f'{str(exc).strip()}: {str(exc_info).strip()}',
+                    extra={'attributes': {'type': LogMessageType.EXCEPTION}},
                 )
 
         ContextTask.abstract = True

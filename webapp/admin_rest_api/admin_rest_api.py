@@ -9,7 +9,6 @@ from flask import Response, request
 
 from webapp.common.blueprint import Blueprint
 from webapp.common.contexts import TelemetryContext
-from webapp.common.logging import log
 from webapp.common.logging.models import LogMessageType
 from webapp.dependencies import dependencies
 
@@ -58,6 +57,9 @@ class AdminRestApi(Blueprint):
             if response.data and response.data.decode().strip():
                 log_fragments.append(f'<< {response.data.decode().strip()}')
 
-            log(logger, logging.INFO, LogMessageType.REQUEST_IN, '\n'.join(log_fragments))
+            logger.info(
+                '\n'.join(log_fragments),
+                extra={'attributes': {'type': LogMessageType.REQUEST_IN}},
+            )
 
             return response

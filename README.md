@@ -341,9 +341,10 @@ handle them the same way you would handle a password. These files should never b
 ## Monitoring: Loki and Prometheus
 
 ParkAPI v3 provides a Prometheus endpoint at `/metrics` which helps to monitor the status of all data sources. It also
-provides a Loki integration to send properly tagged log messages to a Loki instance. This is enabled by the
-configuration value `LOKI_ENABLED` to true. The url is set by `LOKI_URL`, additionall tags are injected by `LOKI_TAGS`,
-and BasicAuth is set by `LOKI_USER` and `LOKI_PASSWORD` (if required).
+provides a Loki and an OpenTelemetry integration to send properly tagged log messages to a Loki or other log collection
+instance. This is using the push handlers plus the formatters
+`webapp.common.logging.loki_formatter.LokiFormatter` or
+`webapp.common.logging.open_telemetry_formatter.OpenTelemetryFormatter`. See `config_dist_dev.yaml` for details.
 
 ## Extending and fixing ParkAPI
 
