@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.25.0
+
+Released 2025-06-23
+
+### Features
+
+* [ParkAPI Sources: Freiburg P+R Converters](https://github.com/ParkenDD/parkapi-sources-v3/pull/230)
+
+
 ## 0.24.0
 
 Released 2025-06-02
