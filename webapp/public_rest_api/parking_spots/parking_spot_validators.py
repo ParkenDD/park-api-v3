@@ -6,10 +6,11 @@ Use of this source code is governed by an MIT-style license that can be found in
 from decimal import Decimal
 from typing import Optional
 
+from validataclass.dataclasses import Default
 from validataclass.exceptions import ValidationError
 from validataclass.validators import IntegerValidator, NumericValidator, StringValidator
 from validataclass_search_queries.filters import SearchParamCustom, SearchParamEquals, SearchParamMultiSelect
-from validataclass_search_queries.pagination import CursorPaginationMixin
+from validataclass_search_queries.pagination import CursorPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
 from validataclass_search_queries.validators import MultiSelectValidator
 
@@ -24,6 +25,8 @@ class ParkingSpotSearchInput(CursorPaginationMixin, BaseSearchQuery):
     lat: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     radius: Optional[int] = SearchParamCustom(), IntegerValidator(allow_strings=True)
+
+    limit: int | None = PaginationLimitValidator(max_value=1000), Default(None)
 
     def __post_init__(self):
         if (self.lat is not None or self.lon is not None or self.radius is not None) and not (
