@@ -9,7 +9,6 @@ from typing import Callable, Optional, Type
 
 from sqlalchemy.orm import scoped_session
 
-from webapp.common.logging import log
 from webapp.common.logging.models import LogMessageType
 
 logger = logging.getLogger(__name__)
@@ -77,4 +76,8 @@ class BaseErrorHandler:
         """
         Helper function to write critical errors to the log.
         """
-        log(logger, logging.ERROR, LogMessageType.EXCEPTION, f'{error}: {traceback.format_exc()}')
+
+        logger.error(
+            f'{error}: {traceback.format_exc()}',
+            extra={'attributes': {'type': LogMessageType.EXCEPTION}},
+        )

@@ -16,7 +16,6 @@ from urllib3.exceptions import NewConnectionError
 
 from webapp.common.config import ConfigHelper
 from webapp.common.json import DefaultJSONEncoder
-from webapp.common.logging import log
 from webapp.common.logging.models import LogMessageType
 
 logger = logging.getLogger(__name__)
@@ -79,11 +78,9 @@ class RemoteHelper:
                 log_fragments.append(f'>> {data}')
             if response.text and response.text.strip():
                 log_fragments.append(f'<< {response.text.strip()}')
-            log(
-                logger,
-                logging.INFO,
-                LogMessageType.REQUEST_OUT,
+            logger.info(
                 '\n'.join(log_fragments),
+                extra={'attributes': {'type': LogMessageType.REQUEST_OUT}},
             )
 
             try:

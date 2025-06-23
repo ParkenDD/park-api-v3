@@ -4,7 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import logging
-from datetime import datetime, timezone
+
 from flask import Flask
 from parkapi_sources import ParkAPISources
 from parkapi_sources.converters.base_converter.pull import (
@@ -14,7 +14,6 @@ from parkapi_sources.converters.base_converter.pull import (
 )
 
 from webapp.common.contexts import TelemetryContext
-from webapp.common.logging import log
 from webapp.common.logging.models import LogMessageType
 from webapp.common.rest.exceptions import UnknownSourceException
 from webapp.models import Source
@@ -92,11 +91,9 @@ class GenericImportService(BaseService):
             try:
                 static_parking_site_inputs, static_parking_site_errors = converter.get_static_parking_sites()
             except Exception as e:
-                log(
-                    logger,
-                    logging.WARNING,
-                    LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
-                    str(e),
+                logger.warning(
+                    f'Failed to pull {source.uid} static parking site data: {e}',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
                 )
                 source.static_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
@@ -107,22 +104,18 @@ class GenericImportService(BaseService):
             )
 
             for static_parking_site_error in static_parking_site_errors:
-                log(
-                    logger,
-                    logging.WARNING,
-                    LogMessageType.FAILED_STATIC_PARKING_SITE_HANDLING,
-                    str(static_parking_site_error),
+                logger.warning(
+                    f'Failed to pull {source.uid} static parking site item: {static_parking_site_error}',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
                 )
 
         if isinstance(converter, ParkingSpotPullConverter):
             try:
                 static_parking_spot_inputs, static_parking_spot_errors = converter.get_static_parking_spots()
             except Exception as e:
-                log(
-                    logger,
-                    logging.WARNING,
-                    LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
-                    str(e),
+                logger.warning(
+                    f'Failed to pull {source.uid} static parking site data: {e}',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
                 )
                 source.static_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
@@ -135,11 +128,9 @@ class GenericImportService(BaseService):
             )
 
             for static_parking_spot_error in static_parking_spot_errors:
-                log(
-                    logger,
-                    logging.WARNING,
-                    LogMessageType.FAILED_STATIC_PARKING_SPOT_HANDLING,
-                    str(static_parking_spot_error),
+                logger.warning(
+                    f'Failed to pull {source.uid} static parking spot item: {static_parking_spot_error}',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
                 )
 
         source.static_status = SourceStatus.ACTIVE
@@ -163,11 +154,9 @@ class GenericImportService(BaseService):
             try:
                 realtime_parking_site_inputs, realtime_parking_site_errors = converter.get_realtime_parking_sites()
             except Exception as e:
-                log(
-                    logger,
-                    logging.WARNING,
-                    LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
-                    str(e),
+                logger.warning(
+                    f'Failed to pull {source.uid} realtime parking site data: {e}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                 )
                 source.realtime_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
@@ -180,23 +169,18 @@ class GenericImportService(BaseService):
             )
 
             for realtime_parking_site_error in realtime_parking_site_errors:
-
-                log(
-                    logger,
-                    logging.WARNING,
-                    LogMessageType.FAILED_REALTIME_PARKING_SITE_HANDLING,
-                    str(realtime_parking_site_error),
+                logger.warning(
+                    f'Failed to pull {source.uid} realtime parking site item: {realtime_parking_site_error}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                 )
 
         if isinstance(converter, ParkingSpotPullConverter):
             try:
                 realtime_parking_spot_inputs, realtime_parking_spot_errors = converter.get_realtime_parking_spots()
             except Exception as e:
-                log(
-                    logger,
-                    logging.WARNING,
-                    LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
-                    str(e),
+                logger.warning(
+                    f'Failed to pull {source.uid} realtime parking spot data: {e}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
                 )
                 source.realtime_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
@@ -209,12 +193,9 @@ class GenericImportService(BaseService):
             )
 
             for realtime_parking_spot_error in realtime_parking_spot_errors:
-
-                log(
-                    logger,
-                    logging.WARNING,
-                    LogMessageType.FAILED_REALTIME_PARKING_SPOT_HANDLING,
-                    str(realtime_parking_spot_error),
+                logger.warning(
+                    f'Failed to pull {source.uid} realtime parking spot item: {realtime_parking_spot_error}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
                 )
 
         source.realtime_status = SourceStatus.ACTIVE

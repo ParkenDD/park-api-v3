@@ -71,61 +71,32 @@ class BaseConfig:
     LOGGING = {
         'version': 1,
         'formatters': {
-            'open_telemetry': {
-                '()': 'webapp.common.logging.formatter.FlaskOpenTelemetryFormatter',
-                'prefix': 'park_api',
-                'service_name': 'ParkAPI',
-            },
-            'loki': {
-                '()': 'webapp.common.logging.formatter.FlaskLokiFormatter',
-                'prefix': 'park_api',
-                'service_name': 'ParkAPI',
-            },
+            'human_readable': {'format': '%(asctime)s %(levelname)s: %(message)s'},
         },
         'handlers': {
             'console_stdout': {
                 'class': 'logging.StreamHandler',
                 'level': 'INFO',
-                'formatter': 'open_telemetry',
+                'formatter': 'human_readable',
                 'stream': 'ext://sys.stdout',
             },
             'console_stderr': {
                 'class': 'logging.StreamHandler',
                 'level': 'ERROR',
-                'formatter': 'open_telemetry',
+                'formatter': 'human_readable',
                 'stream': 'ext://sys.stderr',
             },
-            'open_telemetry_queue': {
-                'class': 'logging.handlers.QueueHandler',
-                'listener': 'webapp.common.logging.autostart_queue_listener.AutostartQueueListener',
-                'queue': 'queue.Queue',
-                'handlers': ['open_telemetry_push'],
+            'split_log_file': {
+                'class': 'webapp.common.logging.split_log_file_handler.SplitLogFileHandler',
                 'level': 'INFO',
-                'formatter': 'open_telemetry',
-            },
-            'open_telemetry_push': {
-                'class': 'webapp.common.logging.http_json_post_handler.HttpPostJsonHandler',
-                'url': 'http://mocked-loki:5000/otel',
-                'level': 'INFO',
-            },
-            'loki_queue': {
-                'class': 'logging.handlers.QueueHandler',
-                'listener': 'webapp.common.logging.autostart_queue_listener.AutostartQueueListener',
-                'queue': 'queue.Queue',
-                'handlers': ['loki_push'],
-                'level': 'INFO',
-                'formatter': 'loki',
-            },
-            'loki_push': {
-                'class': 'webapp.common.logging.http_json_post_handler.HttpPostJsonHandler',
-                'url': 'http://mocked-loki:5000/loki/api/v1/push',
-                'level': 'INFO',
+                'log_path': '/app/logs',
+                'formatter': 'human_readable',
             },
         },
         'loggers': {
             'webapp': {
                 'level': 'INFO',
-                'handlers': ['console_stdout'],
+                'handlers': ['console_stdout', 'console_stderr', 'split_log_file'],
             },
         },
     }
