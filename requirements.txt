@@ -22,7 +22,7 @@ kombu~=5.5.3
 lxml~=5.4.0
 parkapi-sources~=0.20.0
 isodate~=0.7.2
-
+urllib3~=2.4.0
 
 # binary butterfly shared libraries (https://git.binary-butterfly.de/public_libraries)
 --extra-index-url https://git.binary-butterfly.de/api/v4/groups/262/-/packages/pypi/simple

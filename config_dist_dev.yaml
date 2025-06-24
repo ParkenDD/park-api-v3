@@ -20,22 +20,63 @@ PARK_API_CONVERTER:
     hash: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
     generic_source: true
 
-
-# Stdout Logging (useful especially for development)
-STDOUT_LOGGING_ENABLED: true
-
 # Change hour of the day for static data pulling and the frequency in seconds for realtime data pulling
 PARKING_SITE_STATIC_PULL_HOUR: 1
 PARKING_SITE_REALTIME_PULL_FREQUENCY: 300
 
-# Loki Logging Client
-LOKI_ENABLED: false
-LOKI_URL: https://your-monitoring-host/loki/api/v1/push
-LOKI_USER: loki
-LOKI_PASSWORD: password
-LOKI_TAGS:
-  service: park-api
-
 SERVER_AUTH_USERS:
   dev:
     hash: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+
+# This is a template. You can rename it to the config value LOGGING and adapt it to your needs.
+LOGGING_TEMPLATE:
+  version: 1
+  formatters:
+    open_telemetry:
+      (): webapp.common.logging.open_telemetry_formatter.OpenTelemetryFormatter
+      prefix: park_api
+      service_name: ParkAPI
+    loki:
+      (): webapp.common.logging.loki_formatter.LokiFormatter
+      prefix: park_api
+      service_name: ParkAPI
+  handlers:
+    console_stdout:
+      class: logging.StreamHandler
+      level: INFO
+      formatter: open_telemetry
+      stream: ext://sys.stdout
+    console_stderr:
+      class: logging.StreamHandler
+      level: ERROR
+      formatter: open_telemetry
+      stream: ext://sys.stderr
+    open_telemetry_queue:
+      class: logging.handlers.QueueHandler
+      listener: webapp.common.logging.autostart_queue_listener.AutostartQueueListener
+      queue: queue.Queue
+      handlers:
+        - open_telemetry_push
+      level: INFO
+      formatter: open_telemetry
+    open_telemetry_push:
+      class: webapp.common.logging.http_json_post_handler.HttpPostJsonHandler
+      url: http://mocked-loki:5000/otel
+      level: INFO
+    loki_queue:
+      class: logging.handlers.QueueHandler
+      listener: webapp.common.logging.autostart_queue_listener.AutostartQueueListener
+      queue: queue.Queue
+      handlers:
+        - loki_push
+      level: INFO
+      formatter: loki
+    loki_push:
+      class: webapp.common.logging.http_json_post_handler.HttpPostJsonHandler
+      url: http://mocked-loki:5000/loki/api/v1/push
+      level: INFO
+  loggers:
+    webapp:
+      level: INFO
+      handlers:
+        - console_stdout

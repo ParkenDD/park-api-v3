@@ -65,3 +65,37 @@ class BaseConfig:
     STATIC_IMPORT_PULL_HOUR = 1
     REALTIME_IMPORT_PULL_FREQUENCY = 5 * 60
     REALTIME_OUTDATED_AFTER_MINUTES = 30
+
+    # Default log config
+    LOGGING = {
+        'version': 1,
+        'formatters': {
+            'human_readable': {'format': '%(asctime)s %(levelname)s: %(message)s'},
+        },
+        'handlers': {
+            'console_stdout': {
+                'class': 'logging.StreamHandler',
+                'level': 'INFO',
+                'formatter': 'human_readable',
+                'stream': 'ext://sys.stdout',
+            },
+            'console_stderr': {
+                'class': 'logging.StreamHandler',
+                'level': 'ERROR',
+                'formatter': 'human_readable',
+                'stream': 'ext://sys.stderr',
+            },
+            'split_log_file': {
+                'class': 'webapp.common.logging.split_log_file_handler.SplitLogFileHandler',
+                'level': 'INFO',
+                'log_path': '/app/logs',
+                'formatter': 'human_readable',
+            },
+        },
+        'loggers': {
+            'webapp': {
+                'level': 'INFO',
+                'handlers': ['console_stdout', 'console_stderr', 'split_log_file'],
+            },
+        },
+    }

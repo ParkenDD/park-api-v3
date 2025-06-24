@@ -3,6 +3,7 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
 import traceback
 from datetime import datetime, timezone
 
@@ -18,6 +19,8 @@ from webapp.repositories import ParkingSiteGroupRepository, ParkingSiteHistoryRe
 from webapp.repositories.exceptions import ObjectNotFoundException
 
 from .generic_base_import_service import GenericBaseImportService
+
+logger = logging.getLogger(__name__)
 
 
 class GenericParkingSiteImportService(GenericBaseImportService):
@@ -48,13 +51,13 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         for static_parking_site_input in static_parking_site_inputs:
             try:
                 self._save_static_parking_site_input(source, static_parking_site_input, existing_parking_site_ids)
-            except:
-                self.logger.warning(
-                    LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
-                    f'Unhandled exception at dataset {static_parking_site_input}: {traceback.format_exc()}',
+            except Exception as e:
+                logger.warning(
+                    f'Unhandled exception at dataset {static_parking_site_input}: {e} {traceback.format_exc()}',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
                 )
 
-                # Delete remaining existing parking sites because they are not in the new dataset
+        # Delete remaining existing parking sites because they are not in the new dataset
         for existing_parking_site_id in existing_parking_site_ids:
             existing_parking_site = self.parking_site_repository.fetch_parking_site_by_id(existing_parking_site_id)
             self.parking_site_repository.delete_parking_site(existing_parking_site)
@@ -66,6 +69,14 @@ class GenericParkingSiteImportService(GenericBaseImportService):
 
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
         source.static_parking_site_error_count = len(static_parking_site_errors)
+
+        self.source_repository.save_source(source)
+
+        logger.info(
+            f'Successfully imported {len(static_parking_site_inputs)} static parking sites from {source.uid}, '
+            f'and ignored {len(static_parking_site_errors)} datasets with errors.',
+            extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+        )
 
     def _save_static_parking_site_input(
         self,
@@ -156,11 +167,11 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 self._save_realtime_parking_site_input(source, realtime_parking_site_input)
             except ObjectNotFoundException:
                 realtime_parking_site_error_count += 1
-            except:
+            except Exception as e:
                 realtime_parking_site_error_count += 1
-                self.logger.warning(
-                    LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
-                    f'Unhandled exception at dataset {realtime_parking_site_input}: {traceback.format_exc()}',
+                logger.warning(
+                    f'Unhandled exception at dataset {realtime_parking_site_input}: {e} {traceback.format_exc()}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                 )
 
         if len(realtime_parking_site_inputs):
@@ -172,6 +183,12 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         source.realtime_parking_site_error_count = realtime_parking_site_error_count
 
         self.source_repository.save_source(source)
+
+        logger.info(
+            f'Successfully imported {len(realtime_parking_site_inputs)} realtime parking sites from {source.uid}, '
+            f'and ignored {len(realtime_parking_site_errors)} datasets with errors.',
+            extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+        )
 
     def _save_realtime_parking_site_input(self, source: Source, realtime_parking_site_input: RealtimeParkingSiteInput):
         parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
@@ -203,22 +220,22 @@ class GenericParkingSiteImportService(GenericBaseImportService):
 
             if realtime_capacity is UnsetValue or realtime_capacity is None:
                 if realtime_free_capacity > parking_site_capacity:
-                    setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
-                    self.logger.warning(
-                        LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                    setattr(realtime_parking_site_input, f'realtime_free_{capacity_field}', parking_site_capacity)
+                    logger.warning(
                         f'At {parking_site.original_uid} from {source.id}, '
                         f'realtime_free_{capacity_field} {realtime_free_capacity} '
                         f'was higher than {capacity_field} {parking_site_capacity}',
+                        extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                     )
 
             if realtime_capacity is not UnsetValue and realtime_capacity is not None:
                 if realtime_free_capacity > realtime_capacity:
-                    setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
-                    self.logger.warning(
-                        LogMessageType.FAILED_PARKING_SITE_HANDLING,
+                    setattr(realtime_parking_site_input, f'realtime_free_{capacity_field}', realtime_capacity)
+                    logger.warning(
                         f'At {parking_site.original_uid} from {source.id}, '
                         f'realtime_free_{capacity_field} {realtime_free_capacity} '
                         f'was higher than realtime_{capacity_field} {realtime_capacity}',
+                        extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                     )
 
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
