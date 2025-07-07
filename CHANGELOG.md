@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.25.1
+
+### Fixes
+
+* [ParkAPI Sources: Freiburg P+R Attribute](https://github.com/ParkenDD/parkapi-sources-v3/pull/235)
+* [ParkAPI Sources: Freiburg OpeningTime logic](https://github.com/ParkenDD/parkapi-sources-v3/pull/234)
+
+
 ## 0.25.0
 
 Released 2025-06-23
