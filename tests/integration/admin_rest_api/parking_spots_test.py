@@ -18,7 +18,7 @@ def test_create_parking_spot(
 ) -> None:
     result = admin_api_test_client.post(
         '/api/admin/v1/parking-spots',
-        auth=('source', 'test'),
+        auth=('dev', 'test'),
         json=load_admin_client_request_input('parking-spot'),
     )
 
@@ -32,7 +32,7 @@ def test_update_parking_spot(
 ) -> None:
     admin_api_test_client.post(
         '/api/admin/v1/parking-spots',
-        auth=('source', 'test'),
+        auth=('dev', 'test'),
         json=load_admin_client_request_input('parking-spot'),
     )
 
@@ -40,7 +40,7 @@ def test_update_parking_spot(
     parking_spot_data['name'] = 'Updated Parking Spot'
     result = admin_api_test_client.post(
         '/api/admin/v1/parking-spots',
-        auth=('source', 'test'),
+        auth=('dev', 'test'),
         json=parking_spot_data,
     )
 
