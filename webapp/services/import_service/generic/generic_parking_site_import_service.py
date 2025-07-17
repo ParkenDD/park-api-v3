@@ -7,7 +7,7 @@ import traceback
 from datetime import datetime, timezone
 
 from parkapi_sources.exceptions import ImportParkingSiteException
-from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
+from parkapi_sources.models import CombinedParkingSiteInput, RealtimeParkingSiteInput, StaticParkingSiteInput
 from validataclass.helpers import UnsetValue
 
 from webapp.common.logging.models import LogMessageType
@@ -47,7 +47,11 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         existing_parking_site_ids = self.parking_site_repository.fetch_parking_site_ids_by_source_id(source.id)
         for static_parking_site_input in static_parking_site_inputs:
             try:
-                self._save_static_parking_site_input(source, static_parking_site_input, existing_parking_site_ids)
+                self.save_static_or_combined_parking_site_input(
+                    source,
+                    static_parking_site_input,
+                    existing_parking_site_ids,
+                )
             except:
                 self.logger.warning(
                     LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
@@ -67,16 +71,16 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
         source.static_parking_site_error_count = len(static_parking_site_errors)
 
-    def _save_static_parking_site_input(
+    def save_static_or_combined_parking_site_input(
         self,
         source: Source,
-        static_parking_site_input: StaticParkingSiteInput,
+        parking_site_input: StaticParkingSiteInput | CombinedParkingSiteInput,
         existing_parking_site_ids: list[int],
-    ):
+    ) -> ParkingSite:
         try:
             parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
                 source_id=source.id,
-                original_uid=static_parking_site_input.uid,
+                original_uid=parking_site_input.uid,
             )
             # If the ParkingSite exists: remove it from existing parking site list
             if parking_site.id in existing_parking_site_ids:
@@ -84,11 +88,11 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         except ObjectNotFoundException:
             parking_site = ParkingSite()
             parking_site.source_id = source.id
-            parking_site.original_uid = static_parking_site_input.uid
+            parking_site.original_uid = parking_site_input.uid
 
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
-        for key, value in static_parking_site_input.to_dict().items():
+        for key, value in parking_site_input.to_dict().items():
             if key in ['uid', 'external_identifiers', 'tags', 'group_uid']:
                 continue
             if (
@@ -99,10 +103,10 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 history_changed = True
             setattr(parking_site, key, value)
 
-        if static_parking_site_input.external_identifiers not in [None, UnsetValue]:
+        if parking_site_input.external_identifiers not in [None, UnsetValue]:
             external_identifiers: list[ExternalIdentifier] = []
-            for i, external_identifier_input in enumerate(static_parking_site_input.external_identifiers):
-                if len(static_parking_site_input.external_identifiers) < len(parking_site.external_identifiers):
+            for i, external_identifier_input in enumerate(parking_site_input.external_identifiers):
+                if len(parking_site_input.external_identifiers) < len(parking_site.external_identifiers):
                     external_identifier = parking_site.external_identifiers[i]
                 else:
                     external_identifier = ExternalIdentifier()
@@ -111,10 +115,10 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 external_identifiers.append(external_identifier)
             parking_site.external_identifiers = external_identifiers
 
-        if static_parking_site_input.tags not in [None, UnsetValue]:
+        if parking_site_input.tags not in [None, UnsetValue]:
             tags: list[Tag] = []
-            for i, tag_input in enumerate(static_parking_site_input.tags):
-                if len(static_parking_site_input.tags) < len(parking_site.tags):
+            for i, tag_input in enumerate(parking_site_input.tags):
+                if len(parking_site_input.tags) < len(parking_site.tags):
                     tag = parking_site.tags[i]
                 else:
                     tag = Tag()
@@ -122,14 +126,14 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 tags.append(tag)
             parking_site.tags = tags
 
-        if static_parking_site_input.group_uid:
+        if parking_site_input.group_uid:
             try:
                 parking_site_group = self.parking_site_group_repository.fetch_parking_site_group_by_original_uid(
-                    static_parking_site_input.group_uid,
+                    parking_site_input.group_uid,
                 )
             except ObjectNotFoundException:
                 parking_site_group = ParkingSiteGroup()
-                parking_site_group.original_uid = static_parking_site_input.group_uid
+                parking_site_group.original_uid = parking_site_input.group_uid
                 parking_site_group.source_id = parking_site.source_id
 
             parking_site.parking_site_group = parking_site_group
@@ -139,6 +143,8 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         self.parking_site_repository.save_parking_site(parking_site)
         if history_enabled and history_changed:
             self._add_history(parking_site)
+
+        return parking_site
 
     def handle_realtime_import_results(
         self,

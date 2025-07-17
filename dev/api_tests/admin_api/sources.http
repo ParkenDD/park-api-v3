@@ -3,4 +3,4 @@ POST {{api_host}}/api/admin/v1/sources
 Content-Type: application/json
 Authorization: Basic {{source_api_username}} {{source_api_password}}
 
-< ../../tests/request_input/source.json
+< ../../tests/request_input/admin_rest_api/source.json

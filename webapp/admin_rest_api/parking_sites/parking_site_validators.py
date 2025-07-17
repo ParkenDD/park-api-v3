@@ -4,7 +4,12 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from validataclass.dataclasses import Default, validataclass
-from validataclass.validators import IntegerValidator, ListValidator, Noneable, StringValidator
+from validataclass.validators import AnythingValidator, IntegerValidator, ListValidator, Noneable, StringValidator
+
+
+@validataclass
+class ParkingSiteListInput:
+    items: list[dict] = ListValidator(AnythingValidator(allowed_types=[dict]))
 
 
 @validataclass
