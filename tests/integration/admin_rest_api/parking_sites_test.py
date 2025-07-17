@@ -17,7 +17,7 @@ def test_upsert_parking_site_list(
 ) -> None:
     result = admin_api_test_client.post(
         '/api/admin/v1/parking-sites/upsert-list',
-        auth=('dev', 'test'),
+        auth=('source', 'test'),
         json=load_admin_client_request_input('parking-site-list'),
     )
 
@@ -26,7 +26,7 @@ def test_upsert_parking_site_list(
         'items': [PARKING_SITE_RESPONSE_ITEM],
         'errors': [
             {
-                'source_uid': 'dev',
+                'source_uid': 'source',
                 'message': 'Invalid parking site',
                 'data': {
                     'code': 'field_errors',
@@ -44,7 +44,7 @@ def test_upsert_parking_site_item(
 ) -> None:
     result = admin_api_test_client.post(
         '/api/admin/v1/parking-sites/upsert-item',
-        auth=('dev', 'test'),
+        auth=('source', 'test'),
         json=load_admin_client_request_input('parking-site-item'),
     )
 

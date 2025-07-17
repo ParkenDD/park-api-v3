@@ -22,6 +22,6 @@ def admin_api_test_client(flask_app: Flask) -> Generator[FlaskClient, None, None
 def rest_enabled_source(admin_api_test_client: FlaskClient) -> None:
     admin_api_test_client.post(
         '/api/admin/v1/sources',
-        auth=('dev', 'test'),
+        auth=('source', 'test'),
         json=load_admin_client_request_input('source'),
     )
