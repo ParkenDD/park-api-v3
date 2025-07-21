@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.27.0
+
+Released 2025-07-21
+
+### Features
+
+* [generic parking site push endpoints](https://github.com/ParkenDD/park-api-v3/pull/305)
+
+
+### Fixes
+
+* [ParkAPI Sources: Extend Friedrichshafen](https://github.com/ParkenDD/parkapi-sources-v3/pull/244)
+* [more parking spots](https://github.com/ParkenDD/park-api-v3/pull/297)
+
+
 ## 0.26.0
 
 Released 2025-07-14
