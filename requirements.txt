@@ -22,7 +22,6 @@ kombu~=5.5.3
 lxml~=5.4.0
 parkapi-sources~=0.21.1
 isodate~=0.7.2
-urllib3~=2.5.0
 
 
 # binary butterfly shared libraries (https://git.binary-butterfly.de/public_libraries)
