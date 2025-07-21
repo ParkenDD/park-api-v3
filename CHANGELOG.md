@@ -15,6 +15,12 @@ Released 2025-07-21
 * [more parking spots](https://github.com/ParkenDD/park-api-v3/pull/297)
 
 
+### Maintenance
+
+* Dependency Updates
+
+
+
 ## 0.26.0
 
 Released 2025-07-14
