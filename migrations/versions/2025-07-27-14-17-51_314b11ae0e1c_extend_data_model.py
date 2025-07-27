@@ -126,7 +126,8 @@ def upgrade():
         )
 
     with op.batch_alter_table('tag', schema=None) as batch_op:
-        batch_op.add_column(sa.Column('parking_spot_id', sa.BigInteger(), nullable=False))
+        batch_op.add_column(sa.Column('parking_spot_id', sa.BigInteger(), nullable=True))
+        batch_op.alter_column('parking_site_id', existing_type=sa.BIGINT(), nullable=True)
         batch_op.create_foreign_key(batch_op.f('fk_tag_parking_spot_id'), 'parking_spot', ['parking_spot_id'], ['id'])
 
     # ### end Alembic commands ###

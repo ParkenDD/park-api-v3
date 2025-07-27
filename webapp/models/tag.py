@@ -22,7 +22,7 @@ class Tag(BaseModel):
     parking_site: Mapped[Optional['ParkingSite']] = relationship('ParkingSite', back_populates='tags')
     parking_spot: Mapped[Optional['ParkingSpot']] = relationship('ParkingSpot', back_populates='tags')
 
-    parking_site_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('parking_site.id'), nullable=False)
-    parking_spot_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('parking_spot.id'), nullable=False)
+    parking_site_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('parking_site.id'), nullable=True)
+    parking_spot_id: Mapped[int] = mapped_column(BigInteger, db.ForeignKey('parking_spot.id'), nullable=True)
 
     value: Mapped[str] = mapped_column(String(256), nullable=False)
