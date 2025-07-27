@@ -4,6 +4,9 @@ on:
   release:
     types:
       - published
+  push:
+    tags:
+      - 'preview-**'
 
 jobs:
   build-publish:
