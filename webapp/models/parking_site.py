@@ -3,11 +3,21 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import json
 from datetime import datetime
 from decimal import Decimal
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from parkapi_sources.models.enums import OpeningStatus, ParkAndRideType, ParkingSiteType, PurposeType, SupervisionType
+from parkapi_sources.models.enums import (
+    OpeningStatus,
+    ParkAndRideType,
+    ParkingSiteOrientation,
+    ParkingSiteSide,
+    ParkingSiteType,
+    ParkingType,
+    PurposeType,
+    SupervisionType,
+)
 from sqlalchemy import (
     BigInteger,
     Boolean,
@@ -15,6 +25,7 @@ from sqlalchemy import (
     Integer,
     Numeric,
     String,
+    Text,
     event,
     func,
 )
@@ -27,6 +38,7 @@ from sqlalchemy.schema import Index
 from sqlalchemy_utc import UtcDateTime
 
 from webapp.common.dataclass import filter_unset_value_and_none
+from webapp.common.json import DefaultJSONEncoder
 from webapp.common.sqlalchemy.point import Point
 from webapp.extensions import db
 
@@ -86,40 +98,46 @@ class ParkingSite(BaseModel):
     )
 
     source_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('source.id'), nullable=False)
-    parking_site_group_id: Mapped[Optional[int]] = mapped_column(
+    parking_site_group_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey('parking_site_group.id'),
         nullable=True,
     )
-    duplicate_of_parking_site_id: Mapped[Optional[int]] = mapped_column(
+    duplicate_of_parking_site_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey('parking_site.id'),
         nullable=True,
     )
     original_uid: Mapped[str] = mapped_column(String(256), index=True, nullable=False)
     name: Mapped[str] = mapped_column(String(256), nullable=False)
-    operator_name: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
-    public_url: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
-    address: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
-    description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
-    type: Mapped[Optional[ParkingSiteType]] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
+    operator_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    public_url: Mapped[str | None] = mapped_column(String(4096), nullable=True)
+    address: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    description: Mapped[str | None] = mapped_column(String(4096), nullable=True)
+    type: Mapped[ParkingSiteType | None] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
+    _geojson: Mapped[str | None] = mapped_column('geojson', Text, nullable=True)
     purpose: Mapped[PurposeType] = mapped_column(SqlalchemyEnum(PurposeType), nullable=False, index=True)
-    photo_url: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
+    photo_url: Mapped[str | None] = mapped_column(String(4096), nullable=True)
 
-    max_stay: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    max_height: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    max_width: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    has_lighting: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
-    is_covered: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
-    fee_description: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
-    has_fee: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=True)
-    _park_and_ride_type: Mapped[Optional[str]] = mapped_column('park_and_ride_type', String(256), nullable=True)
-    supervision_type: Mapped[Optional[SupervisionType]] = mapped_column(SqlalchemyEnum(SupervisionType), nullable=True)
-    related_location: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
+    max_stay: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    max_height: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    max_width: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    has_lighting: Mapped[bool | None] = mapped_column(Boolean(), nullable=True)
+    is_covered: Mapped[bool | None] = mapped_column(Boolean(), nullable=True)
+    fee_description: Mapped[str | None] = mapped_column(String(4096), nullable=True)
+    has_fee: Mapped[bool | None] = mapped_column(Boolean(), nullable=True)
+    _park_and_ride_type: Mapped[str | None] = mapped_column('park_and_ride_type', String(256), nullable=True)
+    supervision_type: Mapped[SupervisionType | None] = mapped_column(SqlalchemyEnum(SupervisionType), nullable=True)
+    related_location: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    orientation: Mapped[ParkingSiteOrientation | None] = mapped_column(
+        SqlalchemyEnum(ParkingSiteOrientation), nullable=True
+    )
+    side: Mapped[ParkingSiteSide | None] = mapped_column(SqlalchemyEnum(ParkingSiteSide), nullable=True)
+    parking_type: Mapped[ParkingType | None] = mapped_column(SqlalchemyEnum(ParkingType), nullable=True)
 
-    has_realtime_data: Mapped[Optional[bool]] = mapped_column(Boolean(), nullable=False, default=False)
-    static_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
-    realtime_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
+    has_realtime_data: Mapped[bool | None] = mapped_column(Boolean(), nullable=False, default=False)
+    static_data_updated_at: Mapped[datetime | None] = mapped_column(UtcDateTime(), nullable=True)
+    realtime_data_updated_at: Mapped[datetime | None] = mapped_column(UtcDateTime(), nullable=True)
     realtime_opening_status: Mapped[OpeningStatus | None] = mapped_column(
         SqlalchemyEnum(OpeningStatus),
         nullable=True,
@@ -129,41 +147,45 @@ class ParkingSite(BaseModel):
     lat: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=7), nullable=False)
     lon: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=7), nullable=False)
 
-    capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    capacity_disabled: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    capacity_woman: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    capacity_family: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    capacity_charging: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    capacity_carsharing: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    capacity_truck: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    capacity_bus: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
+    capacity: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    capacity_disabled: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    capacity_woman: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    capacity_family: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    capacity_charging: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    capacity_carsharing: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    capacity_truck: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    capacity_bus: Mapped[int | None] = mapped_column(Integer(), nullable=True)
 
-    realtime_capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_capacity_disabled: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_capacity_woman: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_capacity_family: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_capacity_charging: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_capacity_carsharing: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_capacity_truck: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_capacity_bus: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
+    capacity_min: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    capacity_max: Mapped[int | None] = mapped_column(Integer(), nullable=True)
 
-    realtime_free_capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_free_capacity_disabled: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_free_capacity_woman: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_free_capacity_family: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_free_capacity_charging: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_free_capacity_carsharing: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_free_capacity_truck: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
-    realtime_free_capacity_bus: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
+    realtime_capacity: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_capacity_disabled: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_capacity_woman: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_capacity_family: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_capacity_charging: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_capacity_carsharing: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_capacity_truck: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_capacity_bus: Mapped[int | None] = mapped_column(Integer(), nullable=True)
 
-    opening_hours: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    realtime_free_capacity: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_free_capacity_disabled: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_free_capacity_woman: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_free_capacity_family: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_free_capacity_charging: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_free_capacity_carsharing: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_free_capacity_truck: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+    realtime_free_capacity_bus: Mapped[int | None] = mapped_column(Integer(), nullable=True)
+
+    opening_hours: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
     geometry: Mapped[bytes] = mapped_column(Point(), nullable=False)
 
     def to_dict(
         self,
-        fields: Optional[list[str]] = None,
-        ignore: Optional[list[str]] = None,
+        fields: list[str] | None = None,
+        ignore: list[str] | None = None,
+        include_restricted_to: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
         include_group: bool = False,
@@ -179,6 +201,11 @@ class ParkingSite(BaseModel):
         # Add legacy field is_supervised
         if self.supervision_type is not None:
             result['is_supervised'] = self.supervision_type != SupervisionType.NO
+
+        if include_restricted_to and len(self.restricted_to):
+            result['restricted_to'] = []
+            for restricted_to in self.restricted_to:
+                result['restricted_to'].append(restricted_to.to_dict())
 
         if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []
@@ -207,13 +234,26 @@ class ParkingSite(BaseModel):
         return filter_unset_value_and_none(result)
 
     @hybrid_property
-    def park_and_ride_type(self) -> Mapped[Optional[list[ParkAndRideType]]]:
-        if self._park_and_ride_type is None:
+    def geojson(self) -> Mapped[dict | None]:
+        if self._geojson is None:
+            return None
+        return json.loads(self._geojson)
+
+    @geojson.setter
+    def geojson(self, geojson: dict | None = None) -> None:
+        if geojson is None:
+            self._geojson = None
+        else:
+            self._geojson = json.dumps(geojson, cls=DefaultJSONEncoder)
+
+    @hybrid_property
+    def park_and_ride_type(self) -> Mapped[list[ParkAndRideType] | None]:
+        if not self._park_and_ride_type:
             return None
         return [ParkAndRideType[item] for item in self._park_and_ride_type.split('|')]
 
     @park_and_ride_type.setter
-    def park_and_ride_type(self, park_and_ride_type: Optional[list[ParkAndRideType]]):
+    def park_and_ride_type(self, park_and_ride_type: list[ParkAndRideType] | None):
         if park_and_ride_type is None:
             self._park_and_ride_type = None
         else:

@@ -8,10 +8,9 @@ from datetime import datetime, timezone
 
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import CombinedParkingSiteInput, RealtimeParkingSiteInput, StaticParkingSiteInput
-from validataclass.helpers import UnsetValue
 
 from webapp.common.logging.models import LogMessageType
-from webapp.models import ExternalIdentifier, ParkingSite, ParkingSiteHistory, Source, Tag
+from webapp.models import ParkingSite, ParkingSiteHistory, Source
 from webapp.models.parking_site_group import ParkingSiteGroup
 from webapp.models.source import SourceStatus
 from webapp.repositories import ParkingSiteGroupRepository, ParkingSiteHistoryRepository, ParkingSiteRepository
@@ -93,7 +92,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
         for key, value in parking_site_input.to_dict().items():
-            if key in ['uid', 'external_identifiers', 'tags', 'group_uid']:
+            if key in ['uid', 'external_identifiers', 'restricted_to', 'tags', 'group_uid']:
                 continue
             if (
                 history_enabled
@@ -103,28 +102,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 history_changed = True
             setattr(parking_site, key, value)
 
-        if parking_site_input.external_identifiers not in [None, UnsetValue]:
-            external_identifiers: list[ExternalIdentifier] = []
-            for i, external_identifier_input in enumerate(parking_site_input.external_identifiers):
-                if len(parking_site_input.external_identifiers) < len(parking_site.external_identifiers):
-                    external_identifier = parking_site.external_identifiers[i]
-                else:
-                    external_identifier = ExternalIdentifier()
-                external_identifier.type = external_identifier_input.type
-                external_identifier.value = external_identifier_input.value
-                external_identifiers.append(external_identifier)
-            parking_site.external_identifiers = external_identifiers
-
-        if parking_site_input.tags not in [None, UnsetValue]:
-            tags: list[Tag] = []
-            for i, tag_input in enumerate(parking_site_input.tags):
-                if len(parking_site_input.tags) < len(parking_site.tags):
-                    tag = parking_site.tags[i]
-                else:
-                    tag = Tag()
-                tag.value = tag_input
-                tags.append(tag)
-            parking_site.tags = tags
+        self.set_related_objects(parking_site_input, parking_site)
 
         if parking_site_input.group_uid:
             try:
@@ -198,7 +176,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         for capacity_field in capacity_fields:
             realtime_free_capacity = getattr(realtime_parking_site_input, f'realtime_free_{capacity_field}')
             # Not all realtime datasets have free capacities
-            if realtime_free_capacity is None or realtime_free_capacity is UnsetValue:
+            if realtime_free_capacity is None:
                 continue
 
             realtime_capacity = getattr(realtime_parking_site_input, f'realtime_{capacity_field}')
@@ -207,7 +185,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
             if parking_site_capacity is None:
                 continue
 
-            if realtime_capacity is UnsetValue or realtime_capacity is None:
+            if realtime_capacity is None:
                 if realtime_free_capacity > parking_site_capacity:
                     setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
                     self.logger.warning(
@@ -217,7 +195,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                         f'was higher than {capacity_field} {parking_site_capacity}',
                     )
 
-            if realtime_capacity is not UnsetValue and realtime_capacity is not None:
+            if realtime_capacity is not None:
                 if realtime_free_capacity > realtime_capacity:
                     setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
                     self.logger.warning(

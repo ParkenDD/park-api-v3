@@ -13,12 +13,11 @@ from flask_openapi.schema import (
     EnumField,
     IntegerField,
     JsonSchema,
-    NumericField,
     ObjectField,
     Reference,
     StringField,
 )
-from parkapi_sources.models.enums import ParkingSpotType, PurposeType
+from parkapi_sources.models.enums import ExternalIdentifierType, ParkingSpotType, PurposeType
 
 from webapp.models.parking_spot import ParkingSpotStatus
 
@@ -46,21 +45,12 @@ parking_spot_schema = JsonSchema(
         'purpose': EnumField(enum=PurposeType),
         'geojson': ObjectField(
             required=False,
-            description='ParkingSite GeoJSON geometry',
+            description='GeoJSON geometry. Additional attribute is `coordinates` containing coordinates depending '
+            'on `type`.',
             properties={
-                'type': AnyOfField(allowed_values=['Polygon']),
-                'coordinates': ArrayField(
-                    items=ArrayField(
-                        items=ArrayField(
-                            items=NumericField(),
-                            minItems=2,
-                            maxItems=2,
-                        ),
-                    ),
-                    minItems=1,
-                    maxItems=1,
-                ),
+                'type': AnyOfField(allowed_values=['Polygon', 'MultiPolygon', 'LineString', 'MultiLineString']),
             },
+            additionalProperties=True,
         ),
         'restricted_to': ArrayField(
             items=Reference(obj='ParkingRestriction'),
@@ -80,6 +70,16 @@ parking_spot_schema = JsonSchema(
             required=False,
             description='Last time realtime fields were updated. Can be set by the client.',
         ),
+        'external_identifiers': ArrayField(
+            items=ObjectField(
+                properties={
+                    'type': EnumField(enum=ExternalIdentifierType),
+                    'value': StringField(maxLength=256),
+                },
+            ),
+            required=False,
+        ),
+        'tags': ArrayField(items=StringField(maxLength=256), required=False),
     },
 )
 

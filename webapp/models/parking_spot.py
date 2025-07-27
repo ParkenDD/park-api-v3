@@ -35,9 +35,11 @@ from webapp.extensions import db
 from .base import BaseModel
 
 if TYPE_CHECKING:
+    from .external_identifier import ExternalIdentifier
     from .parking_restriction import ParkingRestriction
     from .parking_site import ParkingSite
     from .source import Source
+    from .tag import Tag
 
 
 class ParkingSpot(BaseModel):
@@ -55,6 +57,16 @@ class ParkingSpot(BaseModel):
     parking_site: Mapped[Optional['ParkingSite']] = relationship('ParkingSite', back_populates='parking_spots')
     restricted_to: Mapped[list['ParkingRestriction']] = relationship(
         'ParkingRestriction',
+        back_populates='parking_spot',
+        cascade='all, delete-orphan',
+    )
+    external_identifiers: Mapped[list['ExternalIdentifier']] = relationship(
+        'ExternalIdentifier',
+        back_populates='parking_spot',
+        cascade='all, delete-orphan',
+    )
+    tags: Mapped[list['Tag']] = relationship(
+        'Tag',
         back_populates='parking_spot',
         cascade='all, delete-orphan',
     )
@@ -98,7 +110,9 @@ class ParkingSpot(BaseModel):
     def to_dict(
         self,
         fields: Optional[list[str]] = None,
-        include_parking_restrictions: bool = False,
+        include_restricted_to: bool = False,
+        include_external_identifiers: bool = False,
+        include_tags: bool = False,
         ignore: Optional[list[str]] = None,
     ) -> dict:
         if ignore is None:
@@ -108,10 +122,23 @@ class ParkingSpot(BaseModel):
 
         result = super().to_dict(fields, ignore)
 
-        if include_parking_restrictions and len(self.restricted_to):
+        if include_restricted_to and len(self.restricted_to):
             result['restricted_to'] = []
             for parking_restriction in self.restricted_to:
                 result['restricted_to'].append(parking_restriction.to_dict(fields=['type', 'hours', 'max_stay']))
+
+        if include_external_identifiers and len(self.external_identifiers):
+            result['external_identifiers'] = []
+            for external_identifier in self.external_identifiers:
+                result['external_identifiers'].append({
+                    'type': external_identifier.type,
+                    'value': external_identifier.value,
+                })
+
+        if include_tags and len(self.tags):
+            result['tags'] = []
+            for tag in self.tags:
+                result['tags'].append(tag.value)
 
         return filter_unset_value_and_none(result)
 

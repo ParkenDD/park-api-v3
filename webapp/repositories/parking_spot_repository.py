@@ -24,22 +24,45 @@ class ParkingSpotRepository(BaseRepository[ParkingSpot]):
         *,
         search_query: Optional[BaseSearchQuery] = None,
         include_source: bool = True,
-        include_parking_restrictions: bool = False,
+        include_restricted_to: bool = False,
+        include_external_identifiers: bool = False,
+        include_tags: bool = False,
     ) -> PaginatedResult[ParkingSpot]:
         query = self.session.query(ParkingSpot)
 
         if include_source:
             query = query.options(joinedload(ParkingSpot.source))
-        if include_parking_restrictions:
+        if include_restricted_to:
             query = query.options(selectinload(ParkingSpot.restricted_to))
+        if include_external_identifiers:
+            query = query.options(selectinload(ParkingSpot.external_identifiers))
+        if include_tags:
+            query = query.options(selectinload(ParkingSpot.tags))
 
         return self._search_and_paginate(query, search_query)
 
     def fetch_parking_spot_ids_by_source_id(self, source_id: int) -> list[int]:
         return self.session.scalars(select(ParkingSpot.id).where(ParkingSpot.source_id == source_id)).all()
 
-    def fetch_parking_spot_by_id(self, parking_spot_id: int) -> ParkingSpot:
-        return self.fetch_resource_by_id(parking_spot_id)
+    def fetch_parking_spot_by_id(
+        self,
+        parking_spot_id: int,
+        include_source: bool = True,
+        include_restricted_to: bool = False,
+        include_external_identifiers: bool = False,
+        include_tags: bool = False,
+    ) -> ParkingSpot:
+        load_options = []
+        if include_source:
+            load_options.append(joinedload(ParkingSpot.source))
+        if include_restricted_to:
+            load_options.append(selectinload(ParkingSpot.restricted_to))
+        if include_external_identifiers:
+            load_options.append(selectinload(ParkingSpot.external_identifiers))
+        if include_tags:
+            load_options.append(selectinload(ParkingSpot.tags))
+
+        return self.fetch_resource_by_id(parking_spot_id, load_options=load_options)
 
     def fetch_parking_spot_by_source_id_and_external_uid(self, source_id: int, original_uid: str) -> ParkingSpot:
         parking_spot: ParkingSpot | None = (
