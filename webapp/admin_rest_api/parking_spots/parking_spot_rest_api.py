@@ -92,6 +92,10 @@ class ParkingSpotsMethodView(ParkingSpotBaseMethodView):
             source_uid=self.server_auth_helper.get_current_user().username,
             combined_parking_spot_input=combined_parking_spot_input,
         )
-        parking_spot_dict = parking_spot.to_dict(include_parking_restrictions=True)
+        parking_spot_dict = parking_spot.to_dict(
+            include_restricted_to=True,
+            include_tags=True,
+            include_external_identifiers=True,
+        )
 
         return jsonify(parking_spot_dict), HTTPStatus.CREATED if created else HTTPStatus.OK

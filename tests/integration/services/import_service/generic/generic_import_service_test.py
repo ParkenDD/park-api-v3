@@ -138,7 +138,7 @@ class GenericImportServiceTest:
         parking_spots = db.session.query(ParkingSpot).all()
 
         assert len(parking_spots) == 1
-        parking_spot_dict = parking_spots[0].to_dict(include_parking_restrictions=True)
+        parking_spot_dict = parking_spots[0].to_dict(include_restricted_to=True)
         assert parking_spot_dict == CREATE_PARKING_SPOT_WITH_PARKING_RESTRICTIONS_DATA
 
     @staticmethod
