@@ -11,6 +11,6 @@ DATA_TYPES = {
 }
 
 DEFAULT_BASE_URL = 'https://api.mobidata-bw.de/park-api'
-PUSH_BASE_PATH = '/api/admin/v1/generic-parking-sites'
+PUSH_BASE_PATH = '/api/admin/v1/generic'
 DUPLICATES_BASE_PATH = '/api/admin/v1/parking-sites/duplicates'
 USER_AGENT = 'ParkAPIv3 Push Client v1.0.0'

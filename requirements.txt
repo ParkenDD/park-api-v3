@@ -20,7 +20,7 @@ openpyxl~=3.1.5
 opening-hours-py~=1.1.2
 kombu~=5.5.4
 lxml~=5.4.0
-parkapi-sources~=0.22.0
+parkapi-sources~=0.23.0
 isodate~=0.7.2
 shapely~=2.1.1
 

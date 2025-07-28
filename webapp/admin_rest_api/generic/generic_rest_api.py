@@ -10,61 +10,68 @@ from pathlib import Path
 from flask import Response, jsonify
 from flask_openapi.decorator import ErrorResponse, Request, document
 from flask_openapi.schema import JsonSchema
-from parkapi_sources.exceptions import ImportParkingSiteException
-from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
+from parkapi_sources.exceptions import ImportParkingSiteException, ImportParkingSpotException
+from parkapi_sources.models import (
+    RealtimeParkingSiteInput,
+    RealtimeParkingSpotInput,
+    StaticParkingSiteInput,
+    StaticParkingSpotInput,
+)
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
-from webapp.admin_rest_api.generic_parking_sites.generic_parking_site_schema import generic_parking_site_response
-from webapp.admin_rest_api.generic_parking_sites.generic_parking_sites_handler import GenericParkingSitesHandler
 from webapp.dependencies import dependencies
 
+from .generic_handler import GenericHandler
+from .generic_schema import generic_parking_site_response
 
-class GenericParkingSitesBlueprint(AdminApiBaseBlueprint):
+
+class GenericBlueprint(AdminApiBaseBlueprint):
     documented: bool = True
-    generic_parking_sites_handler: GenericParkingSitesHandler
+    generic_parking_sites_handler: GenericHandler
 
     def __init__(self):
-        super().__init__('generic-parking-sites', __name__, url_prefix='/generic-parking-sites')
+        super().__init__('generic', __name__, url_prefix='/generic')
 
         self.request_helper = dependencies.get_request_helper()
         self.config_helper = dependencies.get_config_helper()
 
-        self.generic_parking_sites_handler = GenericParkingSitesHandler(
+        self.generic_parking_sites_handler = GenericHandler(
             **self.get_base_handler_dependencies(),
             parking_site_repository=dependencies.get_parking_site_repository(),
             parking_site_history_repository=dependencies.get_parking_site_history_repository(),
+            parking_spot_repository=dependencies.get_parking_spot_repository(),
             source_repository=dependencies.get_source_repository(),
             generic_import_service=dependencies.get_generic_import_service(),
         )
 
         self.add_url_rule(
             '/json',
-            view_func=GenericParkingSitesJsonMethodView.as_view(
-                'generic-parking-sites-json',
+            view_func=GenericJsonMethodView.as_view(
+                'generic-json',
                 **self.get_base_method_view_dependencies(),
                 generic_parking_sites_handler=self.generic_parking_sites_handler,
             ),
         )
         self.add_url_rule(
             '/xml',
-            view_func=GenericParkingSitesXmlMethodView.as_view(
-                'generic-parking-sites-xml',
+            view_func=GenericXmlMethodView.as_view(
+                'generic-xml',
                 **self.get_base_method_view_dependencies(),
                 generic_parking_sites_handler=self.generic_parking_sites_handler,
             ),
         )
         self.add_url_rule(
             '/csv',
-            view_func=GenericParkingSitesCsvMethodView.as_view(
-                'generic-parking-sites-csv',
+            view_func=GenericCsvMethodView.as_view(
+                'generic-csv',
                 **self.get_base_method_view_dependencies(),
                 generic_parking_sites_handler=self.generic_parking_sites_handler,
             ),
         )
         self.add_url_rule(
             '/xlsx',
-            view_func=GenericParkingSitesXlsxMethodView.as_view(
-                'generic-parking-sites-xlsx',
+            view_func=GenericXlsxMethodView.as_view(
+                'generic-xlsx',
                 **self.get_base_method_view_dependencies(),
                 generic_parking_sites_handler=self.generic_parking_sites_handler,
             ),
@@ -108,41 +115,67 @@ class GenericParkingSitesBlueprint(AdminApiBaseBlueprint):
             return response
 
 
-class GenericParkingSitesMethodView(AdminApiBaseMethodView):
-    generic_parking_sites_handler: GenericParkingSitesHandler
+class GenericMethodView(AdminApiBaseMethodView):
+    generic_parking_sites_handler: GenericHandler
 
-    def __init__(self, *, generic_parking_sites_handler: GenericParkingSitesHandler, **kwargs):
+    def __init__(self, *, generic_parking_sites_handler: GenericHandler, **kwargs):
         super().__init__(**kwargs)
         self.generic_parking_sites_handler = generic_parking_sites_handler
 
     @staticmethod
     def _generate_response(
-        parking_site_inputs: list[StaticParkingSiteInput | RealtimeParkingSiteInput],
-        parking_site_errors: list[ImportParkingSiteException],
+        parking_inputs: list[
+            StaticParkingSiteInput | RealtimeParkingSiteInput | StaticParkingSpotInput | RealtimeParkingSpotInput
+        ],
+        parking_errors: list[ImportParkingSiteException | ImportParkingSpotException],
     ) -> dict:
-        static_parking_site_inputs = [item for item in parking_site_inputs if isinstance(item, StaticParkingSiteInput)]
-        realtime_parking_site_inputs = [
-            item for item in parking_site_inputs if isinstance(item, RealtimeParkingSiteInput)
+        static_parking_site_inputs = [item for item in parking_inputs if isinstance(item, StaticParkingSiteInput)]
+        realtime_parking_site_inputs = [item for item in parking_inputs if isinstance(item, RealtimeParkingSiteInput)]
+        static_parking_spot_inputs = [item for item in parking_inputs if isinstance(item, StaticParkingSpotInput)]
+        realtime_parking_spot_inputs = [item for item in parking_inputs if isinstance(item, RealtimeParkingSpotInput)]
+
+        parking_site_errors = [
+            parking_error for parking_error in parking_errors if isinstance(parking_error, ImportParkingSiteException)
+        ]
+        parking_spot_errors = [
+            parking_error for parking_error in parking_errors if isinstance(parking_error, ImportParkingSpotException)
         ]
 
         return {
-            'summary': {
-                'static_success_count': len(static_parking_site_inputs),
-                'realtime_success_count': len(realtime_parking_site_inputs),
-                'error_count': len(parking_site_errors),
+            'parking_sites': {
+                'summary': {
+                    'static_success_count': len(static_parking_site_inputs),
+                    'realtime_success_count': len(realtime_parking_site_inputs),
+                    'error_count': len(parking_site_errors),
+                },
+                'errors': [
+                    {
+                        'message': error.message,
+                        'parking_site_uid': error.parking_site_uid,
+                        'source_uid': error.source_uid,
+                    }
+                    for error in parking_site_errors
+                ],
             },
-            'errors': [
-                {
-                    'message': error.message,
-                    'parking_site_uid': error.parking_site_uid,
-                    'source_uid': error.source_uid,
-                }
-                for error in parking_site_errors
-            ],
+            'parking_spots': {
+                'summary': {
+                    'static_success_count': len(static_parking_spot_inputs),
+                    'realtime_success_count': len(realtime_parking_spot_inputs),
+                    'error_count': len(parking_errors),
+                },
+                'errors': [
+                    {
+                        'message': error.message,
+                        'parking_spot_errors': error.parking_spot_uid,
+                        'source_uid': error.source_uid,
+                    }
+                    for error in parking_spot_errors
+                ],
+            },
         }
 
 
-class GenericParkingSitesJsonMethodView(GenericParkingSitesMethodView):
+class GenericJsonMethodView(GenericMethodView):
     @document(
         description='POST update.',
         request=[
@@ -165,7 +198,7 @@ class GenericParkingSitesJsonMethodView(GenericParkingSitesMethodView):
         return jsonify(self._generate_response(parking_site_inputs, parking_site_errors))
 
 
-class GenericParkingSitesXmlMethodView(GenericParkingSitesMethodView):
+class GenericXmlMethodView(GenericMethodView):
     @document(
         description='POST update.',
         request=[Request(mimetype='application/xml')],
@@ -180,7 +213,7 @@ class GenericParkingSitesXmlMethodView(GenericParkingSitesMethodView):
         return jsonify(self._generate_response(parking_site_inputs, parking_site_errors))
 
 
-class GenericParkingSitesCsvMethodView(GenericParkingSitesMethodView):
+class GenericCsvMethodView(GenericMethodView):
     @document(
         description='POST update.',
         request=[Request(mimetype='text/csv')],
@@ -195,7 +228,7 @@ class GenericParkingSitesCsvMethodView(GenericParkingSitesMethodView):
         return jsonify(self._generate_response(parking_site_inputs, parking_site_errors))
 
 
-class GenericParkingSitesXlsxMethodView(GenericParkingSitesMethodView):
+class GenericXlsxMethodView(GenericMethodView):
     @document(
         description='POST update.',
         request=[Request(mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')],
