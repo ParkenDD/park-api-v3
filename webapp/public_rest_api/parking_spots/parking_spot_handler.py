@@ -19,8 +19,15 @@ class ParkingSpotHandler(PublicApiBaseHandler):
     def get_parking_spot_list(self, search_query: ParkingSpotSearchInput) -> PaginatedResult:
         return self.parking_spot_repository.fetch_parking_spots(
             search_query=search_query,
-            include_parking_restrictions=True,
+            include_restricted_to=True,
+            include_external_identifiers=True,
+            include_tags=True,
         )
 
     def get_parking_spot_item(self, parking_spot_id: int) -> ParkingSpot:
-        return self.parking_spot_repository.fetch_parking_spot_by_id(parking_spot_id)
+        return self.parking_spot_repository.fetch_parking_spot_by_id(
+            parking_spot_id,
+            include_restricted_to=True,
+            include_external_identifiers=True,
+            include_tags=True,
+        )

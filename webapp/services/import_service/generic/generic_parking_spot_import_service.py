@@ -11,7 +11,7 @@ from parkapi_sources.exceptions import ImportParkingSpotException
 from parkapi_sources.models import CombinedParkingSpotInput, RealtimeParkingSpotInput, StaticParkingSpotInput
 
 from webapp.common.logging.models import LogMessageType
-from webapp.models import ParkingRestriction, ParkingSpot, Source
+from webapp.models import ParkingSpot, Source
 from webapp.models.source import SourceStatus
 from webapp.repositories import (
     ParkingSpotRepository,
@@ -87,24 +87,16 @@ class GenericParkingSpotImportService(GenericBaseImportService):
             created = True
 
         for key, value in parking_spot_input.to_dict().items():
-            if key in ['uid', 'restricted_to']:
+            if key in [
+                'uid',
+                'external_identifiers',
+                'restricted_to',
+                'tags',
+            ]:
                 continue
             setattr(parking_spot, key, value)
 
-        if parking_spot_input.restricted_to is not None:
-            parking_restrictions: list[ParkingRestriction] = []
-            for i, parking_restrictions_input in enumerate(parking_spot_input.restricted_to):
-                if len(parking_spot_input.restricted_to) < len(parking_spot.restricted_to):
-                    parking_restriction = parking_spot.restricted_to[i]
-                else:
-                    parking_restriction = ParkingRestriction()
-
-                parking_restriction.from_dict(parking_restrictions_input.to_dict())
-
-                parking_restrictions.append(parking_restriction)
-            parking_spot.restricted_to = parking_restrictions
-        else:
-            parking_spot.restricted_to = []
+            self.set_related_objects(parking_spot_input, parking_spot)
 
         self.parking_spot_repository.save_parking_spot(parking_spot)
 

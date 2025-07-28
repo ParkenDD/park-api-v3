@@ -8,6 +8,9 @@ from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
 
+import shapely
+from shapely.geometry.base import BaseGeometry
+
 
 class DefaultJSONEncoder(json.JSONEncoder):
     """
@@ -23,6 +26,8 @@ class DefaultJSONEncoder(json.JSONEncoder):
             return str(obj)
         if isinstance(obj, Enum):
             return obj.value
+        if isinstance(obj, BaseGeometry):
+            return shapely.geometry.mapping(obj)
 
         # Serialize data models using to_dict
         if hasattr(obj, 'to_dict'):

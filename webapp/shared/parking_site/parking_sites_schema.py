@@ -5,6 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from flask_openapi.decorator import Schema
 from flask_openapi.schema import (
+    AnyOfField,
     ArrayField,
     BooleanField,
     DateTimeField,
@@ -17,7 +18,14 @@ from flask_openapi.schema import (
     StringField,
     UriField,
 )
-from parkapi_sources.models.enums import ExternalIdentifierType, PurposeType, SupervisionType
+from parkapi_sources.models.enums import (
+    ExternalIdentifierType,
+    ParkingSiteOrientation,
+    ParkingSiteSide,
+    ParkingType,
+    PurposeType,
+    SupervisionType,
+)
 
 from webapp.models.parking_site import OpeningStatus, ParkAndRideType, ParkingSiteType
 
@@ -93,6 +101,11 @@ parking_site_schema = JsonSchema(
         'is_supervised': BooleanField(required=False, description='Deprecated, will be replaced by supervision_type.'),
         'supervision_type': EnumField(enum=SupervisionType, required=False),
         'is_covered': BooleanField(required=False),
+        'orientation': EnumField(enum=ParkingSiteOrientation, required=False),
+        'side': EnumField(enum=ParkingSiteSide, required=False),
+        'parking_type': EnumField(enum=ParkingType, required=False),
+        'capacity_min': IntegerField(minimum=0, required=False),
+        'capacity_max': IntegerField(minimum=0, required=False),
         'related_location': StringField(maxLength=256, description='A related location like a school.', required=False),
         'has_realtime_data': BooleanField(default=False),
         'fee_description': StringField(required=False),
@@ -112,6 +125,21 @@ parking_site_schema = JsonSchema(
         ),
         'lat': DecimalField(precision=10, scale=7),
         'lon': DecimalField(precision=10, scale=7),
+        'geojson': ObjectField(
+            required=False,
+            description='GeoJSON geometry. Additional attribute is `coordinates` containing coordinates depending'
+            'on `typ`.',
+            properties={
+                'type': AnyOfField(allowed_values=['Polygon', 'MultiPolygon', 'LineString', 'MultiLineString']),
+            },
+            additionalProperties=True,
+        ),
+        'restricted_to': ArrayField(
+            items=Reference(obj='ParkingRestriction'),
+            required=False,
+            description='Restrictions which apply. If there are multiple options, they should be understood with an '
+            'logical or.',
+        ),
         'external_identifiers': ArrayField(
             items=ObjectField(
                 properties={

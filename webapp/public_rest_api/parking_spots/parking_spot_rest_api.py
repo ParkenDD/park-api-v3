@@ -69,7 +69,11 @@ class ParkingSpotBaseMethodView(PublicApiBaseMethodView):
 
     @staticmethod
     def _map_parking_spot(parking_spot: ParkingSpot) -> dict:
-        return parking_spot.to_dict(include_parking_restrictions=True)
+        return parking_spot.to_dict(
+            include_restricted_to=True,
+            include_external_identifiers=True,
+            include_tags=True,
+        )
 
 
 class ParkingSpotListMethodView(ParkingSpotBaseMethodView):

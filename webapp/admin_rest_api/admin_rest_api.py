@@ -11,7 +11,7 @@ from webapp.common.logging.models import LogMessageType, LogTag
 from webapp.dependencies import dependencies
 
 from .base_blueprint import AdminApiBaseBlueprint
-from .generic_parking_sites import GenericParkingSitesBlueprint
+from .generic import GenericBlueprint
 from .parking_sites import ParkingSitesBlueprint
 from .parking_spots import ParkingSpotBlueprint
 from .sources import SourceBlueprint
@@ -22,7 +22,7 @@ class AdminRestApi(Blueprint):
     documentation_auth = 'basic'
 
     blueprints_classes: list[type[AdminApiBaseBlueprint]] = [
-        GenericParkingSitesBlueprint,
+        GenericBlueprint,
         ParkingSitesBlueprint,
         ParkingSpotBlueprint,
         SourceBlueprint,

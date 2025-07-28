@@ -34,6 +34,7 @@ class ParkingSiteRepository(BaseRepository):
         self,
         *,
         search_query: Optional[BaseSearchQuery] = None,
+        include_restricted_to: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
         include_source: bool = True,
@@ -43,6 +44,8 @@ class ParkingSiteRepository(BaseRepository):
 
         if include_source:
             query = query.options(joinedload(ParkingSite.source))
+        if include_restricted_to:
+            query = query.options(selectinload(ParkingSite.restricted_to))
         if include_external_identifiers:
             query = query.options(selectinload(ParkingSite.external_identifiers))
         if include_tags:
@@ -55,10 +58,13 @@ class ParkingSiteRepository(BaseRepository):
     def fetch_parking_site_by_id(
         self,
         parking_site_id: int,
+        include_restricted_to: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
     ):
         load_options = []
+        if include_restricted_to:
+            load_options.append(selectinload(ParkingSite.restricted_to))
         if include_external_identifiers:
             load_options.append(selectinload(ParkingSite.external_identifiers))
         if include_tags:
