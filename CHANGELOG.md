@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.28.0
+
+Released 2025-07-28
+
+⚠️ From admin management perspective, this release is breaking, as the endpoint for generic uploads changes from
+`/api/admin/v1/generic-parking-sites` to `/api/admin/v1/generic`. Data consumers do not experience any breaking
+changes.
+
+
+### Features
+
+* [extend data model, more abstract admin api](https://github.com/ParkenDD/park-api-v3/pull/310)
+* [ParkAPI Sources: Synchronize and extend data model](https://github.com/ParkenDD/parkapi-sources-v3/pull/249)
+* [ParkAPI Sources: Esslingen Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/250)
+* [ParkAPI Sources: Freiburg Scanner Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/251)
+* [ParkAPI Sources: Heidelberg EasyPark Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/252)
+* [ParkAPI Sources: Keltern Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/253)
+* [ParkAPI Sources: Reutlingen Disabled Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/254)
+
+
+
 ## 0.27.0
 
 Released 2025-07-21
