@@ -12,7 +12,7 @@ COPY requirements.txt .
 # pyproj needs alpine-sdk, but alpine-sdk should not be part of the final image, so we remove it right away
 RUN apk --no-cache add alpine-sdk proj proj-dev proj-util libpq libpq-dev && \
     pip install -r requirements.txt && \
-    apk del -r alpine-sdk proj-dev libpq libpq-dev
+    apk del -r alpine-sdk proj-dev libpq-dev
 
 COPY .flaskenv ./.flaskenv
 COPY migrations ./migrations

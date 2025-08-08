@@ -10,7 +10,7 @@ COPY requirements.txt requirements-dev.txt .
 # pyproj needs alpine-sdk, but alpine-sdk should not be part of the final image, so we remove it right away
 RUN apk --no-cache add bash alpine-sdk proj proj-dev proj-util libpq libpq-dev && \
     pip install -r requirements.txt -r requirements-dev.txt && \
-    apk del -r alpine-sdk proj-dev libpq libpq-dev
+    apk del -r alpine-sdk proj-dev libpq-dev
 
 CMD ["python3", "runserver.py"]
 EXPOSE 5000
