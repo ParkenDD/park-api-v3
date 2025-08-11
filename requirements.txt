@@ -2,7 +2,7 @@ Flask~=3.1.1
 Flask-Failsafe~=0.2
 Flask-Migrate~=4.1.0
 Flask-SQLAlchemy~=3.1.1
-SQLAlchemy~=2.0.41
+SQLAlchemy~=2.0.42
 SQLAlchemy-Utc~=0.14.0
 pytz~=2025.2
 psycopg2-binary~=2.9.10
@@ -20,7 +20,7 @@ openpyxl~=3.1.5
 opening-hours-py~=1.1.2
 kombu~=5.5.4
 lxml~=5.4.0
-parkapi-sources~=0.23.0
+parkapi-sources~=0.24.0
 isodate~=0.7.2
 shapely~=2.1.1
 
