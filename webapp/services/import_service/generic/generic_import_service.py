@@ -47,6 +47,7 @@ class GenericImportService(BaseService):
         park_api_source_uids: list[str] = []
         park_api_sources_config: dict[str, str] = {
             'PARK_API_PARKING_SITE_PATCH_DIR': app.config['PARKING_SITE_PATCH_DIR'],
+            'PARK_API_PARKING_SPOT_PATCH_DIR': app.config['PARKING_SPOT_PATCH_DIR'],
             'STATIC_GEOJSON_BASE_URL': app.config['STATIC_GEOJSON_BASE_URL'],
             'DEBUG_DUMP_DIR': app.config['DEBUG_DUMP_DIR'],
             'DEBUG_SOURCES': app.config['DEBUG_SOURCES'],
