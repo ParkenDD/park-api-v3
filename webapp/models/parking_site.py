@@ -114,7 +114,7 @@ class ParkingSite(BaseModel):
     public_url: Mapped[str | None] = mapped_column(String(4096), nullable=True)
     address: Mapped[str | None] = mapped_column(String(512), nullable=True)
     description: Mapped[str | None] = mapped_column(String(4096), nullable=True)
-    type: Mapped[ParkingSiteType | None] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True)
+    type: Mapped[ParkingSiteType | None] = mapped_column(SqlalchemyEnum(ParkingSiteType), nullable=True, index=True)
     _geojson: Mapped[str | None] = mapped_column('geojson', Text, nullable=True)
     purpose: Mapped[PurposeType] = mapped_column(SqlalchemyEnum(PurposeType), nullable=False, index=True)
     photo_url: Mapped[str | None] = mapped_column(String(4096), nullable=True)

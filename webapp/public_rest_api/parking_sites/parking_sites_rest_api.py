@@ -15,6 +15,7 @@ from flask_openapi.decorator import (
     document,
 )
 from flask_openapi.schema import ArrayField, BooleanField, EnumField, IntegerField, NumericField, StringField
+from parkapi_sources.models import ParkingSiteType
 from parkapi_sources.models.enums import PurposeType
 from validataclass.validators import DataclassValidator
 
@@ -111,6 +112,8 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
             Parameter('limit', schema=IntegerField(), description='Limit results'),
             Parameter('start', schema=IntegerField(), description='Start of search query.'),
             Parameter('purpose', schema=EnumField(enum=PurposeType)),
+            Parameter('type', schema=EnumField(enum=ParkingSiteType)),
+            Parameter('not_type', schema=EnumField(enum=ParkingSiteType)),
             Parameter(
                 'ignore_duplicates',
                 schema=BooleanField(),
