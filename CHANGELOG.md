@@ -7,6 +7,7 @@
 * [ParkAPI Sources: Aalen converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/258)
 * [ParkAPI Sources: Unify Patching to support ParkingSpot patches](https://github.com/ParkenDD/parkapi-sources-v3/pull/260)
 * [ParkAPI Sources: Konstanz Disabled converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/257)
+* [Additional type filter](https://github.com/ParkenDD/park-api-v3/pull/315)
 
 
 ### Fixes
