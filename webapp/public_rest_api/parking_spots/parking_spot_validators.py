@@ -6,9 +6,10 @@ Use of this source code is governed by an MIT-style license that can be found in
 from decimal import Decimal
 from typing import Optional
 
+from parkapi_sources.models import ParkingSiteType
 from validataclass.dataclasses import Default
 from validataclass.exceptions import ValidationError
-from validataclass.validators import IntegerValidator, NumericValidator, StringValidator
+from validataclass.validators import EnumValidator, IntegerValidator, NumericValidator, StringValidator
 from validataclass_search_queries.filters import SearchParamCustom, SearchParamEquals, SearchParamMultiSelect
 from validataclass_search_queries.pagination import CursorPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
@@ -21,6 +22,7 @@ class ParkingSpotSearchInput(CursorPaginationMixin, BaseSearchQuery):
     parking_site_id: Optional[int] = SearchParamEquals(), IntegerValidator(allow_strings=True)
     source_uid: Optional[str] = SearchParamEquals(), StringValidator()
     source_uids: Optional[list[str]] = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
+    type: ParkingSiteType | None = SearchParamEquals(), EnumValidator(ParkingSiteType)
 
     lat: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon: Optional[Decimal] = SearchParamCustom(), NumericValidator()

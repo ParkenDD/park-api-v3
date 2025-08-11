@@ -118,7 +118,12 @@ class ParkingSitesMethodView(ParkingSiteBaseMethodView):
     def get(self):
         search_query = self.validate_query_args(self.parking_site_search_query_validator)
 
-        return self.parking_site_handler.get_parking_sites(search_query=search_query)
+        parking_sites = self.parking_site_handler.get_parking_sites(search_query=search_query)
+
+        return self.jsonify_paginated_response(
+            parking_sites,
+            search_query=search_query,
+        ), HTTPStatus.OK
 
 
 class ParkingSiteMethodView(ParkingSiteBaseMethodView):

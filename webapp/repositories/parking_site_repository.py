@@ -167,6 +167,8 @@ class ParkingSiteRepository(BaseRepository):
             if bound_filter.value is False:
                 return query
             return query.filter(ParkingSite.duplicate_of_parking_site_id.is_(None))
+        if bound_filter.param_name == 'not_type':
+            return query.filter(ParkingSite.type != bound_filter.value)
         return super()._apply_bound_search_filter(query, bound_filter)
 
     def fetch_parking_site_locations(self) -> list[ParkingSiteLocation]:

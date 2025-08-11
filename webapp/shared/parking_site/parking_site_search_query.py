@@ -7,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from parkapi_sources.models.enums import PurposeType
+from parkapi_sources.models.enums import ParkingSiteType, PurposeType
 from validataclass.dataclasses import Default
 from validataclass.exceptions import ValidationError
 from validataclass.validators import (
@@ -42,6 +42,8 @@ class ParkingSiteBaseSearchInput(CursorPaginationMixin, BaseSearchQuery):
     name: str | None = SearchParamContains(), StringValidator()
     ignore_duplicates: bool = SearchParamCustom(), BooleanValidator(allow_strings=True), Default(True)
     purpose: PurposeType | None = SearchParamEquals(), EnumValidator(PurposeType)
+    type: ParkingSiteType | None = SearchParamEquals(), EnumValidator(ParkingSiteType)
+    not_type: ParkingSiteType | None = SearchParamCustom(), EnumValidator(ParkingSiteType)
     limit: int | None = PaginationLimitValidator(max_value=1000), Default(None)
     static_data_updated_at_since: datetime | None = SearchParamSince('static_data_updated_at'), DateTimeToUtcValidator()
     static_data_updated_at_until: datetime | None = SearchParamUntil('static_data_updated_at'), DateTimeToUtcValidator()
