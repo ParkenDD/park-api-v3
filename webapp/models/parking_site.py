@@ -205,7 +205,7 @@ class ParkingSite(BaseModel):
         if include_restricted_to and len(self.restricted_to):
             result['restricted_to'] = []
             for restricted_to in self.restricted_to:
-                result['restricted_to'].append(restricted_to.to_dict())
+                result['restricted_to'].append(restricted_to.to_dict(fields=['type', 'hours', 'max_stay']))
 
         if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []
