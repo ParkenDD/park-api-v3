@@ -2,6 +2,21 @@
 
 ## 0.29.0
 
+### Fixes
+
+* [ParkAPI Sources: fix patching system subobjects](https://github.com/ParkenDD/parkapi-sources-v3/pull/268)
+* [ParkAPI Sources: Heidelberg: Fix uid mismatch and missing realtime data](https://github.com/ParkenDD/parkapi-sources-v3/pull/267)
+* [ParkAPI Sources: freiburg scanner address](https://github.com/ParkenDD/parkapi-sources-v3/pull/266)
+* [ParkAPI Sources: better pbw realtime data field](https://github.com/ParkenDD/parkapi-sources-v3/pull/265)
+
+
+### Maintenance
+
+* Several dependency updates, most notably `lxml` 5.x -> 6.x.
+
+
+## 0.29.0
+
 ### Features
 
 * [ParkAPI Sources: Aalen converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/258)
