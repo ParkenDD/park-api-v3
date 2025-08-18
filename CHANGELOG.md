@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.29.0
+## 0.29.1
 
 ### Fixes
 
+* [limit restricion fields](https://github.com/ParkenDD/park-api-v3/pull/323)
 * [ParkAPI Sources: fix patching system subobjects](https://github.com/ParkenDD/parkapi-sources-v3/pull/268)
 * [ParkAPI Sources: Heidelberg: Fix uid mismatch and missing realtime data](https://github.com/ParkenDD/parkapi-sources-v3/pull/267)
 * [ParkAPI Sources: freiburg scanner address](https://github.com/ParkenDD/parkapi-sources-v3/pull/266)
