@@ -23,7 +23,7 @@ from tests.model_generator.parking_spot import get_realtime_parking_spot_input, 
 from webapp.common.flask_app import App
 from webapp.common.sqlalchemy import SQLAlchemy
 from webapp.dependencies import dependencies
-from webapp.models import ParkingSpot
+from webapp.models import ParkingRestriction, ParkingSpot
 from webapp.services.import_service.generic import GenericImportService
 
 
@@ -164,6 +164,28 @@ class GenericImportServiceTest:
         expected_response['realtime_data_updated_at'] = ANY
         expected_response['realtime_status'] = ParkingSpotStatus.AVAILABLE
         assert parking_spots[0].to_dict() == expected_response
+
+    @staticmethod
+    def test_update_sources_update_parking_spot_static_keep_restriction_id(
+        db: SQLAlchemy,
+        inserted_parking_spot: ParkingSpot,
+        generic_import_service: GenericImportService,
+        parking_spot_test_pull_converter: ParkingSpotTestPullConverter,
+    ) -> None:
+        inserted_parking_spot.restricted_to = [ParkingRestriction()]
+        db.session.add(inserted_parking_spot)
+        db.session.commit()
+
+        parking_restriction_id = inserted_parking_spot.restricted_to[0].id
+        parking_spot_test_pull_converter.get_static_parking_spots_return_value = (
+            [get_static_parking_spot_input(restricted_to=[get_parking_restriction_input()])],
+            [],
+        )
+        generic_import_service.update_sources_static()
+
+        parking_spots = db.session.query(ParkingSpot).all()
+
+        assert parking_restriction_id == parking_spots[0].restricted_to[0].id
 
     @staticmethod
     def test_update_sources_update_parking_spot_realtime(

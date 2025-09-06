@@ -38,9 +38,9 @@ def main():
     password = re.sub(r'\x5b.{1,3}\x7e$', '', password)
 
     file_ending = None
-    for ending in DATA_TYPES:
-        if file_path.name.endswith(f'.{ending}'):
-            file_ending = ending
+    for key, value in DATA_TYPES.items():
+        if file_path.name.endswith(f'.{key}'):
+            file_ending = value[0]
 
     if file_ending is None:
         sys.exit(f'Error: invalid ending. Allowed endings are: {", ".join(DATA_TYPES.keys())}')
@@ -54,7 +54,7 @@ def main():
         data=file_data,
         auth=(source_uid, password),
         headers={
-            'Content-Type': DATA_TYPES[file_ending],
+            'Content-Type': DATA_TYPES[file_ending][1],
             'User-Agent': USER_AGENT,
         },
         timeout=300,

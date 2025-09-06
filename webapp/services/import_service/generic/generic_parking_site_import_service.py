@@ -7,7 +7,7 @@ import traceback
 from datetime import datetime, timezone
 
 from parkapi_sources.exceptions import ImportParkingSiteException
-from parkapi_sources.models import CombinedParkingSiteInput, RealtimeParkingSiteInput, StaticParkingSiteInput
+from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
 
 from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSite, ParkingSiteHistory, Source
@@ -73,7 +73,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
     def save_static_or_combined_parking_site_input(
         self,
         source: Source,
-        parking_site_input: StaticParkingSiteInput | CombinedParkingSiteInput,
+        parking_site_input: StaticParkingSiteInput,
         existing_parking_site_ids: list[int],
     ) -> ParkingSite:
         try:
