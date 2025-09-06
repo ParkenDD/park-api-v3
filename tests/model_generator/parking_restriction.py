@@ -5,6 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from copy import deepcopy
 
+from isodate import parse_duration
 from parkapi_sources.models import ParkingRestrictionInput
 from parkapi_sources.models.enums import ParkingAudience
 
@@ -15,7 +16,7 @@ def get_parking_restriction(**kwargs) -> ParkingRestriction:
     base_data = {
         'type': ParkingAudience.DISABLED,
         'hours': 'Mo-Fr 08:00-18:00',
-        'max_stay': 'P6H',
+        'max_stay': parse_duration('PT6H'),
     }
 
     data = deepcopy(base_data)
@@ -28,7 +29,7 @@ def get_parking_restriction_input(**kwargs) -> ParkingRestrictionInput:
     base_data = {
         'type': ParkingAudience.DISABLED,
         'hours': 'Mo-Fr 08:00-18:00',
-        'max_stay': 'P6H',
+        'max_stay': parse_duration('PT6H'),
     }
 
     data = deepcopy(base_data)

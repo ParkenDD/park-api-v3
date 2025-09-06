@@ -5,10 +5,13 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from typing import TYPE_CHECKING, Optional
 
+from isodate import Duration
 from parkapi_sources.models.enums import ParkingAudience
 from sqlalchemy import BigInteger, ForeignKey, String
 from sqlalchemy import Enum as SqlalchemyEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from webapp.common.sqlalchemy import SqlalchemyDuration
 
 from .base import BaseModel
 
@@ -28,4 +31,4 @@ class ParkingRestriction(BaseModel):
 
     type: Mapped[ParkingAudience | None] = mapped_column(SqlalchemyEnum(ParkingAudience), nullable=True)
     hours: Mapped[str | None] = mapped_column(String(512), nullable=True)
-    max_stay: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    max_stay: Mapped[Duration | None] = mapped_column(SqlalchemyDuration, nullable=True)

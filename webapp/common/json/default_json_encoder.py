@@ -4,11 +4,12 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import json
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from enum import Enum
 
 import shapely
+from isodate import Duration, duration_isoformat
 from shapely.geometry.base import BaseGeometry
 
 
@@ -28,6 +29,8 @@ class DefaultJSONEncoder(json.JSONEncoder):
             return obj.value
         if isinstance(obj, BaseGeometry):
             return shapely.geometry.mapping(obj)
+        if isinstance(obj, timedelta) or isinstance(obj, Duration):
+            return duration_isoformat(obj)
 
         # Serialize data models using to_dict
         if hasattr(obj, 'to_dict'):

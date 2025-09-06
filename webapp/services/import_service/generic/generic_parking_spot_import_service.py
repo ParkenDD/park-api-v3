@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 
 from parkapi_sources import ParkAPISources
 from parkapi_sources.exceptions import ImportParkingSpotException
-from parkapi_sources.models import CombinedParkingSpotInput, RealtimeParkingSpotInput, StaticParkingSpotInput
+from parkapi_sources.models import RealtimeParkingSpotInput, StaticParkingSpotInput
 
 from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSpot, Source
@@ -68,7 +68,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
     def save_static_or_combined_parking_spot_input(
         self,
         source: Source,
-        parking_spot_input: StaticParkingSpotInput | CombinedParkingSpotInput,
+        parking_spot_input: StaticParkingSpotInput,
         existing_parking_spot_ids: list[int] | None = None,
     ) -> tuple[ParkingSpot, bool]:
         try:

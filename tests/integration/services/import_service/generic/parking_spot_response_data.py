@@ -3,7 +3,7 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from unittest.mock import ANY
 
@@ -49,7 +49,7 @@ CREATE_PARKING_SPOT_WITH_PARKING_RESTRICTIONS_DATA = {
     'restricted_to': [
         {
             'hours': 'Mo-Fr 08:00-18:00',
-            'max_stay': 'P6H',
+            'max_stay': timedelta(hours=6),
             'type': ParkingAudience.DISABLED,
         },
     ],
