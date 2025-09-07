@@ -4,12 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from parkapi_sources import ParkAPISources
-from parkapi_sources.models import (
-    CombinedParkingSiteInput,
-    CombinedParkingSpotInput,
-    StaticParkingSiteInput,
-    StaticParkingSpotInput,
-)
+from parkapi_sources.models import StaticBaseParkingInput
 
 from webapp.models import ExternalIdentifier, ParkingRestriction, ParkingSite, ParkingSpot, Tag
 from webapp.repositories import SourceRepository
@@ -25,17 +20,11 @@ class GenericBaseImportService(BaseService):
         self.source_repository = source_repository
 
     @staticmethod
-    def set_related_objects(
-        entity_input: StaticParkingSiteInput
-        | CombinedParkingSiteInput
-        | StaticParkingSpotInput
-        | CombinedParkingSpotInput,
-        entity: ParkingSite | ParkingSpot,
-    ):
+    def set_related_objects(entity_input: StaticBaseParkingInput, entity: ParkingSite | ParkingSpot):
         if entity_input.restricted_to is not None:
             parking_restrictions: list[ParkingRestriction] = []
             for i, parking_restrictions_input in enumerate(entity_input.restricted_to):
-                if len(entity_input.restricted_to) < len(entity.restricted_to):
+                if len(entity_input.restricted_to) <= len(entity.restricted_to):
                     parking_restriction = entity.restricted_to[i]
                 else:
                     parking_restriction = ParkingRestriction()
@@ -50,7 +39,7 @@ class GenericBaseImportService(BaseService):
         if entity_input.external_identifiers is not None:
             external_identifiers: list[ExternalIdentifier] = []
             for i, external_identifier_input in enumerate(entity_input.external_identifiers):
-                if len(entity_input.external_identifiers) < len(entity.external_identifiers):
+                if len(entity_input.external_identifiers) <= len(entity.external_identifiers):
                     external_identifier = entity.external_identifiers[i]
                 else:
                     external_identifier = ExternalIdentifier()
@@ -62,7 +51,7 @@ class GenericBaseImportService(BaseService):
         if entity_input.tags is not None:
             tags: list[Tag] = []
             for i, tag_input in enumerate(entity_input.tags):
-                if len(entity_input.tags) < len(entity.tags):
+                if len(entity_input.tags) <= len(entity.tags):
                     tag = entity.tags[i]
                 else:
                     tag = Tag()
