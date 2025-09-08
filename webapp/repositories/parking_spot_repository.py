@@ -86,6 +86,18 @@ class ParkingSpotRepository(BaseRepository[ParkingSpot]):
 
         return {key: value for key, value in result}
 
+    def count_by_source(self) -> dict[int, int]:
+        result: dict[int, int] = {}
+        parking_spots = (
+            self.session.query(ParkingSpot.source_id, func.count(ParkingSpot.id).label('count'))
+            .group_by(ParkingSpot.source_id)
+            .all()
+        )
+        for parking_spot in parking_spots:
+            result[parking_spot.source_id] = parking_spot.count
+
+        return result
+
     def save_parking_spot(self, parking_spot: ParkingSpot, *, commit: bool = True):
         self._save_resources(parking_spot, commit=commit)
 
