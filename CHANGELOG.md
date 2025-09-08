@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.31.0
+
+### Features
+
+* [success metrics](https://github.com/ParkenDD/park-api-v3/pull/330)
+
+
+### Fixes
+
+* [Better duration support, more efficient sub-object updates, support geojson upload](https://github.com/ParkenDD/park-api-v3/pull/329)
+* [ParkAPI Sources: update spatial.vrn.de link](https://github.com/ParkenDD/parkapi-sources-v3/pull/280)
+
+
+### Maintenance
+
+* [depencency updates](https://github.com/ParkenDD/park-api-v3/pull/331)
+
+
 ## 0.30.0
 
 Released 2025-08-31
