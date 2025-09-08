@@ -100,12 +100,26 @@ class GenericImportService(BaseService):
                 return
 
             self.generic_parking_site_import_service.handle_static_import_results(
-                source, static_parking_site_inputs, static_parking_site_errors
+                source=source,
+                static_parking_site_inputs=static_parking_site_inputs,
+                static_parking_site_errors=static_parking_site_errors,
             )
 
-            for static_parking_site_error in static_parking_site_errors:
+            if len(static_parking_site_errors):
+                logger.info(
+                    f'Source {source.uid} successfully updated {len(static_parking_site_inputs)} static parking sites.',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+                )
+            else:
                 logger.warning(
-                    f'Failed to pull {source.uid} static parking site item: {static_parking_site_error}',
+                    f'Source {source.uid} successfully updated {len(static_parking_site_inputs)} static parking '
+                    f'sites with {len(static_parking_site_errors)} errors.',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+                )
+
+            for static_parking_site_error in static_parking_site_errors:
+                logger.info(
+                    f'Failed to pull {source.uid} static parking site item: {static_parking_site_error}.',
                     extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
                 )
 
@@ -122,13 +136,25 @@ class GenericImportService(BaseService):
                 return
 
             self.generic_parking_spot_import_service.handle_static_import_results(
-                source,
-                static_parking_spot_inputs,
-                static_parking_spot_errors,
+                source=source,
+                static_parking_spot_inputs=static_parking_spot_inputs,
+                static_parking_spot_errors=static_parking_spot_errors,
             )
 
-            for static_parking_spot_error in static_parking_spot_errors:
+            if len(static_parking_spot_errors):
+                logger.info(
+                    f'Source {source.uid} successfully updated {len(static_parking_spot_inputs)} static parking spots.',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+                )
+            else:
                 logger.warning(
+                    f'Source {source.uid} successfully updated {len(static_parking_spot_inputs)} static parking '
+                    f'spots with {len(static_parking_spot_errors)} errors.',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+                )
+
+            for static_parking_spot_error in static_parking_spot_errors:
+                logger.info(
                     f'Failed to pull {source.uid} static parking spot item: {static_parking_spot_error}',
                     extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
                 )
@@ -163,13 +189,26 @@ class GenericImportService(BaseService):
                 return
 
             self.generic_parking_site_import_service.handle_realtime_import_results(
-                source,
-                realtime_parking_site_inputs,
-                realtime_parking_site_errors,
+                source=source,
+                realtime_parking_site_inputs=realtime_parking_site_inputs,
+                realtime_parking_site_errors=realtime_parking_site_errors,
             )
 
-            for realtime_parking_site_error in realtime_parking_site_errors:
+            if len(realtime_parking_site_errors):
+                logger.info(
+                    f'Source {source.uid} successfully updated {len(realtime_parking_site_inputs)} realtime '
+                    f'parking sites.',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                )
+            else:
                 logger.warning(
+                    f'Source {source.uid} successfully updated {len(realtime_parking_site_inputs)} realtime parking '
+                    f'sites with {len(realtime_parking_site_errors)} errors.',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                )
+
+            for realtime_parking_site_error in realtime_parking_site_errors:
+                logger.info(
                     f'Failed to pull {source.uid} realtime parking site item: {realtime_parking_site_error}',
                     extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                 )
@@ -187,13 +226,26 @@ class GenericImportService(BaseService):
                 return
 
             self.generic_parking_spot_import_service.handle_realtime_import_results(
-                source,
-                realtime_parking_spot_inputs,
-                realtime_parking_spot_errors,
+                source=source,
+                realtime_parking_spot_inputs=realtime_parking_spot_inputs,
+                realtime_parking_spot_errors=realtime_parking_spot_errors,
             )
 
-            for realtime_parking_spot_error in realtime_parking_spot_errors:
+            if len(realtime_parking_spot_errors):
+                logger.info(
+                    f'Source {source.uid} successfully updated {len(realtime_parking_spot_inputs)} realtime '
+                    f'parking spots.',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+                )
+            else:
                 logger.warning(
+                    f'Source {source.uid} successfully updated {len(realtime_parking_spot_inputs)} realtime '
+                    f'parking spots with {len(realtime_parking_spot_errors)} invalid items.',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+                )
+
+            for realtime_parking_spot_error in realtime_parking_spot_errors:
+                logger.info(
                     f'Failed to pull {source.uid} realtime parking spot item: {realtime_parking_spot_error}',
                     extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
                 )
