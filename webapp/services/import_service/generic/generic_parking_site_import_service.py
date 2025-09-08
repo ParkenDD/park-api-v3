@@ -192,7 +192,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 if realtime_free_capacity > parking_site_capacity:
                     setattr(realtime_parking_site_input, f'realtime_free_{capacity_field}', parking_site_capacity)
                     logger.warning(
-                        f'At {parking_site.original_uid} from {source.id}, '
+                        f'At item uid {parking_site.original_uid} from source {source.uid}, '
                         f'realtime_free_{capacity_field} {realtime_free_capacity} '
                         f'was higher than {capacity_field} {parking_site_capacity}',
                         extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
@@ -202,7 +202,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 if realtime_free_capacity > realtime_capacity:
                     setattr(realtime_parking_site_input, f'realtime_free_{capacity_field}', realtime_capacity)
                     logger.warning(
-                        f'At {parking_site.original_uid} from {source.id}, '
+                        f'At item uid {parking_site.original_uid} from source {source.uid}, '
                         f'realtime_free_{capacity_field} {realtime_free_capacity} '
                         f'was higher than realtime_{capacity_field} {realtime_capacity}',
                         extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},

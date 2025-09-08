@@ -40,16 +40,18 @@ LOGGING_TEMPLATE:
       (): webapp.common.logging.loki_formatter.LokiFormatter
       prefix: park_api
       service_name: ParkAPI
+    human_readable:
+      format: '%(asctime)s %(levelname)s: %(message)s'
   handlers:
     console_stdout:
       class: logging.StreamHandler
       level: INFO
-      formatter: open_telemetry
+      formatter: human_readable
       stream: ext://sys.stdout
     console_stderr:
       class: logging.StreamHandler
       level: ERROR
-      formatter: open_telemetry
+      formatter: human_readable
       stream: ext://sys.stderr
     open_telemetry_queue:
       class: logging.handlers.QueueHandler
@@ -75,6 +77,11 @@ LOGGING_TEMPLATE:
       class: webapp.common.logging.http_json_post_handler.HttpPostJsonHandler
       url: http://mocked-loki:5000/loki/api/v1/push
       level: INFO
+    split_log_file:
+      class: webapp.common.logging.split_log_file_handler.SplitLogFileHandler
+      level: INFO
+      log_path: /app/logs
+      formatter: human_readable
   loggers:
     webapp:
       level: INFO

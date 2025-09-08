@@ -106,14 +106,14 @@ class GenericImportService(BaseService):
             )
 
             if len(static_parking_site_errors):
-                logger.info(
-                    f'Source {source.uid} successfully updated {len(static_parking_site_inputs)} static parking sites.',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
-                )
-            else:
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(static_parking_site_inputs)} static parking '
                     f'sites with {len(static_parking_site_errors)} errors.',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+                )
+            else:
+                logger.info(
+                    f'Source {source.uid} successfully updated {len(static_parking_site_inputs)} static parking sites.',
                     extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
                 )
 
@@ -142,14 +142,14 @@ class GenericImportService(BaseService):
             )
 
             if len(static_parking_spot_errors):
-                logger.info(
-                    f'Source {source.uid} successfully updated {len(static_parking_spot_inputs)} static parking spots.',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
-                )
-            else:
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(static_parking_spot_inputs)} static parking '
                     f'spots with {len(static_parking_spot_errors)} errors.',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+                )
+            else:
+                logger.info(
+                    f'Source {source.uid} successfully updated {len(static_parking_spot_inputs)} static parking spots.',
                     extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
                 )
 
@@ -195,15 +195,15 @@ class GenericImportService(BaseService):
             )
 
             if len(realtime_parking_site_errors):
-                logger.info(
-                    f'Source {source.uid} successfully updated {len(realtime_parking_site_inputs)} realtime '
-                    f'parking sites.',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
-                )
-            else:
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(realtime_parking_site_inputs)} realtime parking '
                     f'sites with {len(realtime_parking_site_errors)} errors.',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                )
+            else:
+                logger.info(
+                    f'Source {source.uid} successfully updated {len(realtime_parking_site_inputs)} realtime '
+                    f'parking sites.',
                     extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                 )
 
@@ -232,15 +232,15 @@ class GenericImportService(BaseService):
             )
 
             if len(realtime_parking_spot_errors):
-                logger.info(
-                    f'Source {source.uid} successfully updated {len(realtime_parking_spot_inputs)} realtime '
-                    f'parking spots.',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
-                )
-            else:
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(realtime_parking_spot_inputs)} realtime '
                     f'parking spots with {len(realtime_parking_spot_errors)} invalid items.',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+                )
+            else:
+                logger.info(
+                    f'Source {source.uid} successfully updated {len(realtime_parking_spot_inputs)} realtime '
+                    f'parking spots.',
                     extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
                 )
 

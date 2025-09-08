@@ -86,17 +86,11 @@ class BaseConfig:
                 'formatter': 'human_readable',
                 'stream': 'ext://sys.stderr',
             },
-            'split_log_file': {
-                'class': 'webapp.common.logging.split_log_file_handler.SplitLogFileHandler',
-                'level': 'INFO',
-                'log_path': '/app/logs',
-                'formatter': 'human_readable',
-            },
         },
         'loggers': {
             'webapp': {
                 'level': 'INFO',
-                'handlers': ['console_stdout', 'console_stderr', 'split_log_file'],
+                'handlers': ['console_stdout', 'console_stderr'],
             },
         },
     }
