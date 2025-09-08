@@ -43,6 +43,9 @@ class PrometheusHandler:
         older_then_delta = timedelta(minutes=self.config_helper.get('REALTIME_OUTDATED_AFTER_MINUTES'))
         older_then = datetime.now(tz=timezone.utc) - older_then_delta
 
+        parking_site_count_by_source = self.parking_site_repository.count_by_source()
+        parking_spot_count_by_source = self.parking_spot_repository.count_by_source()
+
         realtime_outdated_parking_sites_by_source = (
             self.parking_site_repository.fetch_realtime_outdated_parking_site_count_by_source(older_then)
         )
@@ -60,6 +63,16 @@ class PrometheusHandler:
             help='Last realtime update in seconds from now',
             type=MetricType.gauge,
             identifier='app_park_api_source_last_realtime_update',
+        )
+        source_parking_site_count = Metrics(
+            help='Parking site count by source',
+            type=MetricType.gauge,
+            identifier='app_park_api_source_parking_site_count',
+        )
+        source_parking_spot_count = Metrics(
+            help='Parking spot count by source',
+            type=MetricType.gauge,
+            identifier='app_park_api_source_parking_spot_count',
         )
         source_static_parking_site_errors = Metrics(
             help='Parking site static errors by source',
@@ -115,6 +128,22 @@ class PrometheusHandler:
         for source in sources:
             if source.static_status in [SourceStatus.DISABLED, SourceStatus.PROVISIONED]:
                 continue
+
+            if source.id in parking_site_count_by_source:
+                source_parking_site_count.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=parking_site_count_by_source[source.id],
+                    ),
+                )
+
+            if source.id in parking_spot_count_by_source:
+                source_parking_spot_count.metrics.append(
+                    SourceMetric(
+                        source=source.uid,
+                        value=parking_spot_count_by_source[source.id],
+                    ),
+                )
 
             if source.static_data_updated_at:
                 last_static_update_metrics.metrics.append(
@@ -200,7 +229,9 @@ class PrometheusHandler:
             )
 
         metrics = (
-            failed_static_sources.to_metrics()
+            source_parking_site_count.to_metrics()
+            + source_parking_spot_count.to_metrics()
+            + failed_static_sources.to_metrics()
             + last_static_update_metrics.to_metrics()
             + source_static_parking_site_errors.to_metrics()
             + legacy_source_static_parking_site_errors.to_metrics()
