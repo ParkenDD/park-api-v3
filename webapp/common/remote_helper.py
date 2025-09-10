@@ -4,10 +4,11 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import json
+import logging
 from dataclasses import dataclass
 from enum import Enum
 from json.decoder import JSONDecodeError
-from typing import TYPE_CHECKING, Optional, Union
+from typing import Optional, Union
 
 from requests import request
 from requests.exceptions import ConnectionError
@@ -17,8 +18,7 @@ from webapp.common.config import ConfigHelper
 from webapp.common.json import DefaultJSONEncoder
 from webapp.common.logging.models import LogMessageType
 
-if TYPE_CHECKING:
-    from webapp.common.logging import Logger
+logger = logging.getLogger(__name__)
 
 
 class RemoteServerType(Enum):
@@ -43,11 +43,9 @@ class RemoteException(Exception):
 
 
 class RemoteHelper:
-    logger: 'Logger'
     config_helper: ConfigHelper
 
-    def __init__(self, logger: 'Logger', config_helper: ConfigHelper):
-        self.logger = logger
+    def __init__(self, config_helper: ConfigHelper):
         self.config_helper = config_helper
 
     def request(
@@ -80,7 +78,10 @@ class RemoteHelper:
                 log_fragments.append(f'>> {data}')
             if response.text and response.text.strip():
                 log_fragments.append(f'<< {response.text.strip()}')
-            self.logger.info(LogMessageType.REQUEST_OUT, '\n'.join(log_fragments))
+            logger.info(
+                '\n'.join(log_fragments),
+                extra={'attributes': {'type': LogMessageType.REQUEST_OUT}},
+            )
 
             try:
                 if response.status_code == 404 and ignore_404:

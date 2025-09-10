@@ -3,15 +3,15 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
 import traceback
-from typing import TYPE_CHECKING, Callable, Optional, Type
+from typing import Callable, Optional, Type
 
 from sqlalchemy.orm import scoped_session
 
 from webapp.common.logging.models import LogMessageType
 
-if TYPE_CHECKING:
-    from webapp.common.logging import Logger
+logger = logging.getLogger(__name__)
 
 
 class BaseErrorHandler:
@@ -23,15 +23,13 @@ class BaseErrorHandler:
     _handlers: dict
 
     # Dependencies
-    logger: 'Logger'
     db_session: scoped_session
 
     # Whether the application is running in debug mode. Error handlers may decide to log more detailed errors when in debug mode.
     debug: bool
 
-    def __init__(self, *, logger: 'Logger', db_session: scoped_session, debug: bool = False):
+    def __init__(self, *, db_session: scoped_session, debug: bool = False):
         self._handlers = {}
-        self.logger = logger
         self.db_session = db_session
         self.debug = debug
 
@@ -78,4 +76,8 @@ class BaseErrorHandler:
         """
         Helper function to write critical errors to the log.
         """
-        self.logger.critical(LogMessageType.EXCEPTION, f'{error}: {traceback.format_exc()}')
+
+        logger.error(
+            f'{error}: {traceback.format_exc()}',
+            extra={'attributes': {'type': LogMessageType.EXCEPTION}},
+        )

@@ -14,7 +14,6 @@ class PublicApiBaseBlueprint(Blueprint):
     @staticmethod
     def get_base_handler_dependencies() -> dict:
         return {
-            'logger': dependencies.get_logger(),
             'config_helper': dependencies.get_config_helper(),
             'event_helper': dependencies.get_event_helper(),
         }
@@ -22,7 +21,6 @@ class PublicApiBaseBlueprint(Blueprint):
     @staticmethod
     def get_base_method_view_dependencies() -> dict:
         return {
-            'logger': dependencies.get_logger(),
             'request_helper': dependencies.get_request_helper(),
             'config_helper': dependencies.get_config_helper(),
         }

@@ -3,6 +3,7 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
 import traceback
 from datetime import datetime, timezone
 
@@ -20,6 +21,8 @@ from webapp.repositories import (
 from webapp.repositories.exceptions import ObjectNotFoundException
 
 from .generic_base_import_service import GenericBaseImportService
+
+logger = logging.getLogger(__name__)
 
 
 class GenericParkingSpotImportService(GenericBaseImportService):
@@ -46,13 +49,13 @@ class GenericParkingSpotImportService(GenericBaseImportService):
                     static_parking_spot_input,
                     existing_parking_spot_ids,
                 )
-            except:
-                self.logger.warning(
-                    LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
-                    f'Unhandled exception at dataset {static_parking_spot_input}: {traceback.format_exc()}',
+            except Exception as e:
+                logger.warning(
+                    f'Unhandled exception at dataset {static_parking_spot_input}: {e} {traceback.format_exc()}',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
                 )
 
-                # Delete remaining existing parking sites because they are not in the new dataset
+        # Delete remaining existing parking sites because they are not in the new dataset
         for existing_parking_spot_id in existing_parking_spot_ids:
             existing_parking_spot = self.parking_spot_repository.fetch_parking_spot_by_id(existing_parking_spot_id)
             self.parking_spot_repository.delete_parking_spot(existing_parking_spot)
@@ -64,6 +67,14 @@ class GenericParkingSpotImportService(GenericBaseImportService):
 
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
         source.static_parking_spot_error_count = len(static_parking_spot_errors)
+
+        self.source_repository.save_source(source)
+
+        logger.info(
+            f'Successfully imported {len(static_parking_spot_inputs)} static parking spots from {source.uid}, '
+            f'and ignored {len(static_parking_spot_errors)} datasets with errors.',
+            extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+        )
 
     def save_static_or_combined_parking_spot_input(
         self,
@@ -118,11 +129,11 @@ class GenericParkingSpotImportService(GenericBaseImportService):
                 self.save_realtime_parking_spot_input(source, realtime_parking_spot_input)
             except ObjectNotFoundException:
                 realtime_parking_spot_error_count += 1
-            except:
+            except Exception as e:
                 realtime_parking_spot_error_count += 1
-                self.logger.warning(
-                    LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
-                    f'Unhandled exception at dataset {realtime_parking_spot_input}: {traceback.format_exc()}',
+                logger.warning(
+                    f'Unhandled exception at dataset {realtime_parking_spot_input}: {e} {traceback.format_exc()}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
                 )
 
         if len(realtime_parking_spot_inputs):
@@ -134,6 +145,12 @@ class GenericParkingSpotImportService(GenericBaseImportService):
         source.realtime_parking_spot_error_count = realtime_parking_spot_error_count
 
         self.source_repository.save_source(source)
+
+        logger.info(
+            f'Successfully imported {len(realtime_parking_spot_inputs)} realtime parking spots from {source.uid}, '
+            f'and ignored {len(realtime_parking_spot_errors)} datasets with errors.',
+            extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+        )
 
     def save_realtime_parking_spot_input(self, source: Source, realtime_parking_spot_input: RealtimeParkingSpotInput):
         parking_spot = self.parking_spot_repository.fetch_parking_spot_by_source_id_and_external_uid(

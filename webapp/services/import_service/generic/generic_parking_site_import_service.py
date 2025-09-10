@@ -3,6 +3,7 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
 import traceback
 from datetime import datetime, timezone
 
@@ -17,6 +18,8 @@ from webapp.repositories import ParkingSiteGroupRepository, ParkingSiteHistoryRe
 from webapp.repositories.exceptions import ObjectNotFoundException
 
 from .generic_base_import_service import GenericBaseImportService
+
+logger = logging.getLogger(__name__)
 
 
 class GenericParkingSiteImportService(GenericBaseImportService):
@@ -51,13 +54,13 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                     static_parking_site_input,
                     existing_parking_site_ids,
                 )
-            except:
-                self.logger.warning(
-                    LogMessageType.FAILED_STATIC_SOURCE_HANDLING,
-                    f'Unhandled exception at dataset {static_parking_site_input}: {traceback.format_exc()}',
+            except Exception as e:
+                logger.warning(
+                    f'Unhandled exception at dataset {static_parking_site_input}: {e} {traceback.format_exc()}',
+                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
                 )
 
-                # Delete remaining existing parking sites because they are not in the new dataset
+        # Delete remaining existing parking sites because they are not in the new dataset
         for existing_parking_site_id in existing_parking_site_ids:
             existing_parking_site = self.parking_site_repository.fetch_parking_site_by_id(existing_parking_site_id)
             self.parking_site_repository.delete_parking_site(existing_parking_site)
@@ -140,11 +143,11 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 self._save_realtime_parking_site_input(source, realtime_parking_site_input)
             except ObjectNotFoundException:
                 realtime_parking_site_error_count += 1
-            except:
+            except Exception as e:
                 realtime_parking_site_error_count += 1
-                self.logger.warning(
-                    LogMessageType.FAILED_REALTIME_SOURCE_HANDLING,
-                    f'Unhandled exception at dataset {realtime_parking_site_input}: {traceback.format_exc()}',
+                logger.warning(
+                    f'Unhandled exception at dataset {realtime_parking_site_input}: {e} {traceback.format_exc()}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                 )
 
         if len(realtime_parking_site_inputs):
@@ -187,22 +190,22 @@ class GenericParkingSiteImportService(GenericBaseImportService):
 
             if realtime_capacity is None:
                 if realtime_free_capacity > parking_site_capacity:
-                    setattr(realtime_parking_site_input, realtime_free_capacity, parking_site_capacity)
-                    self.logger.warning(
-                        LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                        f'At {parking_site.original_uid} from {source.id}, '
+                    setattr(realtime_parking_site_input, f'realtime_free_{capacity_field}', parking_site_capacity)
+                    logger.warning(
+                        f'At item uid {parking_site.original_uid} from source {source.uid}, '
                         f'realtime_free_{capacity_field} {realtime_free_capacity} '
                         f'was higher than {capacity_field} {parking_site_capacity}',
+                        extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                     )
 
             if realtime_capacity is not None:
                 if realtime_free_capacity > realtime_capacity:
-                    setattr(realtime_parking_site_input, realtime_free_capacity, realtime_capacity)
-                    self.logger.warning(
-                        LogMessageType.FAILED_PARKING_SITE_HANDLING,
-                        f'At {parking_site.original_uid} from {source.id}, '
+                    setattr(realtime_parking_site_input, f'realtime_free_{capacity_field}', realtime_capacity)
+                    logger.warning(
+                        f'At item uid {parking_site.original_uid} from source {source.uid}, '
                         f'realtime_free_{capacity_field} {realtime_free_capacity} '
                         f'was higher than realtime_{capacity_field} {realtime_capacity}',
+                        extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                     )
 
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
