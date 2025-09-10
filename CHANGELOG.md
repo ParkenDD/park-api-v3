@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.32.0
+
+### Features
+
+* [Extended logging, including OpenTelemetry formatter](https://github.com/ParkenDD/park-api-v3/pull/251)
+
+
 ## 0.31.0
 
 ### Features
