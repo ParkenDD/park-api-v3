@@ -1,6 +1,17 @@
 # Changelog
 
+## 0.32.1
+
+Released 2025-09-15
+
+### Fixes
+
+* [ParkAPI Sources: allow linestrings at radolfzell](https://github.com/ParkenDD/parkapi-sources-v3/pull/285)
+
+
 ## 0.32.0
+
+Released 2025-09-10
 
 ### Features
 
@@ -8,6 +19,8 @@
 
 
 ## 0.31.0
+
+Released 2025-09-08
 
 ### Features
 
@@ -22,7 +35,7 @@
 
 ### Maintenance
 
-* [depencency updates](https://github.com/ParkenDD/park-api-v3/pull/331)
+* [dependency updates](https://github.com/ParkenDD/park-api-v3/pull/331)
 
 
 ## 0.30.0

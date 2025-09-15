@@ -33,11 +33,11 @@ LOGGING_TEMPLATE:
   version: 1
   formatters:
     open_telemetry:
-      (): webapp.common.logging.open_telemetry_formatter.OpenTelemetryFormatter
+      (): webapp.common.logging.formatter.OpenTelemetryFormatter
       prefix: park_api
       service_name: ParkAPI
     loki:
-      (): webapp.common.logging.loki_formatter.LokiFormatter
+      (): webapp.common.logging.formatter.LokiFormatter
       prefix: park_api
       service_name: ParkAPI
     human_readable:
