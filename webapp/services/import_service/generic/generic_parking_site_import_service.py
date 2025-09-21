@@ -136,27 +136,38 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         if source.static_status != SourceStatus.ACTIVE:
             return
 
-        realtime_parking_site_error_count = len(realtime_parking_site_errors)
-
         for realtime_parking_site_input in realtime_parking_site_inputs:
             try:
                 self._save_realtime_parking_site_input(source, realtime_parking_site_input)
             except ObjectNotFoundException:
-                realtime_parking_site_error_count += 1
+                realtime_parking_site_errors.append(
+                    ImportParkingSiteException(
+                        message=f'Parking site with uid {realtime_parking_site_input.uid} available in database',
+                        source=source,
+                        dataset=realtime_parking_site_input,
+                    ),
+                )
             except Exception as e:
-                realtime_parking_site_error_count += 1
                 logger.warning(
                     f'Unhandled exception at dataset {realtime_parking_site_input}: {e} {traceback.format_exc()}',
                     extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                 )
+                realtime_parking_site_errors.append(
+                    ImportParkingSiteException(
+                        message=f'Unhandled exception at dataset {realtime_parking_site_input}: '
+                        f'{e} {traceback.format_exc()}',
+                        source=source,
+                        dataset=realtime_parking_site_input,
+                    ),
+                )
 
         if len(realtime_parking_site_inputs):
             source.realtime_status = SourceStatus.ACTIVE
-        elif realtime_parking_site_error_count:
+        elif len(realtime_parking_site_errors):
             source.realtime_status = SourceStatus.FAILED
 
         source.realtime_data_updated_at = datetime.now(tz=timezone.utc)
-        source.realtime_parking_site_error_count = realtime_parking_site_error_count
+        source.realtime_parking_site_error_count = len(realtime_parking_site_errors)
 
         self.source_repository.save_source(source)
 
