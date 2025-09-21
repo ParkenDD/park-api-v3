@@ -9,6 +9,9 @@ from unittest.mock import ANY
 from flask.testing import FlaskClient
 
 from tests.integration.admin_rest_api.helpers import load_admin_client_request_input
+from tests.model_generator.parking_site import get_parking_site
+from tests.model_generator.source import get_source
+from webapp.common.sqlalchemy import SQLAlchemy
 
 
 def test_upsert_parking_site_list(
@@ -91,6 +94,42 @@ def test_generate_duplicates_source_uids(
     # As we just output duplicates where each site is at another source, and we have three sources, filtered to one,
     # we expect two duplicates pairs, because the other pair is between source-2 and source-3
     assert len(duplicates) == 2
+
+
+def test_reset_duplicates_source_uids(admin_api_test_client: FlaskClient, db: SQLAlchemy) -> None:
+    parking_site_1 = get_parking_site(source=get_source(), original_uid='test-1')
+    db.session.add(parking_site_1)
+    parking_site_2 = get_parking_site(source=get_source(), original_uid='test-2')
+    db.session.add(parking_site_2)
+    parking_site_2.duplicate_of_parking_site_id = 1
+    db.session.commit()
+
+    result = admin_api_test_client.post(
+        '/api/admin/v1/parking-sites/duplicates/reset',
+        auth=('dev', 'test'),
+        json={},
+    )
+
+    assert result.status_code == 204
+    assert parking_site_2.duplicate_of_parking_site_id is None
+
+
+def test_filter_reset_duplicates_source_uids(admin_api_test_client: FlaskClient, db: SQLAlchemy) -> None:
+    parking_site_1 = get_parking_site(source=get_source(), original_uid='test-1')
+    db.session.add(parking_site_1)
+    parking_site_2 = get_parking_site(source=get_source(), original_uid='test-2')
+    db.session.add(parking_site_2)
+    parking_site_2.duplicate_of_parking_site_id = 1
+    db.session.commit()
+
+    result = admin_api_test_client.post(
+        '/api/admin/v1/parking-sites/duplicates/reset',
+        auth=('dev', 'test'),
+        json={'purpose': 'BIKE'},
+    )
+
+    assert result.status_code == 204
+    assert parking_site_2.duplicate_of_parking_site_id == 1
 
 
 PARKING_SITE_RESPONSE_ITEM = {

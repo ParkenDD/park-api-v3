@@ -8,7 +8,7 @@ from validataclass_search_queries.pagination import PaginatedResult
 from webapp.models import ParkingSite
 from webapp.public_rest_api.base_handler import PublicApiBaseHandler
 from webapp.repositories import ParkingSiteRepository
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 
 class GenericParkingSiteHandler(PublicApiBaseHandler):
@@ -18,7 +18,7 @@ class GenericParkingSiteHandler(PublicApiBaseHandler):
         super().__init__(*args, **kwargs)
         self.parking_site_repository = parking_site_repository
 
-    def get_parking_site_list(self, search_query: ParkingSiteBaseSearchInput) -> PaginatedResult[ParkingSite]:
+    def get_parking_site_list(self, search_query: ParkingSiteSearchInput) -> PaginatedResult[ParkingSite]:
         return self.parking_site_repository.fetch_parking_sites(
             search_query=search_query,
             include_restricted_to=True,

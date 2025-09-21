@@ -7,7 +7,7 @@ from webapp.public_rest_api.datex2.datex2_mapper import Datex2Mapper
 from webapp.public_rest_api.datex2.datex2_models import Datex2Publication
 from webapp.repositories import SourceRepository
 from webapp.shared.parking_site.generic_parking_site_handler import GenericParkingSiteHandler
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 
 class Datex2Handler(GenericParkingSiteHandler):
@@ -18,7 +18,7 @@ class Datex2Handler(GenericParkingSiteHandler):
         super().__init__(*args, **kwargs)
         self.source_repository = source_repository
 
-    def get_parking_sites(self, search_query: ParkingSiteBaseSearchInput) -> Datex2Publication:
+    def get_parking_sites(self, search_query: ParkingSiteSearchInput) -> Datex2Publication:
         parking_sites = self.get_parking_site_list(search_query)
 
         if search_query.source_uid is None:

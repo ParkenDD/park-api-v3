@@ -11,7 +11,7 @@ from validataclass.validators import DataclassValidator
 from webapp.dependencies import dependencies
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteGeoSearchInput
 
 from .datex2_handler import Datex2Handler
 from .datex2_schema import datex2_parking_sites_example, datex2_parking_sites_schema
@@ -49,7 +49,7 @@ class Datex2BaseMethodView(PublicApiBaseMethodView):
 
 
 class Datex2JSONMethodView(Datex2BaseMethodView):
-    parking_site_search_query_validator = DataclassValidator(ParkingSiteSearchInput)
+    parking_site_search_query_validator = DataclassValidator(ParkingSiteGeoSearchInput)
 
     @document(
         description='Get Datex2 Parking Sites as JSON.',

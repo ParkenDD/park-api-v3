@@ -199,6 +199,22 @@ There is again `-u` as option for a custom URL. If you cant to use this script f
 to set the url. For example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
 
 
+### Reset duplicates
+
+In order to reset all duplicates, you can use the endpoint `/api/admin/v1/parking-sites/duplicates/reset`.
+
+There is a helper script for this, too:
+
+```
+python reset-duplicates.py username
+```
+
+It accepts following parameters:
+- `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For
+  example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
+- `-p` for a purpose to filter for.
+
+
 ## Configuration
 
 Besides `PARK_API_CONVERTER`, there are a few other configuration options to set, you will find valid config keys in

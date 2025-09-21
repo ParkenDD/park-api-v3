@@ -20,7 +20,7 @@ from webapp.models import ParkingSite
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.services.import_service.generic import GenericParkingSiteImportService
 from webapp.services.matching_service import DuplicatedParkingSite, MatchingService
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput, ParkingSiteGeoSearchInput
 
 
 class ParkingSiteHandler(AdminApiBaseHandler):
@@ -48,7 +48,7 @@ class ParkingSiteHandler(AdminApiBaseHandler):
         self.matching_service = matching_service
         self.generic_parking_site_import_service = generic_parking_site_import_service
 
-    def get_parking_sites(self, search_query: ParkingSiteSearchInput) -> PaginatedResult[ParkingSite]:
+    def get_parking_sites(self, search_query: ParkingSiteGeoSearchInput) -> PaginatedResult[ParkingSite]:
         return self.parking_site_repository.fetch_parking_sites(search_query=search_query)
 
     def get_parking_site(self, parking_site_id: int) -> ParkingSite:
@@ -181,3 +181,6 @@ class ParkingSiteHandler(AdminApiBaseHandler):
                 setattr(parking_site_inputs_by_uid[parking_site_patch.uid], key, value)
 
         return parking_site_inputs
+
+    def reset_duplicates(self, search_query: ParkingSiteBaseSearchInput):
+        return self.matching_service.reset_matching(search_query)
