@@ -10,7 +10,7 @@ from opening_hours import OpeningHours  # noqa
 from webapp.models.parking_site import ParkingSiteType
 from webapp.repositories import SourceRepository
 from webapp.shared.parking_site.generic_parking_site_handler import GenericParkingSiteHandler
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 
 class ParkApiV2Handler(GenericParkingSiteHandler):
@@ -49,7 +49,7 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
 
         return result
 
-    def get_parking_site_list_as_dict(self, search_query: ParkingSiteBaseSearchInput) -> dict:
+    def get_parking_site_list_as_dict(self, search_query: ParkingSiteSearchInput) -> dict:
         parking_sites = self.get_parking_site_list(search_query)
 
         lots = []

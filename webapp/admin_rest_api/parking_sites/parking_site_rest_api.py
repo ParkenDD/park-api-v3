@@ -15,7 +15,7 @@ from webapp.common.json import empty_json_response
 from webapp.common.server_auth import ServerAuthHelper
 from webapp.dependencies import dependencies
 from webapp.shared.parking_restriction.parking_restriction_schema import parking_restriction_component
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput, ParkingSiteGeoSearchInput
 from webapp.shared.parking_site.parking_sites_schema import parking_site_component
 from webapp.shared.parking_site_group.parking_sites_group_schema import parking_site_group_component
 from webapp.shared.sources.source_schema import source_component
@@ -101,6 +101,15 @@ class ParkingSitesBlueprint(AdminApiBaseBlueprint):
                 parking_site_handler=self.parking_site_handler,
             ),
         )
+        self.add_url_rule(
+            '/duplicates/reset',
+            view_func=ParkingSiteDuplicatesResetMethodView.as_view(
+                'admin-parking-site-duplicates-reset',
+                **self.get_base_method_view_dependencies(),
+                server_auth_helper=dependencies.get_server_auth_helper(),
+                parking_site_handler=self.parking_site_handler,
+            ),
+        )
 
 
 class ParkingSiteBaseMethodView(AdminApiBaseMethodView):
@@ -113,7 +122,7 @@ class ParkingSiteBaseMethodView(AdminApiBaseMethodView):
 
 
 class ParkingSitesMethodView(ParkingSiteBaseMethodView):
-    parking_site_search_query_validator = DataclassValidator(ParkingSiteSearchInput)
+    parking_site_search_query_validator = DataclassValidator(ParkingSiteGeoSearchInput)
 
     def get(self):
         search_query = self.validate_query_args(self.parking_site_search_query_validator)
@@ -219,7 +228,7 @@ class ParkingSiteDuplicatesApplyMethodView(ParkingSiteBaseMethodView):
     apply_duplicate_validator = DataclassValidator(ApplyDuplicatesInput)
 
     @document(
-        description='Apply ParkingSite duplicates.',
+        description='Delete ParkingSite duplicates.',
         request=apply_parking_site_duplicates_request,
         response=[EmptyResponse(), ErrorResponse(error_codes=[400, 401])],
     )
@@ -227,5 +236,20 @@ class ParkingSiteDuplicatesApplyMethodView(ParkingSiteBaseMethodView):
         apply_duplicate_input: ApplyDuplicatesInput = self.validate_request(self.apply_duplicate_validator)
 
         self.parking_site_handler.apply_duplicates(apply_duplicate_input)
+
+        return empty_json_response(), HTTPStatus.NO_CONTENT
+
+
+class ParkingSiteDuplicatesResetMethodView(ParkingSiteBaseMethodView):
+    parking_site_validator = DataclassValidator(ParkingSiteBaseSearchInput)
+
+    @document(
+        description='Reset ParkingSite duplicates.',
+        response=[EmptyResponse(), ErrorResponse(error_codes=[400, 401])],
+    )
+    def post(self):
+        search_query: ParkingSiteBaseSearchInput = self.validate_request(self.parking_site_validator)
+
+        self.parking_site_handler.reset_duplicates(search_query)
 
         return empty_json_response(), HTTPStatus.NO_CONTENT

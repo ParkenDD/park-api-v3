@@ -12,12 +12,12 @@ from validataclass_search_queries.filters import SearchParamCustom
 from validataclass_search_queries.search_queries import search_query_dataclass
 
 from webapp.common.validation.list_validators import CommaSeparatedListValidator
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
 
 
 @search_query_dataclass
-class ParkApiV2SearchInput(ParkingSiteBaseSearchInput):
-    location: Optional[list[Decimal, Decimal]] = SearchParamCustom(), CommaSeparatedListValidator(NumericValidator())
+class ParkApiV2SearchInput(ParkingSiteSearchInput):
+    location: Optional[list[Decimal]] = SearchParamCustom(), CommaSeparatedListValidator(NumericValidator())
     radius: Optional[Decimal] = SearchParamCustom(), NumericValidator()
 
     def __post_init__(self):

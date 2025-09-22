@@ -3,6 +3,7 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import logging
 import math
 from dataclasses import asdict, dataclass
 from decimal import Decimal
@@ -11,10 +12,14 @@ from typing import Optional
 from parkapi_sources.models.enums import ParkAndRideType, ParkingSiteType
 from pyproj import Geod
 
+from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSite
 from webapp.repositories import ParkingSiteRepository
 from webapp.repositories.parking_site_repository import ParkingSiteLocation
 from webapp.services.base_service import BaseService
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -113,6 +118,20 @@ class MatchingService(BaseService):
             )
             ignore_parking_site.duplicate_of_parking_site_id = duplicate_parking_site.id
             self.parking_site_repository.save_parking_site(ignore_parking_site)
+
+    def reset_matching(self, search_query: ParkingSiteBaseSearchInput):
+        search_query.is_duplicate = True
+        parking_sites = self.parking_site_repository.fetch_parking_sites(search_query=search_query)
+        for parking_site in parking_sites:
+            parking_site.duplicate_of_parking_site_id = None
+            self.parking_site_repository.save_parking_site(parking_site, commit=False)
+
+        self.parking_site_repository.commit_transaction()
+
+        logger.info(
+            f'Reset {len(parking_sites)} duplicates',
+            extra={'attributes': {'type': LogMessageType.DUPLICATE_HANDLING}},
+        )
 
     def parking_site_to_duplicate(
         self,

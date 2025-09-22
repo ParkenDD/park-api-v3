@@ -26,7 +26,7 @@ from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.parking_sites.parking_sites_handler import ParkingSiteHandler
 from webapp.public_rest_api.parking_sites.parking_sites_validators import ParkingSiteHistorySearchQueryInput
 from webapp.shared.parking_restriction.parking_restriction_schema import parking_restriction_component
-from webapp.shared.parking_site.parking_site_search_query import ParkingSiteSearchInput
+from webapp.shared.parking_site.parking_site_search_query import ParkingSiteGeoSearchInput
 from webapp.shared.parking_site.parking_sites_schema import parking_site_component
 from webapp.shared.parking_site_group.parking_sites_group_schema import parking_site_group_component
 from webapp.shared.parking_site_history.parking_sites_schema import parking_site_history_component
@@ -92,7 +92,7 @@ class ParkingSiteBaseMethodView(PublicApiBaseMethodView):
 
 
 class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
-    parking_site_search_query_validator = DataclassValidator(ParkingSiteSearchInput)
+    parking_site_search_query_validator = DataclassValidator(ParkingSiteGeoSearchInput)
 
     @document(
         description='Get Parking Sites. This endpoint is paginated, which means that you can set a limit and iterate over pages. To '

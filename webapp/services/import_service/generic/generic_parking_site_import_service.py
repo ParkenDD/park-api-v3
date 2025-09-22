@@ -143,8 +143,8 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 realtime_parking_site_errors.append(
                     ImportParkingSiteException(
                         message=f'Parking site with uid {realtime_parking_site_input.uid} available in database',
-                        source=source,
-                        dataset=realtime_parking_site_input,
+                        source_uid=source.uid,
+                        data=realtime_parking_site_input.to_dict(),
                     ),
                 )
             except Exception as e:
@@ -156,8 +156,8 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                     ImportParkingSiteException(
                         message=f'Unhandled exception at dataset {realtime_parking_site_input}: '
                         f'{e} {traceback.format_exc()}',
-                        source=source,
-                        dataset=realtime_parking_site_input,
+                        source_uid=source.uid,
+                        data=realtime_parking_site_input.to_dict(),
                     ),
                 )
 

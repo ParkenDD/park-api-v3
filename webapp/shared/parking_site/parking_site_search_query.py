@@ -21,6 +21,7 @@ from validataclass_search_queries.filters import (
     SearchParamContains,
     SearchParamCustom,
     SearchParamEquals,
+    SearchParamIsNotNone,
     SearchParamMultiSelect,
     SearchParamSince,
     SearchParamUntil,
@@ -34,15 +35,23 @@ from webapp.common.validation.list_validators import CommaSeparatedListValidator
 
 
 @search_query_dataclass
-class ParkingSiteBaseSearchInput(CursorPaginationMixin, BaseSearchQuery):
+class ParkingSiteBaseSearchInput(BaseSearchQuery):
     source_id: int | None = SearchParamEquals(), IntegerValidator(allow_strings=True)
-    not_source_ids: list[int] | None = SearchParamCustom(), MultiSelectIntegerValidator(min_value=1)
     source_uid: str | None = SearchParamEquals(), StringValidator()
+    purpose: PurposeType | None = SearchParamEquals(), EnumValidator(PurposeType)
+    type: ParkingSiteType | None = SearchParamEquals(), EnumValidator(ParkingSiteType)
+    is_duplicate: bool | None = (
+        SearchParamIsNotNone('duplicate_of_parking_site_id'),
+        BooleanValidator(allow_strings=True),
+    )
+
+
+@search_query_dataclass
+class ParkingSiteSearchInput(ParkingSiteBaseSearchInput, CursorPaginationMixin):
+    not_source_ids: list[int] | None = SearchParamCustom(), MultiSelectIntegerValidator(min_value=1)
     source_uids: list[str] | None = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
     name: str | None = SearchParamContains(), StringValidator()
     ignore_duplicates: bool = SearchParamCustom(), BooleanValidator(allow_strings=True), Default(True)
-    purpose: PurposeType | None = SearchParamEquals(), EnumValidator(PurposeType)
-    type: ParkingSiteType | None = SearchParamEquals(), EnumValidator(ParkingSiteType)
     not_type: ParkingSiteType | None = SearchParamCustom(), EnumValidator(ParkingSiteType)
     limit: int | None = PaginationLimitValidator(max_value=1000), Default(None)
     static_data_updated_at_since: datetime | None = SearchParamSince('static_data_updated_at'), DateTimeToUtcValidator()
@@ -58,7 +67,7 @@ class ParkingSiteBaseSearchInput(CursorPaginationMixin, BaseSearchQuery):
 
 
 @search_query_dataclass
-class ParkingSiteSearchInput(ParkingSiteBaseSearchInput):
+class ParkingSiteGeoSearchInput(ParkingSiteSearchInput):
     lat: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     # radius: Optional[Decimal] = SearchParamCustom(), IntegerValidator(allow_strings=True)
