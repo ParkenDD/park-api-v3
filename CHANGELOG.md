@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.33.0
+
+Released 2025-09-22
+
+### Features
+
+* [reset duplicates](https://github.com/ParkenDD/park-api-v3/pull/336)
+
+
+### Fixes
+
+* [logging fixes](https://github.com/ParkenDD/park-api-v3/pull/335)
+
+
 ## 0.32.1
 
 Released 2025-09-15
