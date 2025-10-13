@@ -4,6 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from opening_hours import OpeningHours
+from opening_hours.opening_hours import ParserError
 
 from webapp.models.parking_site import ParkingSiteType
 from webapp.repositories import SourceRepository
@@ -72,8 +73,12 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
             if parking_site.has_realtime_data and parking_site.realtime_opening_status is not None:
                 lot['state'] = parking_site.realtime_opening_status.name.lower()
             elif parking_site.opening_hours:
-                oh = OpeningHours(parking_site.opening_hours)
-                lot['state'] = str(oh.state())
+                try:
+                    oh = OpeningHours(parking_site.opening_hours)
+                    lot['state'] = str(oh.state())
+                except ParserError:
+                    lot['state'] = 'unknown'
+
             else:
                 lot['state'] = 'unknown'
 

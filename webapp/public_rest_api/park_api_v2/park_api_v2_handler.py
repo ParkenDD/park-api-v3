@@ -6,6 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from typing import Any
 
 from opening_hours import OpeningHours  # noqa
+from opening_hours.opening_hours import ParserError
 
 from webapp.models.parking_site import ParkingSiteType
 from webapp.repositories import SourceRepository
@@ -71,8 +72,11 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
                 lot['latest_data'] = {'timestamp': parking_site.modified_at}
 
             if parking_site.opening_hours:
-                oh = OpeningHours(parking_site.opening_hours)
-                lot['latest_data']['status'] = str(oh.state())
+                try:
+                    oh = OpeningHours(parking_site.opening_hours)
+                    lot['latest_data']['status'] = str(oh.state())
+                except ParserError:
+                    lot['latest_data']['status'] = 'unknown'
 
             if parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None:
                 lot['latest_data']['lot_timestamp'] = (parking_site.realtime_data_updated_at,)
