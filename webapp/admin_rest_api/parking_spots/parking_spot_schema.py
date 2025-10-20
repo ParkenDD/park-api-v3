@@ -49,7 +49,7 @@ parking_spot_request_schema = JsonSchema(
                 ),
             },
         ),
-        'restricted_to': ArrayField(
+        'restrictions': ArrayField(
             items=ObjectField(
                 properties={
                     'type': EnumField(enum=ParkingAudience, required=False, nullable=True),

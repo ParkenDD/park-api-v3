@@ -8,7 +8,12 @@ import traceback
 from datetime import datetime, timezone
 
 from parkapi_sources.exceptions import ImportParkingSiteException
-from parkapi_sources.models import RealtimeParkingSiteInput, StaticParkingSiteInput
+from parkapi_sources.models import (
+    ParkingAudience,
+    ParkingSiteRestrictionInput,
+    RealtimeParkingSiteInput,
+    StaticParkingSiteInput,
+)
 
 from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSite, ParkingSiteHistory, Source
@@ -20,6 +25,16 @@ from webapp.repositories.exceptions import ObjectNotFoundException
 from .generic_base_import_service import GenericBaseImportService
 
 logger = logging.getLogger(__name__)
+
+RESTRICTION_MAPPING: dict[ParkingAudience, str] = {
+    ParkingAudience.DISABLED: 'capacity_disabled',
+    ParkingAudience.WOMEN: 'capacity_woman',
+    ParkingAudience.FAMILY: 'capacity_family',
+    ParkingAudience.CHARGING: 'capacity_charging',
+    ParkingAudience.CARSHARING: 'capacity_carsharing',
+    ParkingAudience.TRUCK: 'capacity_truck',
+    ParkingAudience.BUS: 'capacity_bus',
+}
 
 
 class GenericParkingSiteImportService(GenericBaseImportService):
@@ -95,7 +110,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
         for key, value in parking_site_input.to_dict().items():
-            if key in ['uid', 'external_identifiers', 'restricted_to', 'tags', 'group_uid']:
+            if key in ['uid', 'external_identifiers', 'restrictions', 'tags', 'group_uid']:
                 continue
             if (
                 history_enabled
@@ -106,6 +121,12 @@ class GenericParkingSiteImportService(GenericBaseImportService):
             setattr(parking_site, key, value)
 
         self.set_related_objects(parking_site_input, parking_site)
+
+        # Legacy mapping
+        for restriction_input in parking_site_input.restrictions:
+            if restriction_input.type not in RESTRICTION_MAPPING:
+                continue
+            setattr(parking_site, RESTRICTION_MAPPING[restriction_input.type], restriction_input.capacity)
 
         if parking_site_input.group_uid:
             try:
@@ -175,7 +196,35 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
             source_id=source.id,
             original_uid=realtime_parking_site_input.uid,
+            include_restrictions=True,
         )
+
+        # Legacy mapping
+        restrictions_by_audience: dict[ParkingAudience, ParkingSiteRestrictionInput] = {
+            item.type: item for item in realtime_parking_site_input.restrictions
+        }
+        for restriction in parking_site.restrictions:
+            if restriction.type is None or restriction.type not in restrictions_by_audience:
+                continue
+
+            restriction.realtime_capacity = restrictions_by_audience[restriction.type].realtime_capacity
+            restriction.realtime_free_capacity = restrictions_by_audience[restriction.type].realtime_free_capacity
+
+        for restriction in realtime_parking_site_input.restrictions:
+            if restriction.type is None or restriction.type not in RESTRICTION_MAPPING:
+                continue
+            setattr(
+                realtime_parking_site_input,
+                f'realtime_{RESTRICTION_MAPPING[restriction.type]}_capacity',
+                restriction.realtime_capacity,
+            )
+            setattr(
+                realtime_parking_site_input,
+                f'realtime_{RESTRICTION_MAPPING[restriction.type]}_free_capacity',
+                restriction.realtime_free_capacity,
+            )
+
+        """
         capacity_fields: list[str] = [
             'capacity',
             'capacity_woman',
@@ -218,11 +267,11 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                         f'was higher than realtime_{capacity_field} {realtime_capacity}',
                         extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
                     )
-
+        """
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
         for key, value in realtime_parking_site_input.to_dict().items():
-            if key in ['uid']:
+            if key in ['uid', 'restrictions']:
                 continue
             if (
                 history_enabled

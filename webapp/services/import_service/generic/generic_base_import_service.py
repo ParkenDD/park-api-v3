@@ -21,20 +21,20 @@ class GenericBaseImportService(BaseService):
 
     @staticmethod
     def set_related_objects(entity_input: StaticBaseParkingInput, entity: ParkingSite | ParkingSpot):
-        if entity_input.restricted_to is not None:
+        if entity_input.restrictions is not None:
             parking_restrictions: list[ParkingRestriction] = []
-            for i, parking_restrictions_input in enumerate(entity_input.restricted_to):
-                if len(entity_input.restricted_to) <= len(entity.restricted_to):
-                    parking_restriction = entity.restricted_to[i]
+            for i, parking_restrictions_input in enumerate(entity_input.restrictions):
+                if len(entity_input.restrictions) <= len(entity.restrictions):
+                    parking_restriction = entity.restrictions[i]
                 else:
                     parking_restriction = ParkingRestriction()
 
                 parking_restriction.from_dict(parking_restrictions_input.to_dict())
 
                 parking_restrictions.append(parking_restriction)
-            entity.restricted_to = parking_restrictions
+            entity.restrictions = parking_restrictions
         else:
-            entity.restricted_to = []
+            entity.restrictions = []
 
         if entity_input.external_identifiers is not None:
             external_identifiers: list[ExternalIdentifier] = []

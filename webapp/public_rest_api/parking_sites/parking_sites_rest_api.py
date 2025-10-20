@@ -25,7 +25,7 @@ from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.parking_sites.parking_sites_handler import ParkingSiteHandler
 from webapp.public_rest_api.parking_sites.parking_sites_validators import ParkingSiteHistorySearchQueryInput
-from webapp.shared.parking_restriction.parking_restriction_schema import parking_restriction_component
+from webapp.shared.parking_restriction.parking_restriction_schema import parking_site_restriction_component
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteGeoSearchInput
 from webapp.shared.parking_site.parking_sites_schema import parking_site_component
 from webapp.shared.parking_site_group.parking_sites_group_schema import parking_site_group_component
@@ -84,7 +84,7 @@ class ParkingSiteBaseMethodView(PublicApiBaseMethodView):
     @staticmethod
     def _map_parking_site(parking_site: ParkingSite) -> dict:
         return parking_site.to_dict(
-            include_restricted_to=True,
+            include_restrictions=True,
             include_external_identifiers=True,
             include_tags=True,
             include_group=True,
@@ -131,7 +131,7 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
         components=[
             source_component,
             parking_site_component,
-            parking_restriction_component,
+            parking_site_restriction_component,
             parking_site_group_component,
         ],
     )
@@ -160,7 +160,7 @@ class ParkingSiteItemMethodView(ParkingSiteBaseMethodView):
         components=[
             source_component,
             parking_site_component,
-            parking_restriction_component,
+            parking_site_restriction_component,
             parking_site_group_component,
             parking_site_history_component,
         ],
@@ -187,7 +187,7 @@ class ParkingSiteHistoryListMethodView(ParkingSiteBaseMethodView):
         ],
         components=[
             source_component,
-            parking_site_component,
+            parking_site_restriction_component,
             parking_site_group_component,
             parking_site_history_component,
         ],

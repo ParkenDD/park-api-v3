@@ -30,6 +30,10 @@ class ParkingSiteHistory(BaseModel):
     )
 
     capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
+    realtime_capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
+    realtime_free_capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
+
+    # Deprecated fields
     capacity_disabled: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     capacity_woman: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     capacity_family: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
@@ -38,7 +42,6 @@ class ParkingSiteHistory(BaseModel):
     capacity_truck: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     capacity_bus: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
 
-    realtime_capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     realtime_capacity_disabled: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     realtime_capacity_woman: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     realtime_capacity_family: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
@@ -47,7 +50,6 @@ class ParkingSiteHistory(BaseModel):
     realtime_capacity_truck: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     realtime_capacity_bus: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
 
-    realtime_free_capacity: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     realtime_free_capacity_disabled: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     realtime_free_capacity_woman: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)
     realtime_free_capacity_family: Mapped[Optional[int]] = mapped_column(Integer(), nullable=True)

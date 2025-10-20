@@ -82,7 +82,7 @@ class ParkingSite(BaseModel):
         back_populates='parking_site',
         cascade='all, delete-orphan',
     )
-    restricted_to: Mapped[list['ParkingRestriction']] = relationship(
+    restrictions: Mapped[list['ParkingRestriction']] = relationship(
         'ParkingRestriction',
         back_populates='parking_site',
         cascade='all, delete-orphan',
@@ -185,7 +185,7 @@ class ParkingSite(BaseModel):
         self,
         fields: list[str] | None = None,
         ignore: list[str] | None = None,
-        include_restricted_to: bool = False,
+        include_restrictions: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
         include_group: bool = False,
@@ -202,10 +202,19 @@ class ParkingSite(BaseModel):
         if self.supervision_type is not None:
             result['is_supervised'] = self.supervision_type != SupervisionType.NO
 
-        if include_restricted_to and len(self.restricted_to):
+        if include_restrictions and len(self.restrictions):
+            result['restrictions'] = []
+            for restrictions in self.restrictions:
+                result['restrictions'].append(
+                    restrictions.to_dict(
+                        fields=['type', 'hours', 'max_stay', 'capacity', 'realtime_capacity', 'realtime_free_capacity'],
+                    ),
+                )
+
+            # Legacy output
             result['restricted_to'] = []
-            for restricted_to in self.restricted_to:
-                result['restricted_to'].append(restricted_to.to_dict(fields=['type', 'hours', 'max_stay']))
+            for restrictions in self.restrictions:
+                result['restricted_to'].append(restrictions.to_dict(fields=['type', 'hours', 'max_stay']))
 
         if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []

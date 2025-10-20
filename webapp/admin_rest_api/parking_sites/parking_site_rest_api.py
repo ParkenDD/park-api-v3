@@ -14,7 +14,7 @@ from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
 from webapp.common.json import empty_json_response
 from webapp.common.server_auth import ServerAuthHelper
 from webapp.dependencies import dependencies
-from webapp.shared.parking_restriction.parking_restriction_schema import parking_restriction_component
+from webapp.shared.parking_restriction.parking_restriction_schema import parking_site_restriction_component
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput, ParkingSiteGeoSearchInput
 from webapp.shared.parking_site.parking_sites_schema import parking_site_component
 from webapp.shared.parking_site_group.parking_sites_group_schema import parking_site_group_component
@@ -159,7 +159,7 @@ class ParkingSiteUpsertListMethodView(ParkingSiteBaseMethodView):
         components=[
             source_component,
             parking_site_component,
-            parking_restriction_component,
+            parking_site_restriction_component,
             parking_site_group_component,
         ],
     )
@@ -193,7 +193,7 @@ class ParkingSiteUpsertItemMethodView(ParkingSiteBaseMethodView):
         components=[
             source_component,
             parking_site_component,
-            parking_restriction_component,
+            parking_site_restriction_component,
             parking_site_group_component,
         ],
     )

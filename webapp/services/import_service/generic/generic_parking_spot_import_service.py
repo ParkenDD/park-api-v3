@@ -101,7 +101,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
             if key in [
                 'uid',
                 'external_identifiers',
-                'restricted_to',
+                'restrictions',
                 'tags',
             ]:
                 continue
