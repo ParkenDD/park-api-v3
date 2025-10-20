@@ -66,5 +66,6 @@ PARKING_SPOT_RESPONSE = {
     'id': 1,
     'created_at': ANY,
     'modified_at': ANY,
+    'restrictions': [{'type': 'DISABLED'}],
     'restricted_to': [{'type': 'DISABLED'}],
 }

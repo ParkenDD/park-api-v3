@@ -7,9 +7,55 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from decimal import Decimal
 
+from parkapi_sources.models import OpeningStatus, RealtimeParkingSiteInput, StaticParkingSiteInput
 from parkapi_sources.models.enums import ParkingSiteType, PurposeType
 
 from webapp.models import ParkingSite
+
+
+def get_static_parking_site_input(**kwargs) -> StaticParkingSiteInput:
+    default_data = {
+        'uid': 'demo-parking-spot',
+        'name': 'Test',
+        'type': 'ON_STREET',
+        'capacity': 10,
+        'purpose': PurposeType.CAR,
+        'static_data_updated_at': datetime(2025, 1, 1, tzinfo=timezone.utc),
+        'has_realtime_data': True,
+        'lat': Decimal('50.0'),
+        'lon': Decimal('10.0'),
+        'geojson': {
+            'type': 'Polygon',
+            'coordinates': [
+                [
+                    [50 + 0.1, 10 + 0.1],
+                    [50 + 0.2, 10 + 0.1],
+                    [50 + 0.2, 10 + 0.2],
+                    [50 + 0.1, 10 + 0.2],
+                    [50 + 0.1, 10 + 0.1],
+                ],
+            ],
+        },
+    }
+
+    data = deepcopy(default_data)
+    data.update(**kwargs)
+
+    return StaticParkingSiteInput(**data)
+
+
+def get_realtime_parking_site_input(**kwargs) -> RealtimeParkingSiteInput:
+    default_data = {
+        'uid': 'demo-parking-spot',
+        'realtime_data_updated_at': datetime(2025, 1, 1, 1, tzinfo=timezone.utc),
+        'realtime_opening_status': OpeningStatus.OPEN,
+        'realtime_free_capacity': 5,
+    }
+
+    data = deepcopy(default_data)
+    data.update(**kwargs)
+
+    return RealtimeParkingSiteInput(**data)
 
 
 def get_parking_site(**kwargs) -> ParkingSite:

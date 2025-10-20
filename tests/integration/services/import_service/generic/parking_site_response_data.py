@@ -3,13 +3,13 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from decimal import Decimal
 from unittest.mock import ANY
 
-from parkapi_sources.models.enums import ParkingAudience, ParkingSpotStatus, PurposeType
+from parkapi_sources.models.enums import OpeningStatus, ParkingSiteType, PurposeType
 
-CREATE_PARKING_SPOT_STATIC_DATA = {
+CREATE_PARKING_SITE_STATIC_DATA = {
     'source_id': 1,
     'original_uid': 'demo-parking-spot',
     'name': 'Test',
@@ -21,6 +21,8 @@ CREATE_PARKING_SPOT_STATIC_DATA = {
     'id': 1,
     'created_at': ANY,
     'modified_at': ANY,
+    'capacity': 10,
+    'type': ParkingSiteType.ON_STREET,
     'geojson': {
         'type': 'Polygon',
         'coordinates': [
@@ -36,28 +38,10 @@ CREATE_PARKING_SPOT_STATIC_DATA = {
 }
 
 
-CREATE_PARKING_SPOT_REALTIME_DATA = {
-    **CREATE_PARKING_SPOT_STATIC_DATA,
+CREATE_PARKING_SITE_REALTIME_DATA = {
+    **CREATE_PARKING_SITE_STATIC_DATA,
     'realtime_data_updated_at': datetime(2025, 1, 1, 1, 0, tzinfo=timezone.utc),
-    'realtime_status': ParkingSpotStatus.AVAILABLE,
+    'realtime_opening_status': OpeningStatus.OPEN,
+    'realtime_free_capacity': 5,
     'has_realtime_data': True,
-}
-
-
-CREATE_PARKING_SPOT_WITH_PARKING_RESTRICTIONS_DATA = {
-    **CREATE_PARKING_SPOT_STATIC_DATA,
-    'restricted_to': [
-        {
-            'hours': 'Mo-Fr 08:00-18:00',
-            'max_stay': timedelta(hours=6),
-            'type': ParkingAudience.DISABLED,
-        },
-    ],
-    'restrictions': [
-        {
-            'hours': 'Mo-Fr 08:00-18:00',
-            'max_stay': timedelta(hours=6),
-            'type': ParkingAudience.DISABLED,
-        },
-    ],
 }

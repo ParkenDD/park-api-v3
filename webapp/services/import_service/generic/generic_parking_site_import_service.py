@@ -199,75 +199,6 @@ class GenericParkingSiteImportService(GenericBaseImportService):
             include_restrictions=True,
         )
 
-        # Legacy mapping
-        restrictions_by_audience: dict[ParkingAudience, ParkingSiteRestrictionInput] = {
-            item.type: item for item in realtime_parking_site_input.restrictions
-        }
-        for restriction in parking_site.restrictions:
-            if restriction.type is None or restriction.type not in restrictions_by_audience:
-                continue
-
-            restriction.realtime_capacity = restrictions_by_audience[restriction.type].realtime_capacity
-            restriction.realtime_free_capacity = restrictions_by_audience[restriction.type].realtime_free_capacity
-
-        for restriction in realtime_parking_site_input.restrictions:
-            if restriction.type is None or restriction.type not in RESTRICTION_MAPPING:
-                continue
-            setattr(
-                realtime_parking_site_input,
-                f'realtime_{RESTRICTION_MAPPING[restriction.type]}_capacity',
-                restriction.realtime_capacity,
-            )
-            setattr(
-                realtime_parking_site_input,
-                f'realtime_{RESTRICTION_MAPPING[restriction.type]}_free_capacity',
-                restriction.realtime_free_capacity,
-            )
-
-        """
-        capacity_fields: list[str] = [
-            'capacity',
-            'capacity_woman',
-            'capacity_disabled',
-            'capacity_charging',
-            'capacity_carsharing',
-            'capacity_bus',
-            'capacity_family',
-            'capacity_truck',
-        ]
-
-        for capacity_field in capacity_fields:
-            realtime_free_capacity = getattr(realtime_parking_site_input, f'realtime_free_{capacity_field}')
-            # Not all realtime datasets have free capacities
-            if realtime_free_capacity is None:
-                continue
-
-            realtime_capacity = getattr(realtime_parking_site_input, f'realtime_{capacity_field}')
-
-            parking_site_capacity = getattr(parking_site, capacity_field)
-            if parking_site_capacity is None:
-                continue
-
-            if realtime_capacity is None:
-                if realtime_free_capacity > parking_site_capacity:
-                    setattr(realtime_parking_site_input, f'realtime_free_{capacity_field}', parking_site_capacity)
-                    logger.warning(
-                        f'At item uid {parking_site.original_uid} from source {source.uid}, '
-                        f'realtime_free_{capacity_field} {realtime_free_capacity} '
-                        f'was higher than {capacity_field} {parking_site_capacity}',
-                        extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
-                    )
-
-            if realtime_capacity is not None:
-                if realtime_free_capacity > realtime_capacity:
-                    setattr(realtime_parking_site_input, f'realtime_free_{capacity_field}', realtime_capacity)
-                    logger.warning(
-                        f'At item uid {parking_site.original_uid} from source {source.uid}, '
-                        f'realtime_free_{capacity_field} {realtime_free_capacity} '
-                        f'was higher than realtime_{capacity_field} {realtime_capacity}',
-                        extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
-                    )
-        """
         history_enabled: bool = self.config_helper.get('HISTORY_ENABLED', False)
         history_changed = False
         for key, value in realtime_parking_site_input.to_dict().items():
@@ -280,6 +211,62 @@ class GenericParkingSiteImportService(GenericBaseImportService):
             ):
                 history_changed = True
             setattr(parking_site, key, value)
+
+        if parking_site.realtime_free_capacity is not None:
+            if parking_site.realtime_capacity is None:
+                compare_capacity = parking_site.capacity
+            else:
+                compare_capacity = parking_site.realtime_capacity
+
+            if parking_site.realtime_free_capacity > compare_capacity:
+                logger.warning(
+                    f'At item uid {parking_site.original_uid} from source {source.uid}, realtime_free_capacity '
+                    f'{parking_site.realtime_free_capacity} was higher than capacity {compare_capacity}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                )
+                parking_site.realtime_free_capacity = compare_capacity
+
+        restrictions_by_audience: dict[ParkingAudience, ParkingSiteRestrictionInput] = {
+            item.type: item for item in realtime_parking_site_input.restrictions
+        }
+        for restriction in parking_site.restrictions:
+            if restriction.type is None or restriction.type not in restrictions_by_audience:
+                continue
+
+            restriction.realtime_capacity = restrictions_by_audience[restriction.type].realtime_capacity
+            restriction.realtime_free_capacity = restrictions_by_audience[restriction.type].realtime_free_capacity
+
+            if restriction.realtime_free_capacity is None:
+                continue
+
+            if restriction.realtime_capacity is None:
+                compare_capacity = restriction.capacity
+            else:
+                compare_capacity = restriction.realtime_capacity
+
+            if restriction.realtime_free_capacity > compare_capacity:
+                logger.warning(
+                    f'At item uid {parking_site.original_uid} from source {source.uid},  realtime_free_capacity '
+                    f'{restriction.realtime_free_capacity} was higher than capacity {compare_capacity} at audience '
+                    f'{restriction.type}',
+                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                )
+                restriction.realtime_free_capacity = compare_capacity
+
+        # Legacy mapping
+        for restriction in parking_site.restrictions:
+            if restriction.type is None or restriction.type not in RESTRICTION_MAPPING:
+                continue
+            setattr(
+                realtime_parking_site_input,
+                f'realtime_{RESTRICTION_MAPPING[restriction.type]}_capacity',
+                restriction.realtime_capacity,
+            )
+            setattr(
+                realtime_parking_site_input,
+                f'realtime_{RESTRICTION_MAPPING[restriction.type]}_free_capacity',
+                restriction.realtime_free_capacity,
+            )
 
         self.parking_site_repository.save_parking_site(parking_site)
         if history_enabled and history_changed:
