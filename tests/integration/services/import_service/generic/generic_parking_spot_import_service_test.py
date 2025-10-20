@@ -9,7 +9,11 @@ from unittest.mock import ANY
 import pytest
 from parkapi_sources.converters.base_converter.pull import ParkingSpotPullConverter
 from parkapi_sources.exceptions import ImportParkingSpotException
-from parkapi_sources.models import RealtimeParkingSpotInput, SourceInfo, StaticParkingSpotInput
+from parkapi_sources.models import (
+    RealtimeParkingSpotInput,
+    SourceInfo,
+    StaticParkingSpotInput,
+)
 from parkapi_sources.models.enums import ParkingSpotStatus
 from parkapi_sources.util import ConfigHelper, RequestHelper
 
@@ -19,7 +23,10 @@ from tests.integration.services.import_service.generic.parking_spot_response_dat
     CREATE_PARKING_SPOT_WITH_PARKING_RESTRICTIONS_DATA,
 )
 from tests.model_generator.parking_restriction import get_parking_restriction_input
-from tests.model_generator.parking_spot import get_realtime_parking_spot_input, get_static_parking_spot_input
+from tests.model_generator.parking_spot import (
+    get_realtime_parking_spot_input,
+    get_static_parking_spot_input,
+)
 from webapp.common.flask_app import App
 from webapp.common.sqlalchemy import SQLAlchemy
 from webapp.dependencies import dependencies
@@ -66,7 +73,10 @@ def parking_spot_test_pull_converter(
 
 
 @pytest.fixture
-def flask_app_with_test_sources(flask_app: App, parking_spot_test_pull_converter: ParkingSpotTestPullConverter) -> App:
+def flask_app_with_test_sources(
+    flask_app: App,
+    parking_spot_test_pull_converter: ParkingSpotTestPullConverter,
+) -> App:
     flask_app.config['PARK_API_SOURCES_CUSTOM_CONVERTERS'] = [parking_spot_test_pull_converter]
     return flask_app
 
@@ -124,13 +134,13 @@ class GenericImportServiceTest:
         assert parking_spots[0].to_dict() == CREATE_PARKING_SPOT_REALTIME_DATA
 
     @staticmethod
-    def test_update_sources_create_parking_spot_with_restricted_to(
+    def test_update_sources_create_parking_spot_with_restrictions(
         db: SQLAlchemy,
         generic_import_service: GenericImportService,
         parking_spot_test_pull_converter: ParkingSpotTestPullConverter,
     ) -> None:
         parking_spot_test_pull_converter.get_static_parking_spots_return_value = (
-            [get_static_parking_spot_input(restricted_to=[get_parking_restriction_input()])],
+            [get_static_parking_spot_input(restrictions=[get_parking_restriction_input()])],
             [],
         )
         generic_import_service.update_sources_static()
@@ -138,7 +148,7 @@ class GenericImportServiceTest:
         parking_spots = db.session.query(ParkingSpot).all()
 
         assert len(parking_spots) == 1
-        parking_spot_dict = parking_spots[0].to_dict(include_restricted_to=True)
+        parking_spot_dict = parking_spots[0].to_dict(include_restrictions=True)
         assert parking_spot_dict == CREATE_PARKING_SPOT_WITH_PARKING_RESTRICTIONS_DATA
 
     @staticmethod
@@ -172,20 +182,20 @@ class GenericImportServiceTest:
         generic_import_service: GenericImportService,
         parking_spot_test_pull_converter: ParkingSpotTestPullConverter,
     ) -> None:
-        inserted_parking_spot.restricted_to = [ParkingRestriction()]
+        inserted_parking_spot.restrictions = [ParkingRestriction()]
         db.session.add(inserted_parking_spot)
         db.session.commit()
 
-        parking_restriction_id = inserted_parking_spot.restricted_to[0].id
+        parking_restriction_id = inserted_parking_spot.restrictions[0].id
         parking_spot_test_pull_converter.get_static_parking_spots_return_value = (
-            [get_static_parking_spot_input(restricted_to=[get_parking_restriction_input()])],
+            [get_static_parking_spot_input(restrictions=[get_parking_restriction_input()])],
             [],
         )
         generic_import_service.update_sources_static()
 
         parking_spots = db.session.query(ParkingSpot).all()
 
-        assert parking_restriction_id == parking_spots[0].restricted_to[0].id
+        assert parking_restriction_id == parking_spots[0].restrictions[0].id
 
     @staticmethod
     def test_update_sources_update_parking_spot_realtime(

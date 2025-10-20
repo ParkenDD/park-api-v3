@@ -13,7 +13,7 @@ from validataclass.validators import DataclassValidator
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
 from webapp.common.server_auth import ServerAuthHelper
 from webapp.dependencies import dependencies
-from webapp.shared.parking_restriction.parking_restriction_schema import parking_restriction_component
+from webapp.shared.parking_restriction.parking_restriction_schema import parking_spot_restriction_component
 from webapp.shared.parking_spot.parking_spot_schema import parking_spot_component
 
 from .parking_spot_handler import ParkingSpotHandler
@@ -83,7 +83,7 @@ class ParkingSpotsMethodView(ParkingSpotBaseMethodView):
                 ],
             ),
         ],
-        components=[parking_spot_component, parking_restriction_component],
+        components=[parking_spot_component, parking_spot_restriction_component],
     )
     def post(self):
         combined_parking_spot_input = self.validate_request(self.combined_parking_spot_validator)
@@ -93,7 +93,7 @@ class ParkingSpotsMethodView(ParkingSpotBaseMethodView):
             combined_parking_spot_input=combined_parking_spot_input,
         )
         parking_spot_dict = parking_spot.to_dict(
-            include_restricted_to=True,
+            include_restrictions=True,
             include_tags=True,
             include_external_identifiers=True,
         )

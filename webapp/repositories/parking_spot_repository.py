@@ -24,7 +24,7 @@ class ParkingSpotRepository(BaseRepository[ParkingSpot]):
         *,
         search_query: Optional[BaseSearchQuery] = None,
         include_source: bool = True,
-        include_restricted_to: bool = False,
+        include_restrictions: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
     ) -> PaginatedResult[ParkingSpot]:
@@ -32,8 +32,8 @@ class ParkingSpotRepository(BaseRepository[ParkingSpot]):
 
         if include_source:
             query = query.options(joinedload(ParkingSpot.source))
-        if include_restricted_to:
-            query = query.options(selectinload(ParkingSpot.restricted_to))
+        if include_restrictions:
+            query = query.options(selectinload(ParkingSpot.restrictions))
         if include_external_identifiers:
             query = query.options(selectinload(ParkingSpot.external_identifiers))
         if include_tags:
@@ -48,15 +48,15 @@ class ParkingSpotRepository(BaseRepository[ParkingSpot]):
         self,
         parking_spot_id: int,
         include_source: bool = True,
-        include_restricted_to: bool = False,
+        include_restrictions: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
     ) -> ParkingSpot:
         load_options = []
         if include_source:
             load_options.append(joinedload(ParkingSpot.source))
-        if include_restricted_to:
-            load_options.append(selectinload(ParkingSpot.restricted_to))
+        if include_restrictions:
+            load_options.append(selectinload(ParkingSpot.restrictions))
         if include_external_identifiers:
             load_options.append(selectinload(ParkingSpot.external_identifiers))
         if include_tags:

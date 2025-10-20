@@ -55,7 +55,7 @@ class ParkingSpot(BaseModel):
 
     source: Mapped['Source'] = relationship('Source', back_populates='parking_spots')
     parking_site: Mapped[Optional['ParkingSite']] = relationship('ParkingSite', back_populates='parking_spots')
-    restricted_to: Mapped[list['ParkingRestriction']] = relationship(
+    restrictions: Mapped[list['ParkingRestriction']] = relationship(
         'ParkingRestriction',
         back_populates='parking_spot',
         cascade='all, delete-orphan',
@@ -110,7 +110,7 @@ class ParkingSpot(BaseModel):
     def to_dict(
         self,
         fields: Optional[list[str]] = None,
-        include_restricted_to: bool = False,
+        include_restrictions: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
         ignore: Optional[list[str]] = None,
@@ -122,9 +122,14 @@ class ParkingSpot(BaseModel):
 
         result = super().to_dict(fields, ignore)
 
-        if include_restricted_to and len(self.restricted_to):
+        if include_restrictions and len(self.restrictions):
+            result['restrictions'] = []
+            for parking_restriction in self.restrictions:
+                result['restrictions'].append(parking_restriction.to_dict(fields=['type', 'hours', 'max_stay']))
+
+            # Legacy output
             result['restricted_to'] = []
-            for parking_restriction in self.restricted_to:
+            for parking_restriction in self.restrictions:
                 result['restricted_to'].append(parking_restriction.to_dict(fields=['type', 'hours', 'max_stay']))
 
         if include_external_identifiers and len(self.external_identifiers):

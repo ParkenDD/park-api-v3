@@ -34,7 +34,7 @@ class ParkingSiteRepository(BaseRepository):
         self,
         *,
         search_query: Optional[BaseSearchQuery] = None,
-        include_restricted_to: bool = False,
+        include_restrictions: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
         include_source: bool = True,
@@ -44,8 +44,8 @@ class ParkingSiteRepository(BaseRepository):
 
         if include_source:
             query = query.options(joinedload(ParkingSite.source))
-        if include_restricted_to:
-            query = query.options(selectinload(ParkingSite.restricted_to))
+        if include_restrictions:
+            query = query.options(selectinload(ParkingSite.restrictions))
         if include_external_identifiers:
             query = query.options(selectinload(ParkingSite.external_identifiers))
         if include_tags:
@@ -58,13 +58,13 @@ class ParkingSiteRepository(BaseRepository):
     def fetch_parking_site_by_id(
         self,
         parking_site_id: int,
-        include_restricted_to: bool = False,
+        include_restrictions: bool = False,
         include_external_identifiers: bool = False,
         include_tags: bool = False,
     ):
         load_options = []
-        if include_restricted_to:
-            load_options.append(selectinload(ParkingSite.restricted_to))
+        if include_restrictions:
+            load_options.append(selectinload(ParkingSite.restrictions))
         if include_external_identifiers:
             load_options.append(selectinload(ParkingSite.external_identifiers))
         if include_tags:
@@ -85,10 +85,19 @@ class ParkingSiteRepository(BaseRepository):
 
         return query.all()
 
-    def fetch_parking_site_by_source_id_and_external_uid(self, source_id: int, original_uid: str) -> ParkingSite:
-        parking_site: ParkingSite | None = (
-            self.session.query(ParkingSite)
-            .filter(ParkingSite.source_id == source_id)
+    def fetch_parking_site_by_source_id_and_external_uid(
+        self,
+        source_id: int,
+        original_uid: str,
+        include_restrictions: bool = False,
+    ) -> ParkingSite:
+        parking_site = self.session.query(ParkingSite)
+
+        if include_restrictions:
+            parking_site = parking_site.options(selectinload(ParkingSite.restrictions))
+
+        parking_site = (
+            parking_site.filter(ParkingSite.source_id == source_id)
             .filter(ParkingSite.original_uid == original_uid)
             .first()
         )

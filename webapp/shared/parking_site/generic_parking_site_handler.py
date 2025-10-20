@@ -21,7 +21,7 @@ class GenericParkingSiteHandler(PublicApiBaseHandler):
     def get_parking_site_list(self, search_query: ParkingSiteSearchInput) -> PaginatedResult[ParkingSite]:
         return self.parking_site_repository.fetch_parking_sites(
             search_query=search_query,
-            include_restricted_to=True,
+            include_restrictions=True,
             include_external_identifiers=True,
             include_tags=True,
             include_parking_site_group=True,
@@ -30,7 +30,7 @@ class GenericParkingSiteHandler(PublicApiBaseHandler):
     def get_parking_site_item(self, parking_site_id: int) -> ParkingSite:
         return self.parking_site_repository.fetch_parking_site_by_id(
             parking_site_id,
-            include_restricted_to=True,
+            include_restrictions=True,
             include_external_identifiers=True,
             include_tags=True,
         )

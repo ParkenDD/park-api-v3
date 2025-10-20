@@ -6,7 +6,7 @@
     "type": "ON_STREET",
     "name": "A1 4",
     "address": "A1 4, 68159 Mannheim",
-    "restricted_to": [
+    "restrictions": [
       {
         "type": "DISABLED"
       }

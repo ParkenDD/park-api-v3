@@ -21,7 +21,7 @@ from webapp.dependencies import dependencies
 from webapp.models import ParkingSpot
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
-from webapp.shared.parking_restriction.parking_restriction_schema import parking_restriction_component
+from webapp.shared.parking_restriction.parking_restriction_schema import parking_spot_restriction_component
 from webapp.shared.parking_spot.parking_spot_schema import parking_spot_component
 from webapp.shared.sources.source_schema import source_component
 
@@ -70,7 +70,7 @@ class ParkingSpotBaseMethodView(PublicApiBaseMethodView):
     @staticmethod
     def _map_parking_spot(parking_spot: ParkingSpot) -> dict:
         return parking_spot.to_dict(
-            include_restricted_to=True,
+            include_restrictions=True,
             include_external_identifiers=True,
             include_tags=True,
         )
@@ -106,7 +106,7 @@ class ParkingSpotListMethodView(ParkingSpotBaseMethodView):
                 )
             )
         ],
-        components=[source_component, parking_spot_component, parking_restriction_component],
+        components=[source_component, parking_spot_component, parking_spot_restriction_component],
     )
     def get(self):
         search_query = self.validate_query_args(self.parking_spot_search_query_validator)
@@ -130,7 +130,7 @@ class ParkingSpotItemMethodView(ParkingSpotBaseMethodView):
                 )
             )
         ],
-        components=[source_component, parking_spot_component, parking_restriction_component],
+        components=[source_component, parking_spot_component, parking_spot_restriction_component],
     )
     def get(self, parking_spot_id: int):
         parking_spot = self.parking_spot_handler.get_parking_spot_item(parking_spot_id)
