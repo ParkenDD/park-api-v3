@@ -1,6 +1,20 @@
 # Changelog
 
+## 0.35.0
+
+Released 2025-10-20
+
+This release introduces the new `restrictions` system to get rid of `capacity_{audience}` fields, which are
+deprecated.
+
+### Features
+
+* [restrictions](https://github.com/ParkenDD/park-api-v3/pull/350)
+
+
 ## 0.34.1
+
+Released 2025-10-14
 
 ### Fixes
 
