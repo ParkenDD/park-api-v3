@@ -97,6 +97,10 @@ class ParkingSpotListMethodView(ParkingSpotBaseMethodView):
             Parameter('radius', schema=NumericField(), description='Radius, in m', example='3500'),
             Parameter('limit', schema=IntegerField(), description='Limit results'),
             Parameter('start', schema=IntegerField(), description='Start of search query.'),
+            Parameter('lat_min', schema=NumericField(), example=55.0, description='Bounding box'),
+            Parameter('lat_max', schema=NumericField(), example=55.5, description='Bounding box'),
+            Parameter('lon_min', schema=NumericField(), example=5.0, description='Bounding box'),
+            Parameter('lon_max', schema=NumericField(), example=5.5, description='Bounding box'),
         ],
         response=[
             Response(

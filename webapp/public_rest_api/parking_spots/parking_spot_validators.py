@@ -28,6 +28,11 @@ class ParkingSpotSearchInput(CursorPaginationMixin, BaseSearchQuery):
     lon: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     radius: Optional[int] = SearchParamCustom(), IntegerValidator(allow_strings=True)
 
+    lat_min: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+    lat_max: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+    lon_min: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+    lon_max: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+
     limit: int | None = PaginationLimitValidator(max_value=1000), Default(None)
 
     def __post_init__(self):
