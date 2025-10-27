@@ -178,19 +178,19 @@ class ParkingSiteRepository(BaseRepository):
             query = query.filter(distance_function < int(radius))
 
         if (
-            hasattr(search_query, 'lat_min')
-            and hasattr(search_query, 'lat_max')
-            and hasattr(search_query, 'lon_min')
-            and hasattr(search_query, 'lon_max')
+            getattr(search_query, 'lat_min', None)
+            and getattr(search_query, 'lat_max', None)
+            and getattr(search_query, 'lon_min', None)
+            and getattr(search_query, 'lon_max', None)
         ):
             query = query.filter(
                 func.ST_Within(
                     ParkingSite.geometry,
                     func.ST_MakeEnvelope(
-                        search_query.lon_min,
-                        search_query.lat_min,
-                        search_query.lon_max,
-                        search_query.lat_max,
+                        getattr(search_query, 'lon_min'),
+                        getattr(search_query, 'lat_min'),
+                        getattr(search_query, 'lon_max'),
+                        getattr(search_query, 'lat_max'),
                         4326,
                     ),
                 ),
