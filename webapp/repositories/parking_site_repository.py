@@ -143,7 +143,7 @@ class ParkingSiteRepository(BaseRepository):
 
         # Apply all search filters one-by-one
         for _param_name, bound_filter in search_query.get_search_filters():
-            if _param_name in ['location', 'radius', 'lat', 'lon']:
+            if _param_name in ['location', 'radius', 'lat', 'lon', 'lat_min', 'lat_max', 'lon_min', 'lon_max']:
                 continue
             query = self._apply_bound_search_filter(query, bound_filter)
 
@@ -176,6 +176,25 @@ class ParkingSiteRepository(BaseRepository):
             else:
                 raise NotImplementedError('The application just supports mysql, mariadb and postgresql.')
             query = query.filter(distance_function < int(radius))
+
+        if (
+            getattr(search_query, 'lat_min', None)
+            and getattr(search_query, 'lat_max', None)
+            and getattr(search_query, 'lon_min', None)
+            and getattr(search_query, 'lon_max', None)
+        ):
+            query = query.filter(
+                func.ST_Within(
+                    ParkingSite.geometry,
+                    func.ST_MakeEnvelope(
+                        getattr(search_query, 'lon_min'),
+                        getattr(search_query, 'lat_min'),
+                        getattr(search_query, 'lon_max'),
+                        getattr(search_query, 'lat_max'),
+                        4326,
+                    ),
+                ),
+            )
 
         return query
 

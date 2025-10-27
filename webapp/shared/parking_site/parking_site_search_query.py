@@ -65,6 +65,11 @@ class ParkingSiteSearchInput(ParkingSiteBaseSearchInput, CursorPaginationMixin):
         DateTimeToUtcValidator(),
     )
 
+    lat_min: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+    lat_max: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+    lon_min: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+    lon_max: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+
 
 @search_query_dataclass
 class ParkingSiteGeoSearchInput(ParkingSiteSearchInput):
