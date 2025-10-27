@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.36.0
+
+Released 2025-10-27
+
+### Features
+
+* [bounding box search](https://github.com/ParkenDD/park-api-v3/pull/352)
+
+
 ## 0.35.0
 
 Released 2025-10-20
