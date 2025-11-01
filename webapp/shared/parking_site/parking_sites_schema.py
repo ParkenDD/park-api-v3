@@ -152,6 +152,7 @@ parking_site_schema = JsonSchema(
         ),
         'max_stay': IntegerField(minimum=0, required=False, description='Maximum stay, in seconds.'),
         'max_height': IntegerField(minimum=0, required=False, description='Max height, in centimeters.'),
+        'max_width': IntegerField(minimum=0, required=False, description='Max width, in centimeters.'),
         'has_lighting': BooleanField(required=False),
         'park_and_ride_type': ArrayField(items=EnumField(enum=ParkAndRideType), required=False),
         'is_supervised': BooleanField(required=False, description='Deprecated, will be replaced by supervision_type.'),
