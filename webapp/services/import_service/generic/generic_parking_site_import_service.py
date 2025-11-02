@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import (
+    CombinedParkingSiteInput,
     ParkingAudience,
     ParkingSiteRestrictionInput,
     RealtimeParkingSiteInput,
@@ -127,6 +128,19 @@ class GenericParkingSiteImportService(GenericBaseImportService):
             if restriction_input.type not in RESTRICTION_MAPPING:
                 continue
             setattr(parking_site, RESTRICTION_MAPPING[restriction_input.type], restriction_input.capacity)
+
+            # Don't overwrite realtime data in case of static data
+            if isinstance(parking_site_input, CombinedParkingSiteInput):
+                setattr(
+                    parking_site,
+                    f'realtime_{RESTRICTION_MAPPING[restriction_input.type]}',
+                    restriction_input.realtime_capacity,
+                )
+                setattr(
+                    parking_site,
+                    f'realtime_free_{RESTRICTION_MAPPING[restriction_input.type]}',
+                    restriction_input.realtime_free_capacity,
+                )
 
         if parking_site_input.group_uid:
             try:

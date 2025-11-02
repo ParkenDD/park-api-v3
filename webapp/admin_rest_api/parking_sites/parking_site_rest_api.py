@@ -7,7 +7,6 @@ from http import HTTPStatus
 
 from flask import jsonify
 from flask_openapi.decorator import EmptyResponse, ErrorResponse, Response, ResponseData, SchemaReference, document
-from parkapi_sources.models import CombinedParkingSiteInput
 from validataclass.validators import DataclassValidator
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
@@ -29,7 +28,12 @@ from .parking_site_schema import (
     parking_site_list_request,
     parking_site_list_response,
 )
-from .parking_site_validators import ApplyDuplicatesInput, GetDuplicatesInput, ParkingSiteListInput
+from .parking_site_validators import (
+    ApplyDuplicatesInput,
+    GetDuplicatesInput,
+    LegacyCombinedParkingSiteInput,
+    ParkingSiteListInput,
+)
 
 
 class ParkingSitesBlueprint(AdminApiBaseBlueprint):
@@ -175,7 +179,7 @@ class ParkingSiteUpsertListMethodView(ParkingSiteBaseMethodView):
 
 
 class ParkingSiteUpsertItemMethodView(ParkingSiteBaseMethodView):
-    combined_parking_site_validator = DataclassValidator(CombinedParkingSiteInput)
+    legacy_combined_parking_site_validator = DataclassValidator(LegacyCombinedParkingSiteInput)
 
     @document(
         request=parking_site_item_request,
@@ -198,11 +202,13 @@ class ParkingSiteUpsertItemMethodView(ParkingSiteBaseMethodView):
         ],
     )
     def post(self):
-        parking_site: CombinedParkingSiteInput = self.validate_request(self.combined_parking_site_validator)
+        parking_site: LegacyCombinedParkingSiteInput = self.validate_request(
+            self.legacy_combined_parking_site_validator,
+        )
 
         response = self.parking_site_handler.upsert_parking_site_item(
             source_uid=self.server_auth_helper.get_current_user().username,
-            combined_parking_site_input=parking_site,
+            combined_parking_site_input=parking_site.to_combined_parking_site_input(),
         )
 
         return jsonify(response), HTTPStatus.OK
