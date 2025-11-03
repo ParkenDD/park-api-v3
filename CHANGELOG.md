@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.37.0
+
+Released 2025-11-03
+
+### Features
+
+* [ParkAPI Sources: Add Freiburg VAG bike boxes](https://github.com/ParkenDD/parkapi-sources-v3/pull/296)
+
+
+### Fixes
+
+* [legacy api fields support](https://github.com/ParkenDD/park-api-v3/pull/354)
+* [add max_width to docs](https://github.com/ParkenDD/park-api-v3/pull/353)
+
+
 ## 0.36.0
 
 Released 2025-10-27
