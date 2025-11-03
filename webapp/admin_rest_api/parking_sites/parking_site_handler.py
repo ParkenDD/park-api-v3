@@ -15,7 +15,11 @@ from validataclass_search_queries.pagination import PaginatedResult
 
 from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.admin_rest_api.parking_sites.parking_site_response import ParkingSiteResponse
-from webapp.admin_rest_api.parking_sites.parking_site_validators import ApplyDuplicatesInput, GetDuplicatesInput
+from webapp.admin_rest_api.parking_sites.parking_site_validators import (
+    ApplyDuplicatesInput,
+    GetDuplicatesInput,
+    LegacyCombinedParkingSiteInput,
+)
 from webapp.models import ParkingSite
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.services.import_service.generic import GenericParkingSiteImportService
@@ -29,7 +33,7 @@ class ParkingSiteHandler(AdminApiBaseHandler):
     matching_service: MatchingService
     generic_parking_site_import_service: GenericParkingSiteImportService
 
-    combined_parking_site_validator = DataclassValidator(CombinedParkingSiteInput)
+    legacy_combined_parking_site_validator = DataclassValidator(LegacyCombinedParkingSiteInput)
     static_patch_input_validator = DataclassValidator(StaticPatchInput)
     static_parking_site_patch_validator = DataclassValidator(StaticParkingSitePatchInput)
 
@@ -63,7 +67,9 @@ class ParkingSiteHandler(AdminApiBaseHandler):
 
         for parking_site_dict in parking_site_dicts:
             try:
-                combined_parking_site_input = self.combined_parking_site_validator.validate(parking_site_dict)
+                legacy_combined_parking_site_input = self.legacy_combined_parking_site_validator.validate(
+                    parking_site_dict,
+                )
             except ValidationError as e:
                 response.errors.append(
                     ImportParkingSiteException(
@@ -74,6 +80,8 @@ class ParkingSiteHandler(AdminApiBaseHandler):
                     ),
                 )
                 continue
+
+            combined_parking_site_input = legacy_combined_parking_site_input.to_combined_parking_site_input()
             combined_parking_site_inputs.append(combined_parking_site_input)
 
         combined_parking_site_inputs = self.apply_static_patches(
@@ -138,6 +146,7 @@ class ParkingSiteHandler(AdminApiBaseHandler):
             include_external_identifiers=True,
             include_tags=True,
             include_group=True,
+            include_restrictions=True,
         )
 
     def apply_static_patches(

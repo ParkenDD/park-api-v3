@@ -214,6 +214,9 @@ class ParkingSite(BaseModel):
             # Legacy output
             result['restricted_to'] = []
             for restrictions in self.restrictions:
+                # It would be misleading to output a restriction without capacity at the legacy field
+                if restrictions.capacity is not None:
+                    continue
                 result['restricted_to'].append(restrictions.to_dict(fields=['type', 'hours', 'max_stay']))
 
         if include_external_identifiers and len(self.external_identifiers):
