@@ -50,6 +50,34 @@ def test_update_parking_spot(
     assert result.json == expected_response
 
 
+def test_create_parking_spot_with_relations(
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+) -> None:
+    result = admin_api_test_client.post(
+        '/api/admin/v1/parking-spots',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-spot-with-relations'),
+    )
+
+    assert result.status_code == HTTPStatus.CREATED
+    assert result.json == PARKING_SPOT_WITH_RELATIONS_RESPONSE
+
+
+def test_create_parking_spot_with_restricted_to(
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+) -> None:
+    result = admin_api_test_client.post(
+        '/api/admin/v1/parking-spots',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-spot-with-restricted-to'),
+    )
+
+    assert result.status_code == HTTPStatus.CREATED
+    assert result.json == PARKING_SPOT_WITH_RESTRICTED_TO_RESPONSE
+
+
 PARKING_SPOT_RESPONSE = {
     'source_id': 1,
     'original_uid': 'demo-parking-spot',
@@ -66,6 +94,14 @@ PARKING_SPOT_RESPONSE = {
     'id': 1,
     'created_at': ANY,
     'modified_at': ANY,
+}
+
+
+PARKING_SPOT_WITH_RELATIONS_RESPONSE = {
+    **PARKING_SPOT_RESPONSE,
     'restrictions': [{'type': 'DISABLED'}],
     'restricted_to': [{'type': 'DISABLED'}],
 }
+
+
+PARKING_SPOT_WITH_RESTRICTED_TO_RESPONSE = PARKING_SPOT_WITH_RELATIONS_RESPONSE
