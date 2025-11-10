@@ -6,6 +6,11 @@
     "type": "ON_STREET",
     "name": "A1 4",
     "address": "A1 4, 68159 Mannheim",
+    "restrictions": [
+      {
+        "type": "DISABLED"
+      }
+    ],
     "has_realtime_data": true,
     "realtime_status": "TAKEN",
     "static_data_updated_at": "2025-05-20T13:55:33+02:00",

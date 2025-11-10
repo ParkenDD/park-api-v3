@@ -3,9 +3,8 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from parkapi_sources.models import CombinedParkingSpotInput
-
 from webapp.admin_rest_api import AdminApiBaseHandler
+from webapp.admin_rest_api.parking_spots.parking_spot_validators import LegacyCombinedParkingSpotInput
 from webapp.models import ParkingSpot
 from webapp.repositories import SourceRepository
 from webapp.services.import_service.generic import GenericParkingSpotImportService
@@ -29,13 +28,13 @@ class ParkingSpotHandler(AdminApiBaseHandler):
     def upsert_parking_spot(
         self,
         source_uid: str,
-        combined_parking_spot_input: CombinedParkingSpotInput,
+        legacy_combined_parking_spot_input: LegacyCombinedParkingSpotInput,
     ) -> tuple[ParkingSpot, bool]:
         source = self.source_repository.fetch_source_by_uid(source_uid)
 
         parking_spot, created = self.generic_parking_spot_import_service.save_static_or_combined_parking_spot_input(
             source=source,
-            parking_spot_input=combined_parking_spot_input,
+            parking_spot_input=legacy_combined_parking_spot_input.to_combined_parking_spot_input(),
         )
 
         return parking_spot, created

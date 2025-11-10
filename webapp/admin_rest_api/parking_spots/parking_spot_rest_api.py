@@ -7,7 +7,6 @@ from http import HTTPStatus
 
 from flask import jsonify
 from flask_openapi.decorator import ErrorResponse, ExampleReference, Response, ResponseData, SchemaReference, document
-from parkapi_sources.models import CombinedParkingSpotInput
 from validataclass.validators import DataclassValidator
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
@@ -18,6 +17,7 @@ from webapp.shared.parking_spot.parking_spot_schema import parking_spot_componen
 
 from .parking_spot_handler import ParkingSpotHandler
 from .parking_spot_schema import parking_spot_request
+from .parking_spot_validators import LegacyCombinedParkingSpotInput
 
 
 class ParkingSpotBlueprint(AdminApiBaseBlueprint):
@@ -55,7 +55,7 @@ class ParkingSpotBaseMethodView(AdminApiBaseMethodView):
 
 
 class ParkingSpotsMethodView(ParkingSpotBaseMethodView):
-    combined_parking_spot_validator = DataclassValidator(CombinedParkingSpotInput)
+    combined_parking_spot_validator = DataclassValidator(LegacyCombinedParkingSpotInput)
 
     @document(
         request=parking_spot_request,
@@ -86,11 +86,11 @@ class ParkingSpotsMethodView(ParkingSpotBaseMethodView):
         components=[parking_spot_component, parking_spot_restriction_component],
     )
     def post(self):
-        combined_parking_spot_input = self.validate_request(self.combined_parking_spot_validator)
+        legacy_combined_parking_spot_input = self.validate_request(self.combined_parking_spot_validator)
 
         parking_spot, created = self.parking_spot_handler.upsert_parking_spot(
             source_uid=self.server_auth_helper.get_current_user().username,
-            combined_parking_spot_input=combined_parking_spot_input,
+            legacy_combined_parking_spot_input=legacy_combined_parking_spot_input,
         )
         parking_spot_dict = parking_spot.to_dict(
             include_restrictions=True,

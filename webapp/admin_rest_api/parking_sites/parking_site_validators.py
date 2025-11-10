@@ -6,9 +6,22 @@ Use of this source code is governed by an MIT-style license that can be found in
 from dataclasses import fields
 from typing import Any
 
-from parkapi_sources.models import CombinedParkingSiteInput, ParkingAudience, ParkingSiteRestrictionInput
+from parkapi_sources.models import (
+    CombinedParkingSiteInput,
+    ParkingAudience,
+    ParkingRestrictionInput,
+    ParkingSiteRestrictionInput,
+    ParkingSpotRestrictionInput,
+)
 from validataclass.dataclasses import Default, validataclass
-from validataclass.validators import AnythingValidator, IntegerValidator, ListValidator, Noneable, StringValidator
+from validataclass.validators import (
+    AnythingValidator,
+    DataclassValidator,
+    IntegerValidator,
+    ListValidator,
+    Noneable,
+    StringValidator,
+)
 
 CAPACITY_TYPES: dict[str, ParkingAudience] = {
     'disabled': ParkingAudience.DISABLED,
@@ -80,17 +93,32 @@ class LegacyCombinedParkingSiteInput(CombinedParkingSiteInput):
         Default(None),
     )
 
+    restricted_to: list[ParkingRestrictionInput] = (
+        Noneable(ListValidator(DataclassValidator(ParkingSpotRestrictionInput))),
+        Default(None),
+    )
+
     def to_combined_parking_site_input(self) -> CombinedParkingSiteInput:
         combined_parking_site_dict: dict[str, Any] = {}
         # prevent recursive dataclass to dict by using fields
         for field in fields(self):
             key = field.name
-            if key.endswith(tuple(CAPACITY_TYPES.keys())):
+            if key.endswith(tuple(CAPACITY_TYPES.keys())) or key == 'restricted_to':
                 continue
 
             combined_parking_site_dict[key] = getattr(self, key)
 
         combined_parking_site_input = CombinedParkingSiteInput(**combined_parking_site_dict)
+
+        if self.restricted_to is not None:
+            for restriction in self.restricted_to:
+                combined_parking_site_input.restrictions.append(
+                    ParkingSiteRestrictionInput(
+                        type=restriction.type,
+                        hours=restriction.hours,
+                        max_stay=restriction.max_stay,
+                    ),
+                )
 
         for key, audience in CAPACITY_TYPES.items():
             if getattr(self, f'capacity_{key}') is not None:
