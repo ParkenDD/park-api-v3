@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.38.0
+
+Released 2025-11-10
+
+### Features
+
+* [bfrk disabled spots](https://github.com/ParkenDD/parkapi-sources-v3/pull/300)
+
+
+### Fixes
+
+* [legacy restricted to, tests](https://github.com/ParkenDD/park-api-v3/pull/356)
+
+
 ## 0.37.0
 
 Released 2025-11-03
