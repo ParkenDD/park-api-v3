@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.38.1
+
+Released 2025-11-12
+
+### Fixes
+
+* [ParkAPI Sources: bfrk: add missing base class](https://github.com/ParkenDD/parkapi-sources-v3/pull/302)
+
+
 ## 0.38.0
 
 Released 2025-11-10
