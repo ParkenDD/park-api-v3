@@ -39,84 +39,86 @@ parking_site_base_properties = {
         description='Last time static fields were updated. Can be set by the client.',
     ),
     'capacity': IntegerField(minimum=0),
-    'capacity_disabled': IntegerField(minimum=0, required=False, description='Deprecated, use restrictions instead.'),
-    'capacity_woman': IntegerField(minimum=0, required=False, description='Deprecated, use restrictions instead.'),
-    'capacity_family': IntegerField(minimum=0, required=False, description='Deprecated, use restrictions instead.'),
-    'capacity_charging': IntegerField(minimum=0, required=False, description='Deprecated, use restrictions instead.'),
-    'capacity_carsharing': IntegerField(minimum=0, required=False, description='Deprecated, use restrictions instead.'),
-    'capacity_truck': IntegerField(minimum=0, required=False, description='Deprecated, use restrictions instead.'),
-    'capacity_bus': IntegerField(minimum=0, required=False, description='Deprecated, use restrictions instead.'),
+    'capacity_disabled': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
+    'capacity_woman': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
+    'capacity_family': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
+    'capacity_charging': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
+    'capacity_carsharing': IntegerField(
+        minimum=0, required=False, description='*Deprecated, use restrictions instead.*'
+    ),
+    'capacity_truck': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
+    'capacity_bus': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
     'realtime_capacity': IntegerField(minimum=0, required=False),
     'realtime_capacity_disabled': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_capacity_woman': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_capacity_family': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_capacity_charging': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_capacity_carsharing': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_capacity_truck': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_capacity_bus': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_free_capacity': IntegerField(minimum=0, required=False),
     'realtime_free_capacity_disabled': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_free_capacity_woman': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_free_capacity_family': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_free_capacity_charging': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_free_capacity_carsharing': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_free_capacity_truck': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
     'realtime_free_capacity_bus': IntegerField(
         minimum=0,
         required=False,
-        description='Deprecated, use restrictions instead.',
+        description='*Deprecated, use restrictions instead.*',
     ),
 }
 
@@ -155,7 +157,9 @@ parking_site_schema = JsonSchema(
         'max_width': IntegerField(minimum=0, required=False, description='Max width, in centimeters.'),
         'has_lighting': BooleanField(required=False),
         'park_and_ride_type': ArrayField(items=EnumField(enum=ParkAndRideType), required=False),
-        'is_supervised': BooleanField(required=False, description='Deprecated, will be replaced by supervision_type.'),
+        'is_supervised': BooleanField(
+            required=False, description='*Deprecated, will be replaced by supervision_type.*'
+        ),
         'supervision_type': EnumField(enum=SupervisionType, required=False),
         'is_covered': BooleanField(required=False),
         'orientation': EnumField(enum=ParkingSiteOrientation, required=False),
@@ -194,8 +198,8 @@ parking_site_schema = JsonSchema(
         'restricted_to': ArrayField(
             items=Reference(obj='ParkingSiteRestriction'),
             required=False,
-            description='Restrictions which apply. If there are multiple options, they should be understood with an '
-            'logical or. Deprecated, use restrictions instead.',
+            description='*Deprecated, use restrictions instead.*<br>Restrictions which apply. If there are multiple options, they should be understood with an '
+            'logical or.',
         ),
         'restrictions': ArrayField(
             items=Reference(obj='ParkingSiteRestriction'),
