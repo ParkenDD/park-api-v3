@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.39.0
+
+Released 2025-11-17
+
+### Features
+
+* [ParkAPI Sources: ParkRaumCheck mapping + implementation](https://github.com/ParkenDD/parkapi-sources-v3/pull/196)
+
+
+### Fixes
+
+* [ParkingSpotRestriction docs fix](https://github.com/ParkenDD/park-api-v3/pull/358)
+* [better deprecation notices](https://github.com/ParkenDD/park-api-v3/pull/359)
+* [ParkAPI Sources: freiburg_vag_bike: Map Bike + Ride to park_and_ride_type](https://github.com/ParkenDD/parkapi-sources-v3/pull/304)
+* [ParkAPI Sources: Hotfix: for mismatched realtime_free_capacity data](https://github.com/ParkenDD/parkapi-sources-v3/pull/303)
+
+
 ## 0.38.1
 
 Released 2025-11-12
