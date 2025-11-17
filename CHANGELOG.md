@@ -17,6 +17,11 @@ Released 2025-11-17
 * [ParkAPI Sources: Hotfix: for mismatched realtime_free_capacity data](https://github.com/ParkenDD/parkapi-sources-v3/pull/303)
 
 
+### Maintenance
+
+* [dependency updates](https://github.com/ParkenDD/park-api-v3/pull/360)
+
+
 ## 0.38.1
 
 Released 2025-11-12
