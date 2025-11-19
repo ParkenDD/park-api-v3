@@ -4,7 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from parkapi_sources import ParkAPISources
-from parkapi_sources.models import StaticBaseParkingInput
+from parkapi_sources.models import StaticBaseParkingInput, StaticParkingSpotInput
 
 from webapp.models import ExternalIdentifier, ParkingRestriction, ParkingSite, ParkingSpot, Tag
 from webapp.repositories import SourceRepository
@@ -20,7 +20,10 @@ class GenericBaseImportService(BaseService):
         self.source_repository = source_repository
 
     @staticmethod
-    def set_related_objects(entity_input: StaticBaseParkingInput, entity: ParkingSite | ParkingSpot):
+    def set_related_objects(
+        entity_input: StaticBaseParkingInput | StaticParkingSpotInput,
+        entity: ParkingSite | ParkingSpot,
+    ):
         if entity_input.restrictions is not None:
             parking_restrictions: list[ParkingRestriction] = []
             for i, parking_restrictions_input in enumerate(entity_input.restrictions):
