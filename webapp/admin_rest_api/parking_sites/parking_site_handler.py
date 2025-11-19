@@ -4,12 +4,14 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import json
+from dataclasses import fields
 from json import JSONDecodeError
 from pathlib import Path
 
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import CombinedParkingSiteInput, StaticParkingSitePatchInput, StaticPatchInput
 from validataclass.exceptions import ValidationError
+from validataclass.helpers import UnsetValue
 from validataclass.validators import DataclassValidator
 from validataclass_search_queries.pagination import PaginatedResult
 
@@ -186,7 +188,11 @@ class ParkingSiteHandler(AdminApiBaseHandler):
             if parking_site_patch.uid not in parking_site_inputs_by_uid:
                 continue
 
-            for key, value in parking_site_patch.to_dict().items():
+            for field in fields(parking_site_patch):
+                key = field.name
+                value = getattr(parking_site_patch, key)
+                if value is UnsetValue:
+                    continue
                 setattr(parking_site_inputs_by_uid[parking_site_patch.uid], key, value)
 
         return parking_site_inputs
