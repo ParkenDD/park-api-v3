@@ -140,7 +140,8 @@ parking_site_schema = JsonSchema(
         'address': StringField(
             maxLength=512,
             required=False,
-            description='Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city}',
+            description='Full address including street postalcode and city. Preferable in format {street with number}, '
+            '{postalcode} {city}',
         ),
         'description': StringField(
             maxLength=4096,
@@ -152,13 +153,18 @@ parking_site_schema = JsonSchema(
             description='ON_STREET, OFF_STREET_PARKING_GROUND, UNDERGROUND and CAR_PARK are used at car parks, '
             'WALL_LOOPS, STANDS, LOCKERS, SHED, TWO_TIER, BUILDING are used at bike parks, and OTHER at both.',
         ),
-        'max_stay': IntegerField(minimum=0, required=False, description='Maximum stay, in seconds.'),
+        'max_stay': IntegerField(
+            minimum=0,
+            required=False,
+            description='*Deprecated, use restrictions.max_stay instead.*<br> Maximum stay, in seconds.',
+        ),
         'max_height': IntegerField(minimum=0, required=False, description='Max height, in centimeters.'),
         'max_width': IntegerField(minimum=0, required=False, description='Max width, in centimeters.'),
         'has_lighting': BooleanField(required=False),
         'park_and_ride_type': ArrayField(items=EnumField(enum=ParkAndRideType), required=False),
         'is_supervised': BooleanField(
-            required=False, description='*Deprecated, will be replaced by supervision_type.*'
+            required=False,
+            description='*Deprecated, will be replaced by supervision_type.*',
         ),
         'supervision_type': EnumField(enum=SupervisionType, required=False),
         'is_covered': BooleanField(required=False),
@@ -172,7 +178,7 @@ parking_site_schema = JsonSchema(
         'fee_description': StringField(required=False),
         'has_fee': BooleanField(required=False),
         'static_data_updated_at': DateTimeField(
-            description='Last time static fields were updated. Can be set by the client.'
+            description='Last time static fields were updated. Can be set by the client.',
         ),
         'realtime_data_updated_at': DateTimeField(
             required=False,
@@ -198,8 +204,8 @@ parking_site_schema = JsonSchema(
         'restricted_to': ArrayField(
             items=Reference(obj='ParkingSiteRestriction'),
             required=False,
-            description='*Deprecated, use restrictions instead.*<br>Restrictions which apply. If there are multiple options, they should be understood with an '
-            'logical or.',
+            description='*Deprecated, use restrictions instead.*<br>Restrictions which apply. If there are multiple '
+            'options, they should be understood with an logical or.',
         ),
         'restrictions': ArrayField(
             items=Reference(obj='ParkingSiteRestriction'),
