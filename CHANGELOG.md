@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.40.0
+
+Released 2025-12-01
+
+### Features
+
+* [Parking spot site relation](https://github.com/ParkenDD/park-api-v3/pull/367)
+* [ParkAPI Sources: relation between parking sites and spots](https://github.com/ParkenDD/parkapi-sources-v3/pull/306)
+
+
+### Fixes
+
+* [ParkAPI Sources: set disabled restriction at konstanz disabled](https://github.com/ParkenDD/parkapi-sources-v3/pull/307)
+* [ParkAPI Sources: add max_stay to restrictions](https://github.com/ParkenDD/parkapi-sources-v3/pull/308)
+* [deprecate parking_site.max_stay](https://github.com/ParkenDD/park-api-v3/pull/366)
+* [fix patches at rest updates](https://github.com/ParkenDD/park-api-v3/pull/361)
+
+
 ## 0.39.0
 
 Released 2025-11-17
