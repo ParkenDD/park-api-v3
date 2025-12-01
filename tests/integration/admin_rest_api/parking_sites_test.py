@@ -3,15 +3,22 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import json
 from http import HTTPStatus
+from pathlib import Path
+from typing import Generator
 from unittest.mock import ANY
 
+import pytest
 from flask.testing import FlaskClient
+from parkapi_sources.models import ParkAndRideType, ParkingSiteType
 
 from tests.integration.admin_rest_api.helpers import load_admin_client_request_input
 from tests.model_generator.parking_site import get_parking_site
 from tests.model_generator.source import get_source
+from webapp.common.flask_app import App
 from webapp.common.sqlalchemy import SQLAlchemy
+from webapp.models import ParkingSite
 
 
 def test_upsert_parking_site_list(
@@ -122,6 +129,55 @@ def test_upsert_parking_site_list_with_relations(
 
     assert result.status_code == HTTPStatus.OK
     assert result.json == PARKING_SITE_RESPONSE_ITEM_WITH_RELATIONS
+
+
+@pytest.fixture()
+def parking_site_patch(flask_app: App) -> Generator[None, None, None]:
+    json_file_path = Path(flask_app.config.get('PARKING_SITE_PATCH_DIR'), 'source.json')
+    json_file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    patch_data = {
+        'items': [
+            {
+                'uid': '12717250',
+                'type': 'UNDERGROUND',
+                'park_and_ride_type': ['TRAM'],
+                'external_identifiers': [{'type': 'DHID', 'value': 'de:08111:6027:1:1'}],
+            },
+            {
+                'uid': '12717432',
+                'type': 'UNDERGROUND',
+            },
+        ],
+    }
+
+    with json_file_path.open('w') as json_file:
+        json_file.write(json.dumps(patch_data))
+
+    yield
+
+    json_file_path.unlink()
+
+
+def test_upsert_parking_site_item_with_patch(
+    db: SQLAlchemy,
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    parking_site_patch: None,
+) -> None:
+    result = admin_api_test_client.post(
+        '/api/admin/v1/parking-sites/upsert-item',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-site-item'),
+    )
+
+    assert result.status_code == HTTPStatus.OK
+
+    parking_site = db.session.get(ParkingSite, 1)
+
+    assert parking_site.park_and_ride_type == [ParkAndRideType.TRAM]
+    assert parking_site.type == ParkingSiteType.UNDERGROUND
+    assert len(parking_site.external_identifiers) == 1
 
 
 def test_upsert_parking_site_list_with_restricted_to(
