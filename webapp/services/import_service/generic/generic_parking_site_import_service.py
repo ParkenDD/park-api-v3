@@ -124,23 +124,24 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         self.set_related_objects(parking_site_input, parking_site)
 
         # Legacy mapping
-        for restriction_input in parking_site_input.restrictions:
-            if restriction_input.type not in RESTRICTION_MAPPING:
-                continue
-            setattr(parking_site, RESTRICTION_MAPPING[restriction_input.type], restriction_input.capacity)
+        if parking_site_input.restrictions:
+            for restriction_input in parking_site_input.restrictions:
+                if restriction_input.type not in RESTRICTION_MAPPING:
+                    continue
+                setattr(parking_site, RESTRICTION_MAPPING[restriction_input.type], restriction_input.capacity)
 
-            # Don't overwrite realtime data in case of static data
-            if isinstance(parking_site_input, CombinedParkingSiteInput):
-                setattr(
-                    parking_site,
-                    f'realtime_{RESTRICTION_MAPPING[restriction_input.type]}',
-                    restriction_input.realtime_capacity,
-                )
-                setattr(
-                    parking_site,
-                    f'realtime_free_{RESTRICTION_MAPPING[restriction_input.type]}',
-                    restriction_input.realtime_free_capacity,
-                )
+                # Don't overwrite realtime data in case of static data
+                if isinstance(parking_site_input, CombinedParkingSiteInput):
+                    setattr(
+                        parking_site,
+                        f'realtime_{RESTRICTION_MAPPING[restriction_input.type]}',
+                        restriction_input.realtime_capacity,
+                    )
+                    setattr(
+                        parking_site,
+                        f'realtime_free_{RESTRICTION_MAPPING[restriction_input.type]}',
+                        restriction_input.realtime_free_capacity,
+                    )
 
         if parking_site_input.group_uid:
             try:

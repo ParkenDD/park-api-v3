@@ -30,6 +30,8 @@ class GenericImportRunner:
         self.generic_import_service = generic_import_service
 
     def start(self):
+        if self.config_helper.get('PREVENT_AUTO_IMPORT'):
+            return
         for source_uid in self.generic_import_service.park_api_sources.converter_by_uid.keys():
             # Don't try to pull push-endpoints
             if not isinstance(

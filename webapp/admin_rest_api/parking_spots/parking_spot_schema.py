@@ -23,6 +23,7 @@ parking_spot_request_schema = JsonSchema(
     properties={
         'uid': StringField(minLength=1, maxLength=256),
         'name': StringField(minLength=1, maxLength=256, required=False, nullable=True),
+        'parking_site_uid': StringField(minLength=1, maxLength=256, required=False),
         'address': StringField(maxLength=256, required=False, nullable=True),
         'purpose': EnumField(enum=PurposeType, default=PurposeType.CAR, required=False),
         'type': EnumField(enum=ParkingSpotType, required=False, nullable=True),
