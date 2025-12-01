@@ -80,7 +80,7 @@ class ParkingSite(BaseModel):
     parking_spots: Mapped[list['ParkingSpot']] = relationship(
         'ParkingSpot',
         back_populates='parking_site',
-        cascade='all, delete-orphan',
+        cascade='all',
     )
     restrictions: Mapped[list['ParkingRestriction']] = relationship(
         'ParkingRestriction',

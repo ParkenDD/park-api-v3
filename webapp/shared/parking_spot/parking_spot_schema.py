@@ -89,6 +89,8 @@ parking_spot_schema = JsonSchema(
     },
 )
 
+
 parking_spot_example = {}
+
 
 parking_spot_component = Schema('ParkingSpot', parking_spot_schema, parking_spot_example)

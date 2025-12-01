@@ -171,6 +171,7 @@ class Dependencies:
     def get_generic_parking_spot_import_service(self) -> GenericParkingSpotImportService:
         return GenericParkingSpotImportService(
             source_repository=self.get_source_repository(),
+            parking_site_repository=self.get_parking_site_repository(),
             parking_spot_repository=self.get_parking_spot_repository(),
             **self.get_base_service_dependencies(),
         )

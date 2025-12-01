@@ -15,6 +15,7 @@ from webapp.common.logging.models import LogMessageType
 from webapp.models import ParkingSpot, Source
 from webapp.models.source import SourceStatus
 from webapp.repositories import (
+    ParkingSiteRepository,
     ParkingSpotRepository,
     SourceRepository,
 )
@@ -27,12 +28,19 @@ logger = logging.getLogger(__name__)
 
 class GenericParkingSpotImportService(GenericBaseImportService):
     source_repository: SourceRepository
+    parking_site_repository: ParkingSiteRepository
     parking_spot_repository: ParkingSpotRepository
     park_api_sources: ParkAPISources
 
-    def __init__(self, *args, parking_spot_repository: ParkingSpotRepository, **kwargs):
+    def __init__(
+        self,
+        *args,
+        parking_site_repository: ParkingSiteRepository,
+        parking_spot_repository: ParkingSpotRepository,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
-
+        self.parking_site_repository = parking_site_repository
         self.parking_spot_repository = parking_spot_repository
 
     def handle_static_import_results(
@@ -103,11 +111,24 @@ class GenericParkingSpotImportService(GenericBaseImportService):
                 'external_identifiers',
                 'restrictions',
                 'tags',
+                'parking_site_uid',
             ]:
                 continue
             setattr(parking_spot, key, value)
 
-            self.set_related_objects(parking_spot_input, parking_spot)
+        self.set_related_objects(parking_spot_input, parking_spot)
+
+        if parking_spot_input.parking_site_uid:
+            try:
+                parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
+                    source_id=source.id,
+                    original_uid=parking_spot_input.parking_site_uid,
+                )
+                parking_spot.parking_site = parking_site
+            except ObjectNotFoundException:
+                parking_spot.parking_site_id = None
+        else:
+            parking_spot.parking_site_id = None
 
         self.parking_spot_repository.save_parking_spot(parking_spot)
 
