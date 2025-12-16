@@ -1,5 +1,5 @@
 pytest~=9.0.1
 pytest-cov~=7.0.0
-ruff~=0.14.5
+ruff~=0.14.6
 freezegun~=1.5.5
 openapi-core~=0.19.4  # 0.19.5 conflicts with werkzeug 3.1.3
