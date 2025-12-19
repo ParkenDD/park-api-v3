@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.40.1
+
+Released 2025-12-19
+
+### Fixes
+
+* [Various smaller fixes from ParkAPI Sources](https://github.com/ParkenDD/parkapi-sources-v3/releases/tag/0.32.1)
+* Dependency updates
+
+
 ## 0.40.0
 
 Released 2025-12-01
