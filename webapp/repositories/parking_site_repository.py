@@ -10,6 +10,7 @@ from typing import Optional
 from parkapi_sources.models.enums import PurposeType
 from sqlalchemy import func, select
 from sqlalchemy.orm import Query, joinedload, selectinload
+from sqlalchemy.orm.interfaces import LoaderOption
 from validataclass_search_queries.filters import BoundSearchFilter
 from validataclass_search_queries.pagination import PaginatedResult
 from validataclass_search_queries.search_queries import BaseSearchQuery
@@ -34,43 +35,39 @@ class ParkingSiteRepository(BaseRepository):
         self,
         *,
         search_query: Optional[BaseSearchQuery] = None,
-        include_restrictions: bool = False,
-        include_external_identifiers: bool = False,
-        include_tags: bool = False,
-        include_source: bool = True,
-        include_parking_site_group: bool = False,
+        **kwargs,
     ) -> PaginatedResult[ParkingSite]:
         query = self.session.query(ParkingSite)
 
-        if include_source:
-            query = query.options(joinedload(ParkingSite.source))
-        if include_restrictions:
-            query = query.options(selectinload(ParkingSite.restrictions))
-        if include_external_identifiers:
-            query = query.options(selectinload(ParkingSite.external_identifiers))
-        if include_tags:
-            query = query.options(selectinload(ParkingSite.tags))
-        if include_parking_site_group:
-            query = query.options(joinedload(ParkingSite.parking_site_group))
+        loader_options = self._get_loader_options(**kwargs)
+        if loader_options:
+            query = query.options(*loader_options)
 
         return self._search_and_paginate(query, search_query)
 
     def fetch_parking_site_by_id(
         self,
         parking_site_id: int,
-        include_restrictions: bool = False,
-        include_external_identifiers: bool = False,
-        include_tags: bool = False,
+        **kwargs,
     ):
-        load_options = []
-        if include_restrictions:
-            load_options.append(selectinload(ParkingSite.restrictions))
-        if include_external_identifiers:
-            load_options.append(selectinload(ParkingSite.external_identifiers))
-        if include_tags:
-            load_options.append(selectinload(ParkingSite.tags))
-
+        load_options = self._get_loader_options(**kwargs)
         return self.fetch_resource_by_id(parking_site_id, load_options=load_options)
+
+    def fetch_parking_site_by_source_uid_and_original_uid(
+        self, source_uid: str, original_uid: str, **kwargs
+    ) -> ParkingSite:
+        query = self.session.query(ParkingSite)
+
+        load_options = self._get_loader_options(**kwargs)
+        if load_options:
+            query = query.options(*load_options)
+
+        query = query.join(ParkingSite.source)
+        query = query.filter(Source.uid == source_uid, ParkingSite.original_uid == original_uid)
+
+        return self._or_raise(
+            query.one_or_none(), f'ParkingSite with source uid {source_uid} and original_uid {original_uid} not found'
+        )
 
     def fetch_parking_site_by_ids(
         self,
@@ -85,25 +82,22 @@ class ParkingSiteRepository(BaseRepository):
 
         return query.all()
 
-    def fetch_parking_site_by_source_id_and_external_uid(
+    def fetch_parking_site_by_source_id_and_original_uid(
         self,
         source_id: int,
         original_uid: str,
-        include_restrictions: bool = False,
+        **kwargs,
     ) -> ParkingSite:
-        parking_site = self.session.query(ParkingSite)
+        query = self.session.query(ParkingSite)
 
-        if include_restrictions:
-            parking_site = parking_site.options(selectinload(ParkingSite.restrictions))
+        load_options = self._get_loader_options(**kwargs)
+        if load_options:
+            query = query.options(*load_options)
 
-        parking_site = (
-            parking_site.filter(ParkingSite.source_id == source_id)
-            .filter(ParkingSite.original_uid == original_uid)
-            .first()
-        )
+        query = query.filter(ParkingSite.source_id == source_id, ParkingSite.original_uid == original_uid)
 
         return self._or_raise(
-            parking_site,
+            query.one_or_none(),
             f'ParkingSite with source id {source_id} and original_uid {original_uid} not found',
         )
 
@@ -232,3 +226,26 @@ class ParkingSiteRepository(BaseRepository):
                 ),
             )
         return result
+
+    @staticmethod
+    def _get_loader_options(
+        *,
+        include_restrictions: bool = False,
+        include_external_identifiers: bool = False,
+        include_tags: bool = False,
+        include_source: bool = True,
+        include_parking_site_group: bool = False,
+    ) -> list[LoaderOption]:
+        loader_options: list[LoaderOption] = []
+        if include_source:
+            loader_options.append(joinedload(ParkingSite.source))
+        if include_restrictions:
+            loader_options.append(selectinload(ParkingSite.restrictions))
+        if include_external_identifiers:
+            loader_options.append(selectinload(ParkingSite.external_identifiers))
+        if include_tags:
+            loader_options.append(selectinload(ParkingSite.tags))
+        if include_parking_site_group:
+            loader_options.append(joinedload(ParkingSite.parking_site_group))
+
+        return loader_options

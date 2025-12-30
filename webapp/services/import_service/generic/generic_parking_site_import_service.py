@@ -96,7 +96,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         existing_parking_site_ids: list[int],
     ) -> ParkingSite:
         try:
-            parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
+            parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_original_uid(
                 source_id=source.id,
                 original_uid=parking_site_input.uid,
             )
@@ -208,7 +208,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         self.source_repository.save_source(source)
 
     def _save_realtime_parking_site_input(self, source: Source, realtime_parking_site_input: RealtimeParkingSiteInput):
-        parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
+        parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_original_uid(
             source_id=source.id,
             original_uid=realtime_parking_site_input.uid,
             include_restrictions=True,

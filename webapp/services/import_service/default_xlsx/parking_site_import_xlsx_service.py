@@ -134,7 +134,7 @@ class ParkingSiteXlsxImportService(BaseService):
                 continue
 
             try:
-                parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
+                parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_original_uid(
                     source_id=source.id,
                     original_uid=parking_site_input.original_uid,
                 )

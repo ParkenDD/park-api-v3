@@ -22,6 +22,7 @@ from webapp.admin_rest_api.parking_sites.parking_site_validators import (
     GetDuplicatesInput,
     LegacyCombinedParkingSiteInput,
 )
+from webapp.common.rest.exceptions import UnauthorizedException
 from webapp.models import ParkingSite
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.services.import_service.generic import GenericParkingSiteImportService
@@ -55,10 +56,56 @@ class ParkingSiteHandler(AdminApiBaseHandler):
         self.generic_parking_site_import_service = generic_parking_site_import_service
 
     def get_parking_sites(self, search_query: ParkingSiteGeoSearchInput) -> PaginatedResult[ParkingSite]:
-        return self.parking_site_repository.fetch_parking_sites(search_query=search_query)
+        return self.parking_site_repository.fetch_parking_sites(
+            search_query=search_query,
+            include_source=True,
+            include_restrictions=True,
+            include_external_identifiers=True,
+            include_tags=True,
+            include_parking_site_group=True,
+        )
 
-    def get_parking_site(self, parking_site_id: int) -> ParkingSite:
-        return self.parking_site_repository.fetch_parking_site_by_id(parking_site_id)
+    def get_parking_site_by_id(self, parking_site_id: int) -> dict:
+        parking_site = self.parking_site_repository.fetch_parking_site_by_id(
+            parking_site_id,
+            include_restrictions=True,
+            include_external_identifiers=True,
+            include_tags=True,
+            include_parking_site_group=True,
+            include_source=True,
+        )
+
+        return self._map_parking_site(parking_site)
+
+    def get_parking_site_by_uid(self, source_uid: str, parking_site_uid: str) -> dict:
+        parking_site = self.parking_site_repository.fetch_parking_site_by_source_uid_and_original_uid(
+            source_uid=source_uid,
+            original_uid=parking_site_uid,
+            include_restrictions=True,
+            include_external_identifiers=True,
+            include_tags=True,
+            include_parking_site_group=True,
+            include_source=True,
+        )
+
+        return self._map_parking_site(parking_site)
+
+    def delete_parking_site_by_id(self, source_uid: str, parking_site_id: int):
+        parking_site = self.parking_site_repository.fetch_parking_site_by_id(parking_site_id, include_source=True)
+
+        if parking_site.source.uid != source_uid:
+            raise UnauthorizedException(message='Invalid credentials for this ParkingSite')
+
+        self.parking_site_repository.delete_parking_site(parking_site)
+
+    def delete_parking_site_by_uid(self, source_uid: str, parking_site_uid: str):
+        parking_site = self.parking_site_repository.fetch_parking_site_by_source_uid_and_original_uid(
+            source_uid=source_uid,
+            original_uid=parking_site_uid,
+            include_source=True,
+        )
+
+        self.parking_site_repository.delete_parking_site(parking_site)
 
     def upsert_parking_site_list(self, source_uid: str, parking_site_dicts: list[dict]) -> ParkingSiteResponse:
         response = ParkingSiteResponse()
