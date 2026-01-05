@@ -10,9 +10,84 @@ from unittest.mock import ANY
 from flask.testing import FlaskClient
 
 from tests.integration.admin_rest_api.helpers import load_admin_client_request_input
+from webapp.common.sqlalchemy import SQLAlchemy
+from webapp.models import ParkingSpot
+
+
+def test_get_parking_spot_by_id(
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    inserted_parking_spot: ParkingSpot,
+) -> None:
+    result = admin_api_test_client.get(
+        '/api/admin/v1/parking-spots/1',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-spot'),
+    )
+    assert result.status_code == HTTPStatus.OK
+    assert result.json == EXISTING_PARKING_SPOT_RESPONSE
+
+
+def test_get_parking_spot_by_uid(
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    inserted_parking_spot: ParkingSpot,
+) -> None:
+    result = admin_api_test_client.get(
+        '/api/admin/v1/parking-spots/by-uid/demo-parking-spot',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-spot'),
+    )
+
+    assert result.status_code == HTTPStatus.OK
+    assert result.json == EXISTING_PARKING_SPOT_RESPONSE
+
+
+def test_delete_parking_spot_by_id(
+    db: SQLAlchemy,
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    inserted_parking_spot: ParkingSpot,
+) -> None:
+    result = admin_api_test_client.delete(
+        '/api/admin/v1/parking-spots/1',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-spot'),
+    )
+    assert result.status_code == HTTPStatus.NO_CONTENT
+    assert db.session.get(ParkingSpot, 1) is None
+
+
+def test_delete_parking_spot_by_uid(
+    db: SQLAlchemy,
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    inserted_parking_spot: ParkingSpot,
+) -> None:
+    result = admin_api_test_client.delete(
+        '/api/admin/v1/parking-spots/by-uid/demo-parking-spot',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-spot'),
+    )
+    assert result.status_code == HTTPStatus.NO_CONTENT
+    assert db.session.get(ParkingSpot, 1) is None
 
 
 def test_create_parking_spot(
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+) -> None:
+    result = admin_api_test_client.post(
+        '/api/admin/v1/parking-spots/upsert-item',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-spot'),
+    )
+
+    assert result.status_code == HTTPStatus.CREATED
+    assert result.json == PARKING_SPOT_RESPONSE
+
+
+def test_create_parking_spot_legacy_endpoint(
     rest_enabled_source: None,
     admin_api_test_client: FlaskClient,
 ) -> None:
@@ -31,7 +106,7 @@ def test_update_parking_spot(
     admin_api_test_client: FlaskClient,
 ) -> None:
     admin_api_test_client.post(
-        '/api/admin/v1/parking-spots',
+        '/api/admin/v1/parking-spots/upsert-item',
         auth=('source', 'test'),
         json=load_admin_client_request_input('parking-spot'),
     )
@@ -55,7 +130,7 @@ def test_create_parking_spot_with_relations(
     admin_api_test_client: FlaskClient,
 ) -> None:
     result = admin_api_test_client.post(
-        '/api/admin/v1/parking-spots',
+        '/api/admin/v1/parking-spots/upsert-item',
         auth=('source', 'test'),
         json=load_admin_client_request_input('parking-spot-with-relations'),
     )
@@ -69,13 +144,34 @@ def test_create_parking_spot_with_restricted_to(
     admin_api_test_client: FlaskClient,
 ) -> None:
     result = admin_api_test_client.post(
-        '/api/admin/v1/parking-spots',
+        '/api/admin/v1/parking-spots/upsert-item',
         auth=('source', 'test'),
         json=load_admin_client_request_input('parking-spot-with-restricted-to'),
     )
 
     assert result.status_code == HTTPStatus.CREATED
     assert result.json == PARKING_SPOT_WITH_RESTRICTED_TO_RESPONSE
+
+
+EXISTING_PARKING_SPOT_RESPONSE = {
+    'source_id': 2,
+    'original_uid': 'demo-parking-spot',
+    'name': 'Test',
+    'lat': '50.0000000',
+    'lon': '10.0000000',
+    'geojson': {
+        'type': 'Polygon',
+        'coordinates': [[[50.1, 10.1], [50.2, 10.1], [50.2, 10.2], [50.1, 10.2], [50.1, 10.1]]],
+    },
+    'purpose': 'CAR',
+    'realtime_status': 'AVAILABLE',
+    'static_data_updated_at': ANY,
+    'realtime_data_updated_at': ANY,
+    'has_realtime_data': True,
+    'id': 1,
+    'created_at': ANY,
+    'modified_at': ANY,
+}
 
 
 PARKING_SPOT_RESPONSE = {

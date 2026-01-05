@@ -91,7 +91,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
         existing_parking_spot_ids: list[int] | None = None,
     ) -> tuple[ParkingSpot, bool]:
         try:
-            parking_spot = self.parking_spot_repository.fetch_parking_spot_by_source_id_and_external_uid(
+            parking_spot = self.parking_spot_repository.fetch_parking_spot_by_source_id_and_original_uid(
                 source_id=source.id,
                 original_uid=parking_spot_input.uid,
             )
@@ -120,7 +120,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
 
         if parking_spot_input.parking_site_uid:
             try:
-                parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_external_uid(
+                parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_original_uid(
                     source_id=source.id,
                     original_uid=parking_spot_input.parking_site_uid,
                 )
@@ -185,7 +185,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
         )
 
     def save_realtime_parking_spot_input(self, source: Source, realtime_parking_spot_input: RealtimeParkingSpotInput):
-        parking_spot = self.parking_spot_repository.fetch_parking_spot_by_source_id_and_external_uid(
+        parking_spot = self.parking_spot_repository.fetch_parking_spot_by_source_id_and_original_uid(
             source_id=source.id,
             original_uid=realtime_parking_spot_input.uid,
         )

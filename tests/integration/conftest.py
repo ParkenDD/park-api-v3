@@ -47,14 +47,7 @@ def flask_app() -> Generator[App, None, None]:
 
 @pytest.fixture
 def db(flask_app: App) -> Generator[SQLAlchemy, None, None]:
-    """
-    Yields the database as a session-scoped fixture without resetting any content.
-
-    If you use this in a test, make sure to manually reset the affected tables
-    at the beginning and end of the test, e.g. by calling empty_tables().
-    """
-    with flask_app.app_context():
-        yield flask_sqlalchemy
+    yield flask_sqlalchemy
 
 
 @pytest.fixture

@@ -6,7 +6,17 @@ Use of this source code is governed by an MIT-style license that can be found in
 from http import HTTPStatus
 
 from flask import jsonify
-from flask_openapi.decorator import EmptyResponse, ErrorResponse, Response, ResponseData, SchemaReference, document
+from flask_openapi.decorator import (
+    EmptyResponse,
+    ErrorResponse,
+    ExampleReference,
+    Parameter,
+    Response,
+    ResponseData,
+    SchemaReference,
+    document,
+)
+from flask_openapi.schema import IntegerField, StringField
 from validataclass.validators import DataclassValidator
 
 from webapp.admin_rest_api import AdminApiBaseBlueprint, AdminApiBaseMethodView
@@ -51,67 +61,66 @@ class ParkingSitesBlueprint(AdminApiBaseBlueprint):
             generic_parking_site_import_service=dependencies.get_generic_parking_site_import_service(),
         )
 
+        method_view_dependencies = {
+            **self.get_base_method_view_dependencies(),
+            'server_auth_helper': dependencies.get_server_auth_helper(),
+            'parking_site_handler': self.parking_site_handler,
+        }
+
         self.add_url_rule(
             '',
             view_func=ParkingSitesMethodView.as_view(
                 'admin-parking-sites',
-                **self.get_base_method_view_dependencies(),
-                server_auth_helper=dependencies.get_server_auth_helper(),
-                parking_site_handler=self.parking_site_handler,
+                **method_view_dependencies,
             ),
         )
         self.add_url_rule(
             '/upsert-list',
             view_func=ParkingSiteUpsertListMethodView.as_view(
                 'admin-upsert-parking-site-list',
-                **self.get_base_method_view_dependencies(),
-                server_auth_helper=dependencies.get_server_auth_helper(),
-                parking_site_handler=self.parking_site_handler,
+                **method_view_dependencies,
             ),
         )
         self.add_url_rule(
             '/upsert-item',
             view_func=ParkingSiteUpsertItemMethodView.as_view(
                 'admin-upsert-parking-site-item',
-                **self.get_base_method_view_dependencies(),
-                server_auth_helper=dependencies.get_server_auth_helper(),
-                parking_site_handler=self.parking_site_handler,
+                **method_view_dependencies,
             ),
         )
         self.add_url_rule(
             '/<int:parking_site_id>',
             view_func=ParkingSiteMethodView.as_view(
                 'admin-parking-site',
-                **self.get_base_method_view_dependencies(),
-                server_auth_helper=dependencies.get_server_auth_helper(),
-                parking_site_handler=self.parking_site_handler,
+                **method_view_dependencies,
+            ),
+        )
+        self.add_url_rule(
+            '/by-uid/<parking_site_uid>',
+            view_func=ParkingSiteByUidMethodView.as_view(
+                'admin-parking-site-by-uid',
+                **method_view_dependencies,
             ),
         )
         self.add_url_rule(
             '/duplicates/generate',
             view_func=ParkingSiteDuplicatesGenerateMethodView.as_view(
                 'admin-parking-site-duplicates-generate',
-                **self.get_base_method_view_dependencies(),
-                server_auth_helper=dependencies.get_server_auth_helper(),
-                parking_site_handler=self.parking_site_handler,
+                **method_view_dependencies,
             ),
         )
         self.add_url_rule(
             '/duplicates/apply',
             view_func=ParkingSiteDuplicatesApplyMethodView.as_view(
                 'admin-parking-site-duplicates-apply',
-                **self.get_base_method_view_dependencies(),
-                server_auth_helper=dependencies.get_server_auth_helper(),
-                parking_site_handler=self.parking_site_handler,
+                **method_view_dependencies,
             ),
         )
         self.add_url_rule(
             '/duplicates/reset',
             view_func=ParkingSiteDuplicatesResetMethodView.as_view(
                 'admin-parking-site-duplicates-reset',
-                **self.get_base_method_view_dependencies(),
-                server_auth_helper=dependencies.get_server_auth_helper(),
-                parking_site_handler=self.parking_site_handler,
+                **method_view_dependencies,
             ),
         )
 
@@ -140,8 +149,97 @@ class ParkingSitesMethodView(ParkingSiteBaseMethodView):
 
 
 class ParkingSiteMethodView(ParkingSiteBaseMethodView):
+    @document(
+        path=[Parameter('parking_site_id', schema=IntegerField(minimum=1))],
+        response=[
+            Response(
+                ResponseData(schema=SchemaReference('ParkingSite'), example=ExampleReference('ParkingSite')),
+                http_status=HTTPStatus.OK,
+            ),
+            ErrorResponse(
+                error_codes=[
+                    HTTPStatus.UNAUTHORIZED,
+                    HTTPStatus.FORBIDDEN,
+                    HTTPStatus.NOT_FOUND,
+                ],
+            ),
+        ],
+        components=[
+            source_component,
+            parking_site_component,
+            parking_site_restriction_component,
+            parking_site_group_component,
+        ],
+    )
     def get(self, parking_site_id: int):
-        self.parking_site_handler.get_parking_site(parking_site_id)
+        return self.parking_site_handler.get_parking_site_by_id(parking_site_id)
+
+    @document(
+        path=[Parameter('parking_site_id', schema=IntegerField(minimum=1))],
+        response=[
+            EmptyResponse(),
+            ErrorResponse(
+                error_codes=[
+                    HTTPStatus.UNAUTHORIZED,
+                    HTTPStatus.FORBIDDEN,
+                    HTTPStatus.NOT_FOUND,
+                ],
+            ),
+        ],
+    )
+    def delete(self, parking_site_id: int):
+        self.parking_site_handler.delete_parking_site_by_id(
+            source_uid=self.server_auth_helper.get_current_user().username,
+            parking_site_id=parking_site_id,
+        )
+        return empty_json_response(), HTTPStatus.NO_CONTENT
+
+
+class ParkingSiteByUidMethodView(ParkingSiteBaseMethodView):
+    @document(
+        path=[Parameter('parking_site_uid', schema=StringField(minLength=1))],
+        response=[
+            Response(ResponseData(schema=SchemaReference('ParkingSite'), example=ExampleReference('ParkingSite'))),
+            ErrorResponse(
+                error_codes=[
+                    HTTPStatus.UNAUTHORIZED,
+                    HTTPStatus.FORBIDDEN,
+                    HTTPStatus.NOT_FOUND,
+                ],
+            ),
+        ],
+        components=[
+            source_component,
+            parking_site_component,
+            parking_site_restriction_component,
+            parking_site_group_component,
+        ],
+    )
+    def get(self, parking_site_uid: str):
+        return self.parking_site_handler.get_parking_site_by_uid(
+            source_uid=self.server_auth_helper.get_current_user().username,
+            parking_site_uid=parking_site_uid,
+        )
+
+    @document(
+        path=[Parameter('parking_site_uid', schema=StringField(minLength=1))],
+        response=[
+            EmptyResponse(),
+            ErrorResponse(
+                error_codes=[
+                    HTTPStatus.UNAUTHORIZED,
+                    HTTPStatus.FORBIDDEN,
+                    HTTPStatus.NOT_FOUND,
+                ],
+            ),
+        ],
+    )
+    def delete(self, parking_site_uid: str):
+        self.parking_site_handler.delete_parking_site_by_uid(
+            source_uid=self.server_auth_helper.get_current_user().username,
+            parking_site_uid=parking_site_uid,
+        )
+        return empty_json_response(), HTTPStatus.NO_CONTENT
 
 
 class ParkingSiteUpsertListMethodView(ParkingSiteBaseMethodView):
@@ -184,7 +282,7 @@ class ParkingSiteUpsertItemMethodView(ParkingSiteBaseMethodView):
     @document(
         request=parking_site_item_request,
         response=[
-            Response(ResponseData(SchemaReference('ParkingSite'))),
+            Response(ResponseData(schema=SchemaReference('ParkingSite'), example=ExampleReference('ParkingSite'))),
             ErrorResponse(
                 error_codes=[
                     HTTPStatus.BAD_REQUEST,

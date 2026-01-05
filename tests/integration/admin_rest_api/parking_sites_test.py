@@ -21,6 +21,68 @@ from webapp.common.sqlalchemy import SQLAlchemy
 from webapp.models import ParkingSite
 
 
+def test_get_parking_site_by_id(
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    inserted_parking_site: ParkingSite,
+) -> None:
+    result = admin_api_test_client.get(
+        '/api/admin/v1/parking-sites/1',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-site-item'),
+    )
+
+    assert result.status_code == HTTPStatus.OK
+    assert result.json == EXISTING_PARKING_SITE_RESPONSE
+
+
+def test_get_parking_site_by_uid(
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    inserted_parking_site: ParkingSite,
+) -> None:
+    result = admin_api_test_client.get(
+        '/api/admin/v1/parking-sites/by-uid/demo-parking-site',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-site-item'),
+    )
+
+    assert result.status_code == HTTPStatus.OK
+    assert result.json == EXISTING_PARKING_SITE_RESPONSE
+
+
+def test_delete_get_parking_site_by_id(
+    db: SQLAlchemy,
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    inserted_parking_site: ParkingSite,
+) -> None:
+    result = admin_api_test_client.delete(
+        '/api/admin/v1/parking-sites/1',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-site-item'),
+    )
+
+    assert result.status_code == HTTPStatus.NO_CONTENT
+    assert db.session.get(ParkingSite, 1) is None
+
+
+def test_delete_get_parking_site_by_uid(
+    db: SQLAlchemy,
+    rest_enabled_source: None,
+    admin_api_test_client: FlaskClient,
+    inserted_parking_site: ParkingSite,
+) -> None:
+    result = admin_api_test_client.delete(
+        '/api/admin/v1/parking-sites/by-uid/demo-parking-site',
+        auth=('source', 'test'),
+        json=load_admin_client_request_input('parking-site-item'),
+    )
+
+    assert result.status_code == HTTPStatus.NO_CONTENT
+    assert db.session.get(ParkingSite, 1) is None
+
+
 def test_upsert_parking_site_list(
     rest_enabled_source: None,
     admin_api_test_client: FlaskClient,
@@ -269,6 +331,28 @@ def test_filter_reset_duplicates_source_uids(admin_api_test_client: FlaskClient,
 
     assert result.status_code == 204
     assert parking_site_2.duplicate_of_parking_site_id == 1
+
+
+EXISTING_PARKING_SITE_RESPONSE = {
+    'source_id': 2,
+    'original_uid': 'demo-parking-site',
+    'name': 'Demo Parking Site',
+    'operator_name': 'Demo Operator',
+    'address': 'Demo Address, Demo City',
+    'description': 'Demo Description',
+    'type': 'CAR_PARK',
+    'purpose': 'CAR',
+    'has_fee': False,
+    'has_realtime_data': False,
+    'static_data_updated_at': ANY,
+    'lat': '50.0000000',
+    'lon': '10.0000000',
+    'capacity': 100,
+    'opening_hours': 'Mo-Su 08:00-18:00',
+    'id': 1,
+    'created_at': ANY,
+    'modified_at': ANY,
+}
 
 
 PARKING_SITE_RESPONSE_ITEM = {
