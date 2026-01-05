@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.41.0
+
+Released 2026-01-05
+
+### Features
+
+* [ParkAPI Sources: Stadtwerke Heilbronn: GOLDBECK Parking Services](https://github.com/ParkenDD/parkapi-sources-v3/pull/315)
+* [ParkAPI Sources: Karlsruhe Disabled: Realtime Extension](https://github.com/ParkenDD/parkapi-sources-v3/pull/330)
+* [ParkAPI Sources: Parking Audience Enum update, now supporting CARGOBIKE](https://github.com/ParkenDD/parkapi-sources-v3/pull/332)
+* [GET and DELETE ParkingSite / ParkingSpot](https://github.com/ParkenDD/park-api-v3/pull/372)
+
+
 ## 0.40.1
 
 Released 2025-12-19
