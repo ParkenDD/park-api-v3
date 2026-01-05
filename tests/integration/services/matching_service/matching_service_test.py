@@ -31,6 +31,26 @@ class MatchingServiceTest:
         assert len(duplicates) == 4
 
     @staticmethod
+    def test_generate_duplicates_existing_duplicates(
+        db: SQLAlchemy,
+        multi_source_parking_site_test_data: None,
+        matching_service: MatchingService,
+    ) -> None:
+        duplicate_site = db.session.get(ParkingSite, 3)
+        duplicate_site.duplicate_of_parking_site_id = 4
+        db.session.add(duplicate_site)
+        db.session.commit()
+
+        duplicates = matching_service.generate_duplicates(
+            existing_matches=[],
+            match_radius=25000,
+        )
+        # Even if we already have duplicates, we expect two duplicates pairs, therefor four datasets
+        assert len(duplicates) == 4
+        # We expect the third duplicate to be the ignored one
+        assert duplicates[2].status == 'IGNORE'
+
+    @staticmethod
     def test_generate_duplicates_no_match(
         multi_source_parking_site_test_data: None,
         matching_service: MatchingService,
