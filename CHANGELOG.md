@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.41.1
+
+Released 2026-01-12
+
+### Fixes
+
+* [ParkAPI Sources: enable realtime at karlsruhe disabled](https://github.com/ParkenDD/parkapi-sources-v3/pull/334)
+
+
 ## 0.41.0
 
 Released 2026-01-05
