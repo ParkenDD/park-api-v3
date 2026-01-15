@@ -1,5 +1,14 @@
 # Changelog
 
+# 0.41.2
+
+Released 2026-01-15
+
+### Fixes
+
+* [ParkAPI Sources: fix karlsruhe tls](https://github.com/ParkenDD/parkapi-sources-v3/pull/336)
+
+
 ## 0.41.1
 
 Released 2026-01-12
