@@ -8,8 +8,8 @@ from datetime import datetime
 from typing import Optional
 
 from parkapi_sources.models.enums import PurposeType
-from sqlalchemy import func, select
-from sqlalchemy.orm import Query, joinedload, selectinload
+from sqlalchemy import func, or_, select
+from sqlalchemy.orm import Query, aliased, joinedload, selectinload
 from sqlalchemy.orm.interfaces import LoaderOption
 from validataclass_search_queries.filters import BoundSearchFilter
 from validataclass_search_queries.pagination import PaginatedResult
@@ -225,6 +225,29 @@ class ParkingSiteRepository(BaseRepository):
                     lon=float(item.lon),
                 ),
             )
+        return result
+
+    def fetch_parking_sites_duplicates(self, source_ids: list[int] | None = None) -> list[tuple[int, int]]:
+        query = self.session.query(ParkingSite.id, ParkingSite.duplicate_of_parking_site_id)
+
+        query = query.filter(ParkingSite.duplicate_of_parking_site_id.isnot(None))
+
+        if source_ids is not None:
+            duplicate_parking_site = aliased(ParkingSite)
+            query = query.join(
+                duplicate_parking_site, duplicate_parking_site.id == ParkingSite.duplicate_of_parking_site_id
+            )
+            query = query.filter(
+                or_(
+                    ParkingSite.source_id.in_(source_ids),
+                    duplicate_parking_site.source_id.in_(source_ids),
+                )
+            )
+
+        result: list[tuple[int, int]] = []
+        for item in query.all():
+            result.append((item.id, item.duplicate_of_parking_site_id))
+
         return result
 
     @staticmethod

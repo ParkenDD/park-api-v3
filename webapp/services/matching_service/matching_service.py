@@ -65,7 +65,10 @@ class MatchingService(BaseService):
         if match_radius is None:
             match_radius: int = self.config_helper.get('MATCH_RADIUS', 100)
 
+        existing_matches_in_db = self.parking_site_repository.fetch_parking_sites_duplicates(source_ids)
+
         parking_site_locations = self.parking_site_repository.fetch_parking_site_locations()
+
         for i in range(len(parking_site_locations)):
             for j in range(i + 1, len(parking_site_locations)):
                 # If source_ids is set, we just want matches for these, so we continue for any other source id
@@ -88,6 +91,12 @@ class MatchingService(BaseService):
                 if (parking_site_locations[i].id, parking_site_locations[j].id) in existing_matches:
                     continue
 
+                # Don't add combinations which are already stored in DB
+                if (parking_site_locations[j].id, parking_site_locations[i].id) in existing_matches_in_db:
+                    continue
+                if (parking_site_locations[i].id, parking_site_locations[j].id) in existing_matches_in_db:
+                    continue
+
                 # If distance is over match radius: ignore possible match
                 distance = self.distance(parking_site_locations[i], parking_site_locations[j])
                 if math.isnan(distance) or distance > match_radius:
@@ -95,14 +104,49 @@ class MatchingService(BaseService):
                 matches.append((parking_site_locations[i], parking_site_locations[j], distance))
 
         duplicates: list[DuplicatedParkingSite] = []
-        parking_site_ids: list[int] = list(set([match[0].id for match in matches] + [match[1].id for match in matches]))
+        parking_site_ids: list[int] = [match[0].id for match in matches] + [match[1].id for match in matches]
+        parking_site_ids += [item[0] for item in existing_matches_in_db]
+        parking_site_ids += [item[1] for item in existing_matches_in_db]
+
+        parking_site_ids = list(set(parking_site_ids))
         parking_sites = self.parking_site_repository.fetch_parking_site_by_ids(parking_site_ids)
         parking_sites_by_id: dict[int, ParkingSite] = {parking_site.id: parking_site for parking_site in parking_sites}
 
         for match in matches:
-            duplicates.append(self.parking_site_to_duplicate(parking_sites_by_id[match[0].id], match[1].id, match[2]))
-            duplicates.append(self.parking_site_to_duplicate(parking_sites_by_id[match[1].id], match[0].id, match[2]))
-
+            duplicates.append(
+                self.parking_site_to_duplicate(
+                    parking_sites_by_id[match[0].id],
+                    match[1].id,
+                    match[2],
+                ),
+            )
+            duplicates.append(
+                self.parking_site_to_duplicate(
+                    parking_sites_by_id[match[1].id],
+                    match[0].id,
+                    match[2],
+                ),
+            )
+        for existing_match_in_db in existing_matches_in_db:
+            distance = self.distance(
+                parking_sites_by_id[existing_match_in_db[0]],
+                parking_sites_by_id[existing_match_in_db[1]],
+            )
+            duplicates.append(
+                self.parking_site_to_duplicate(
+                    parking_sites_by_id[existing_match_in_db[0]],
+                    existing_match_in_db[1],
+                    distance,
+                    status='IGNORE',
+                ),
+            )
+            duplicates.append(
+                self.parking_site_to_duplicate(
+                    parking_sites_by_id[existing_match_in_db[1]],
+                    existing_match_in_db[0],
+                    distance,
+                ),
+            )
         return duplicates
 
     def apply_duplicates(self, keep: list[list[int]], ignore: list[list[int]]):
@@ -138,11 +182,12 @@ class MatchingService(BaseService):
         parking_site: ParkingSite,
         duplicate_id: int,
         distance: float,
+        status: str = 'KEEP',
     ) -> DuplicatedParkingSite:
         return DuplicatedParkingSite(
             id=parking_site.id,
             duplicate_id=duplicate_id,
-            status='KEEP',
+            status=status,
             source_id=parking_site.source_id,
             source_uid=parking_site.source.uid,
             lat=parking_site.lat,
@@ -160,7 +205,9 @@ class MatchingService(BaseService):
             opening_hours=parking_site.opening_hours,
         )
 
-    def distance(self, location_1: ParkingSiteLocation, location_2: ParkingSiteLocation) -> float:
+    def distance(
+        self, location_1: ParkingSiteLocation | ParkingSite, location_2: ParkingSiteLocation | ParkingSite
+    ) -> float:
         _, _, distance = self.geo_distance_service.inv(
             float(location_1.lat),
             float(location_1.lon),
