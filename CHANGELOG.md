@@ -1,5 +1,16 @@
 # Changelog
 
+# 0.41.3
+
+Released 2026-01-17
+
+### Fixes
+
+* [ParkAPI Sources: add bfrk filter and add tests](https://github.com/ParkenDD/parkapi-sources-v3/issues/322)
+* [ParkAPI Sources: set karlsruhe disabled attribute properly](https://github.com/ParkenDD/parkapi-sources-v3/pull/338)
+* [ParkAPI Sources: better-realtime_data_updated_at-logic-at-combined-inputs](https://github.com/ParkenDD/parkapi-sources-v3/pull/337)
+
+
 # 0.41.2
 
 Released 2026-01-15
