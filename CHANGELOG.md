@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.43.0
+
+Released 2026-02-10
+
+### Features
+
+* [ParkAPI Sources: Bielefeld](https://github.com/ParkenDD/parkapi-sources-v3/pull/347)
+* [ParkAPI Sources: Jena](https://github.com/ParkenDD/parkapi-sources-v3/pull/344)
+* [ParkAPI Sources: Basel](https://github.com/ParkenDD/parkapi-sources-v3/pull/86)
+
+
 ## 0.42.0
 
 Released 2026-01-18
