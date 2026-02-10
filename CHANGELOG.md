@@ -11,6 +11,12 @@ Released 2026-02-10
 * [ParkAPI Sources: Basel](https://github.com/ParkenDD/parkapi-sources-v3/pull/86)
 
 
+### Fixes
+
+* [ParkAPI Sources: herrenberg_bike: update to the new mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/340)
+* [ParkAPI Sources: heilbronn_goldbeck: add static data patching possibility](https://github.com/ParkenDD/parkapi-sources-v3/pull/345)
+
+
 ## 0.42.0
 
 Released 2026-01-18
