@@ -1,14 +1,21 @@
 # Changelog
 
+## 0.43.2
+
+Released 2026-03-16
+
+* [ParkAPI Sources: herrenberg bike: remove empty restrictions](https://github.com/ParkenDD/parkapi-sources-v3/pull/367)
+
+
 ## 0.43.1
 
 Released 2026-03-16
 
 ### Fixes
 
-* [Add support for static patches to xlsx push converters and others](https://github.com/ParkenDD/parkapi-sources-v3/pull/362)
-* [refactor bfrk car source](https://github.com/ParkenDD/parkapi-sources-v3/pull/366)
-* [herrenberg bike: update url and fix AttributeError](https://github.com/ParkenDD/parkapi-sources-v3/pull/355)
+* [ParkAPI Sources: Add support for static patches to xlsx push converters and others](https://github.com/ParkenDD/parkapi-sources-v3/pull/362)
+* [ParkAPI Sources: refactor bfrk car source](https://github.com/ParkenDD/parkapi-sources-v3/pull/366)
+* [ParkAPI Sources: herrenberg bike: update url and fix AttributeError](https://github.com/ParkenDD/parkapi-sources-v3/pull/355)
 
 
 ### Maintenance
