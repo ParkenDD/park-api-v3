@@ -96,6 +96,19 @@ class ParkingSite(BaseModel):
         'ParkingSiteGroup',
         back_populates='parking_sites',
     )
+    # When the referenced parking site is deleted, SQLAlchemy's default cascade nulls out
+    # duplicate_of_parking_site_id on the dependents instead of failing the FK constraint.
+    duplicate_of_parking_site: Mapped['ParkingSite | None'] = relationship(
+        'ParkingSite',
+        back_populates='duplicates',
+        remote_side='ParkingSite.id',
+        foreign_keys='ParkingSite.duplicate_of_parking_site_id',
+    )
+    duplicates: Mapped[list['ParkingSite']] = relationship(
+        'ParkingSite',
+        back_populates='duplicate_of_parking_site',
+        foreign_keys='ParkingSite.duplicate_of_parking_site_id',
+    )
 
     source_id: Mapped[int] = mapped_column(BigInteger, ForeignKey('source.id'), nullable=False)
     parking_site_group_id: Mapped[int | None] = mapped_column(
