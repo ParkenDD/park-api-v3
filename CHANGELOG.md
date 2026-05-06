@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.44.1
+
+Released 2026-05-06
+
+### Fixes
+
+* [fix duplicate reference error](https://github.com/ParkenDD/park-api-v3/pull/374)
+
+
 ## 0.44.0
 
 Released 2026-05-04
