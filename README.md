@@ -77,6 +77,47 @@ the realtime frequency using `REALTIME_IMPORT_PULL_FREQUENCY`, which should be i
 `REALTIME_OUTDATED_AFTER_MINUTES`, which will flag sources at outdated in our Prometheus endpoint after the defined
 amount of time. It defaults to 30 minutes.
 
+### Source status: static and realtime
+
+Every source tracks two independent import states, `static_status` and `realtime_status`. Both are exposed in the
+public source data and used by the Prometheus endpoint for monitoring. Each can take one of the following values:
+
+- `PROVISIONED`: the source has been created (e.g. by `flask source init-converters`) but has not yet had a successful
+  import. This is the initial state.
+- `ACTIVE`: the last import succeeded.
+- `FAILED`: the last import failed (for example because the upstream server was unreachable or returned invalid data).
+- `DISABLED`: this kind of import does not apply to the source. In practice this is used for `realtime_status` of
+  sources which only provide static data.
+
+Static and realtime imports run on different schedules: static data is pulled nightly, realtime data every few minutes
+(see above).
+
+#### Realtime updates are blocked while static data is not active
+
+Realtime data only makes sense on top of an up-to-date set of parking sites/spots. For that reason, **a realtime import
+is skipped as long as the source's `static_status` is not `ACTIVE`**. Concretely, if a static import fails, the
+`static_status` is set to `FAILED`, and every following realtime import for that source returns early without doing
+anything — the `realtime_status` is left untouched, so it keeps its previous value.
+
+Because static data is only pulled once per night by default, a failed static import means realtime updates stay blocked
+until the next successful static pull. The realtime data will silently go stale (and eventually be flagged as outdated
+via `REALTIME_OUTDATED_AFTER_MINUTES` in the Prometheus endpoint) even though the realtime source itself might be fine.
+
+#### Recovering with `flask source pull`
+
+To recover a source without waiting for the next nightly run, trigger an immediate pull for the affected source. The
+`flask source pull` command first runs the static import and then, on success, the realtime import in one go:
+
+```bash
+make docker-run CMD="flask source pull my_source_uid"
+```
+
+A successful static import sets `static_status` back to `ACTIVE`, which immediately unblocks realtime updates, and the
+realtime import that follows in the same command brings the realtime data up to date again. If the static import keeps
+failing, the underlying source problem has to be fixed first — see [Debugging data sources](#debugging-data-sources)
+for how to inspect the actual upstream requests and responses. See
+[Flask command line interface](#flask-command-line-interface) for more details on the `flask source` commands.
+
 
 ## Push services
 
@@ -213,6 +254,83 @@ It accepts following parameters:
 - `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For
   example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
 - `-p` for a purpose to filter for.
+
+
+## Flask command line interface
+
+Besides the standalone helper scripts in `scripts/` (see above), ParkAPI ships a set of CLI commands which run
+inside the application context. They are implemented as [Flask CLI](https://flask.palletsprojects.com/en/stable/cli/)
+commands and registered in `webapp/cli/`. As they need a working application context (database, config, RabbitMQ), they
+are usually run inside the `flask` docker container.
+
+The application entrypoint is configured via `FLASK_APP="webapp:launch()"` (see `.flaskenv`), so you can invoke any
+command with `flask <command>`. Inside the docker dev environment, the most convenient way is the `docker-run` makefile
+target, which runs an arbitrary command in the `flask` container:
+
+```bash
+make docker-run CMD="flask <command>"
+```
+
+Alternatively, open a shell in the container with `make docker-shell` and run `flask <command>` directly.
+
+### Source commands
+
+The `source` command group bundles all data-source related commands. Run `flask source --help` for an overview.
+
+- `flask source init-converters`: creates or updates all sources configured in `PARK_API_CONVERTER` in the database
+  (both static and realtime metadata). This is the same command the `flask-init-converters` init container runs on
+  startup, so a fresh dev environment already has its sources set up.
+
+  ```bash
+  make docker-run CMD="flask source init-converters"
+  ```
+
+- `flask source pull SOURCE`: triggers an immediate pull import (static and realtime) for a single generic/pull source,
+  identified by its `source_uid`. Useful for testing a converter without waiting for the scheduled Celery task.
+
+  ```bash
+  make docker-run CMD="flask source pull my_source_uid"
+  ```
+
+- `flask source xlsx-import SOURCE IMPORT_FILE_PATH`: imports parking sites for a source from a local XLSX file. The
+  file path is resolved inside the container, so make sure the file is available there (e.g. via the mounted project
+  directory).
+
+  ```bash
+  make docker-run CMD="flask source xlsx-import my_source_uid data/my-file.xlsx"
+  ```
+
+- `flask source delete SOURCE_UID`: deletes a source and **all** of its parking sites. This is irreversible, so use it
+  with care.
+
+  ```bash
+  make docker-run CMD="flask source delete my_source_uid"
+  ```
+
+### Built-in Flask commands
+
+A few commands come from Flask and its extensions and are wrapped by makefile targets for convenience:
+
+- `flask db upgrade` / `flask db downgrade` / `flask db migrate -m "..."`: database migrations provided by
+  [Flask-Migrate](https://flask-migrate.readthedocs.io/). Use `make apply-migrations`, `make downgrade-migrations` and
+  `make generate-migration MSG="..."` respectively.
+- `flask shell`: an interactive Python shell with the application context loaded. Use `make flask-shell`.
+
+
+## Application entrypoints
+
+The actual long-running processes are started via dedicated entrypoint scripts in the project root. In the docker dev
+environment they are wired up as container commands in `docker-compose.yml`, so you normally do not run them by hand:
+
+- `run_flask_dev.py`: starts the Flask development server (the `flask` container, reachable at
+  `http://localhost:5000`).
+- `run_celery_dev.py`: starts a Celery worker which processes background tasks like data pulls (the `worker`
+  container).
+- `run_celery_heartbeat_dev.py`: starts the Celery beat scheduler which regularly enqueues the periodic import tasks
+  (the `worker-heartbeat` container). Both worker and heartbeat are required for pull imports to run.
+
+For production deployments, the application is served as a WSGI app via `webapp:launch()` and the Celery worker/beat
+are started with the regular Celery CLI against `webapp.entry_point_celery:celery`.
 
 
 ## Configuration
