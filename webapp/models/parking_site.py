@@ -4,7 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import TYPE_CHECKING
 
@@ -209,6 +209,7 @@ class ParkingSite(BaseModel):
         include_external_identifiers: bool = False,
         include_tags: bool = False,
         include_group: bool = False,
+        unset_realtime_after_minutes: int | None = None,
     ) -> dict:
         if ignore is None:
             ignore = []
@@ -263,8 +264,23 @@ class ParkingSite(BaseModel):
                 ignore=['parking_site_id'],
             )
 
+        # Realtime data is considered outdated once realtime_data_updated_at is older than the configured
+        # threshold. In that case we behave as if there was no realtime data at all.
+        has_realtime_data = self.has_realtime_data
+        if (
+            has_realtime_data
+            and unset_realtime_after_minutes is not None
+            and (
+                self.realtime_data_updated_at is None
+                or self.realtime_data_updated_at
+                < datetime.now(tz=timezone.utc) - timedelta(minutes=unset_realtime_after_minutes)
+            )
+        ):
+            has_realtime_data = False
+            result['has_realtime_data'] = False
+
         # If we don't have realtime support, we don't need realtime data
-        if not self.has_realtime_data:
+        if not has_realtime_data:
             return filter_unset_value_and_none(
                 {key: value for key, value in result.items() if not key.startswith('realtime_')},
             )
