@@ -81,13 +81,13 @@ class ParkingSiteBaseMethodView(PublicApiBaseMethodView):
         super().__init__(**kwargs)
         self.parking_site_handler = parking_site_handler
 
-    @staticmethod
-    def _map_parking_site(parking_site: ParkingSite) -> dict:
+    def _map_parking_site(self, parking_site: ParkingSite) -> dict:
         return parking_site.to_dict(
             include_restrictions=True,
             include_external_identifiers=True,
             include_tags=True,
             include_group=True,
+            unset_realtime_after_minutes=self.config_helper.get('UNSET_REALTIME_AFTER_MINUTES', 15),
         )
 
 
