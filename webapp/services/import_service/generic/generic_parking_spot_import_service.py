@@ -3,10 +3,10 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import logging
 import traceback
 from datetime import datetime, timezone
 
+import structlog
 from parkapi_sources import ParkAPISources
 from parkapi_sources.exceptions import ImportParkingSpotException
 from parkapi_sources.models import RealtimeParkingSpotInput, StaticParkingSpotInput
@@ -23,7 +23,7 @@ from webapp.repositories.exceptions import ObjectNotFoundException
 
 from .generic_base_import_service import GenericBaseImportService
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class GenericParkingSpotImportService(GenericBaseImportService):
@@ -60,7 +60,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
             except Exception as e:
                 logger.warning(
                     f'Unhandled exception at dataset {static_parking_spot_input}: {e} {traceback.format_exc()}',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SPOT_HANDLING,
                 )
 
         # Delete remaining existing parking sites because they are not in the new dataset
@@ -81,7 +81,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
         logger.info(
             f'Successfully imported {len(static_parking_spot_inputs)} static parking spots from {source.uid}, '
             f'and ignored {len(static_parking_spot_errors)} datasets with errors.',
-            extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+            type=LogMessageType.STATIC_PARKING_SPOT_HANDLING,
         )
 
     def save_static_or_combined_parking_spot_input(
@@ -157,7 +157,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
             except Exception as e:
                 logger.warning(
                     f'Unhandled exception at dataset {realtime_parking_spot_input}: {e} {traceback.format_exc()}',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SPOT_HANDLING,
                 )
                 realtime_parking_spot_errors.append(
                     ImportParkingSpotException(
@@ -181,7 +181,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
         logger.info(
             f'Successfully imported {len(realtime_parking_spot_inputs)} realtime parking spots from {source.uid}, '
             f'and ignored {len(realtime_parking_spot_errors)} datasets with errors.',
-            extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+            type=LogMessageType.REALTIME_PARKING_SPOT_HANDLING,
         )
 
     def save_realtime_parking_spot_input(self, source: Source, realtime_parking_spot_input: RealtimeParkingSpotInput):

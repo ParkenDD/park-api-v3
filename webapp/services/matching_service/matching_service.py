@@ -3,12 +3,12 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import logging
 import math
 from dataclasses import asdict, dataclass
 from decimal import Decimal
 from typing import Optional
 
+import structlog
 from parkapi_sources.models.enums import ParkAndRideType, ParkingSiteType
 from pyproj import Geod
 
@@ -19,7 +19,7 @@ from webapp.repositories.parking_site_repository import ParkingSiteLocation
 from webapp.services.base_service import BaseService
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteBaseSearchInput
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 @dataclass
@@ -174,7 +174,7 @@ class MatchingService(BaseService):
 
         logger.info(
             f'Reset {len(parking_sites)} duplicates',
-            extra={'attributes': {'type': LogMessageType.DUPLICATE_HANDLING}},
+            type=LogMessageType.DUPLICATE_HANDLING,
         )
 
     def parking_site_to_duplicate(

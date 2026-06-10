@@ -3,15 +3,15 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import logging
 import traceback
 from typing import Callable, Optional, Type
 
+import structlog
 from sqlalchemy.orm import scoped_session
 
 from webapp.common.logging.models import LogMessageType
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class BaseErrorHandler:
@@ -79,5 +79,5 @@ class BaseErrorHandler:
 
         logger.error(
             f'{error}: {traceback.format_exc()}',
-            extra={'attributes': {'type': LogMessageType.EXCEPTION}},
+            type=LogMessageType.EXCEPTION,
         )
