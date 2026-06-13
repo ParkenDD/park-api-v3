@@ -9,6 +9,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 from parkapi_sources.models.enums import (
+    LinearParkingPosition,
     OpeningStatus,
     ParkAndRideType,
     ParkingSiteOrientation,
@@ -147,6 +148,9 @@ class ParkingSite(BaseModel):
     )
     side: Mapped[ParkingSiteSide | None] = mapped_column(SqlalchemyEnum(ParkingSiteSide), nullable=True)
     parking_type: Mapped[ParkingType | None] = mapped_column(SqlalchemyEnum(ParkingType), nullable=True)
+    linear_parking_position: Mapped[LinearParkingPosition | None] = mapped_column(
+        SqlalchemyEnum(LinearParkingPosition), nullable=True
+    )
 
     has_realtime_data: Mapped[bool | None] = mapped_column(Boolean(), nullable=False, default=False)
     static_data_updated_at: Mapped[datetime | None] = mapped_column(UtcDateTime(), nullable=True)

@@ -55,7 +55,7 @@ parking_site_item_request_schema = JsonSchema(
         'realtime_free_capacity_truck': IntegerField(minimum=0, required=False, nullable=True),
         'realtime_free_capacity_bus': IntegerField(minimum=0, required=False, nullable=True),
         'uid': StringField(maxLength=256, description='Unique Identifier.'),
-        'purpose': EnumField(enum=PurposeType),
+        'purpose': EnumField(enum=PurposeType, required=False, description='Defaults to CAR if not set.'),
         'photo_url': UriField(maxLength=4096, required=False, nullable=True, description='Photo of the parking site'),
         'name': StringField(maxLength=256),
         'operator_name': StringField(maxLength=256, required=False, nullable=True),
