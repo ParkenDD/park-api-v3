@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.45.0
+
+Released 2026-06-13
+
+### Features
+
+* [linear_parking_position support](https://github.com/ParkenDD/park-api-v3/pull/381)
+* [Improves has_realtime_data and realtime data output, disabling for data older then 30 min](https://github.com/ParkenDD/park-api-v3/pull/377)
+* [ParkAPI Sources: Freiburg Easypark](https://github.com/ParkenDD/parkapi-sources-v3/pull/382)
+* [Regionalschluessel Support](https://github.com/ParkenDD/park-api-v3/pull/379)
+
+
+### Fixes
+
+* [ParkAPI Sources: `PARK_API_KARLSRUHE_CAR_IGNORE_MISSING_CAPACITIES` flag for Karlsruhe to reduce repeating log messages](https://github.com/ParkenDD/parkapi-sources-v3/pull/380)
+* [numeric lat/lon output](https://github.com/ParkenDD/park-api-v3/pull/380)
+
+
+### Maintenance
+
+* [Move to structlog](https://github.com/ParkenDD/park-api-v3/pull/378)
+* [Improved documentation](https://github.com/ParkenDD/park-api-v3/pull/376)
+
+
 ## 0.44.1
 
 Released 2026-05-06
