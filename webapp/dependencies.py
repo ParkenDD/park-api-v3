@@ -16,6 +16,7 @@ from webapp.common.rest import RequestHelper
 from webapp.common.server_auth import ServerAuthHelper
 from webapp.repositories import (
     BaseRepository,
+    OfficialRegionCodeRepository,
     ParkingSiteGroupRepository,
     ParkingSiteHistoryRepository,
     ParkingSiteRepository,
@@ -144,6 +145,10 @@ class Dependencies:
     def get_source_repository(self) -> SourceRepository:
         return self._create_repository(SourceRepository)
 
+    @cache_dependency
+    def get_official_region_code_repository(self) -> OfficialRegionCodeRepository:
+        return OfficialRegionCodeRepository(session=self.get_db_session())
+
     def get_base_service_dependencies(self) -> dict:
         return {
             'context_helper': self.get_context_helper(),
@@ -164,6 +169,7 @@ class Dependencies:
             parking_site_repository=self.get_parking_site_repository(),
             parking_site_history_repository=self.get_parking_site_history_repository(),
             parking_site_group_repository=self.get_parking_site_group_repository(),
+            official_region_code_repository=self.get_official_region_code_repository(),
             **self.get_base_service_dependencies(),
         )
 
@@ -173,6 +179,7 @@ class Dependencies:
             source_repository=self.get_source_repository(),
             parking_site_repository=self.get_parking_site_repository(),
             parking_spot_repository=self.get_parking_spot_repository(),
+            official_region_code_repository=self.get_official_region_code_repository(),
             **self.get_base_service_dependencies(),
         )
 

@@ -23,6 +23,7 @@ class ParkingSpotSearchInput(CursorPaginationMixin, BaseSearchQuery):
     source_uid: Optional[str] = SearchParamEquals(), StringValidator()
     source_uids: Optional[list[str]] = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
     type: ParkingSiteType | None = SearchParamEquals(), EnumValidator(ParkingSiteType)
+    official_region_code: str | None = SearchParamEquals(), StringValidator(min_length=1, max_length=36)
 
     lat: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon: Optional[Decimal] = SearchParamCustom(), NumericValidator()

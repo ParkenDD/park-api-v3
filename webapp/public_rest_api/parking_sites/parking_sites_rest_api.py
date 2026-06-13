@@ -118,6 +118,7 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
             Parameter('purpose', schema=EnumField(enum=PurposeType)),
             Parameter('type', schema=EnumField(enum=ParkingSiteType)),
             Parameter('not_type', schema=EnumField(enum=ParkingSiteType)),
+            Parameter('official_region_code', schema=StringField(maxLength=36), example='083110000000'),
             Parameter(
                 'ignore_duplicates',
                 schema=BooleanField(),

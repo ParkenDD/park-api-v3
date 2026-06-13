@@ -192,6 +192,12 @@ parking_site_schema = JsonSchema(
         ),
         'lat': DecimalField(precision=10, scale=7),
         'lon': DecimalField(precision=10, scale=7),
+        'official_region_code': StringField(
+            maxLength=36,
+            required=False,
+            nullable=True,
+            description='German Regionalschlüssel / Gemeindeschlüssel, derived from the coordinates.',
+        ),
         'geojson': ObjectField(
             required=False,
             description='GeoJSON geometry. Additional attribute is `coordinates` containing coordinates depending'

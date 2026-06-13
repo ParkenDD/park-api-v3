@@ -160,6 +160,9 @@ class ParkingSite(BaseModel):
     lat: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=7), nullable=False)
     lon: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=7), nullable=False)
 
+    # German Regionalschlüssel / Gemeindeschlüssel, derived from the coordinates via the regionalschluessel database.
+    official_region_code: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+
     capacity: Mapped[int | None] = mapped_column(Integer(), nullable=True)
     capacity_disabled: Mapped[int | None] = mapped_column(Integer(), nullable=True)
     capacity_woman: Mapped[int | None] = mapped_column(Integer(), nullable=True)

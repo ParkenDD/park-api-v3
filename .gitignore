@@ -16,6 +16,7 @@ __pycache__/
 /temp/*
 /files/*
 /data/*
+!/data/regionalschluessel/
 
 /.env
 
