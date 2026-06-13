@@ -3,8 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import logging
-
+import structlog
 from flask import Response, request
 
 from webapp.common.blueprint import Blueprint
@@ -18,7 +17,7 @@ from .parking_sites import ParkingSitesBlueprint
 from .parking_spots import ParkingSpotBlueprint
 from .sources import SourceBlueprint
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class AdminRestApi(Blueprint):
@@ -59,7 +58,7 @@ class AdminRestApi(Blueprint):
 
             logger.info(
                 '\n'.join(log_fragments),
-                extra={'attributes': {'type': LogMessageType.REQUEST_IN}},
+                type=LogMessageType.REQUEST_IN,
             )
 
             return response

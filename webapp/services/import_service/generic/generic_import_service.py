@@ -3,8 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import logging
-
+import structlog
 from flask import Flask
 from parkapi_sources import ParkAPISources
 from parkapi_sources.converters.base_converter.pull import (
@@ -25,7 +24,7 @@ from webapp.services.base_service import BaseService
 from .generic_parking_site_import_service import GenericParkingSiteImportService
 from .generic_parking_spot_import_service import GenericParkingSpotImportService
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class GenericImportService(BaseService):
@@ -93,7 +92,7 @@ class GenericImportService(BaseService):
             except Exception as e:
                 logger.warning(
                     f'Failed to pull {source.uid} static parking site data: {e}',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SITE_HANDLING,
                 )
                 source.static_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
@@ -109,18 +108,18 @@ class GenericImportService(BaseService):
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(static_parking_site_inputs)} static parking '
                     f'sites with {len(static_parking_site_errors)} errors.',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SITE_HANDLING,
                 )
             else:
                 logger.info(
                     f'Source {source.uid} successfully updated {len(static_parking_site_inputs)} static parking sites.',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SITE_HANDLING,
                 )
 
             for static_parking_site_error in static_parking_site_errors:
                 logger.info(
                     f'Failed to pull {source.uid} static parking site item: {static_parking_site_error}.',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SITE_HANDLING,
                 )
 
         if isinstance(converter, ParkingSpotPullConverter):
@@ -129,7 +128,7 @@ class GenericImportService(BaseService):
             except Exception as e:
                 logger.warning(
                     f'Failed to pull {source.uid} static parking site data: {e}',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SPOT_HANDLING,
                 )
                 source.static_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
@@ -145,18 +144,18 @@ class GenericImportService(BaseService):
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(static_parking_spot_inputs)} static parking '
                     f'spots with {len(static_parking_spot_errors)} errors.',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SPOT_HANDLING,
                 )
             else:
                 logger.info(
                     f'Source {source.uid} successfully updated {len(static_parking_spot_inputs)} static parking spots.',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SPOT_HANDLING,
                 )
 
             for static_parking_spot_error in static_parking_spot_errors:
                 logger.info(
                     f'Failed to pull {source.uid} static parking spot item: {static_parking_spot_error}',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SPOT_HANDLING,
                 )
 
         source.static_status = SourceStatus.ACTIVE
@@ -182,7 +181,7 @@ class GenericImportService(BaseService):
             except Exception as e:
                 logger.warning(
                     f'Failed to pull {source.uid} realtime parking site data: {e}',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
                 source.realtime_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
@@ -198,19 +197,19 @@ class GenericImportService(BaseService):
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(realtime_parking_site_inputs)} realtime parking '
                     f'sites with {len(realtime_parking_site_errors)} errors.',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
             else:
                 logger.info(
                     f'Source {source.uid} successfully updated {len(realtime_parking_site_inputs)} realtime '
                     f'parking sites.',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
 
             for realtime_parking_site_error in realtime_parking_site_errors:
                 logger.info(
                     f'Failed to pull {source.uid} realtime parking site item: {realtime_parking_site_error}',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
 
         if isinstance(converter, ParkingSpotPullConverter):
@@ -219,7 +218,7 @@ class GenericImportService(BaseService):
             except Exception as e:
                 logger.warning(
                     f'Failed to pull {source.uid} realtime parking spot data: {e}',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SPOT_HANDLING,
                 )
                 source.realtime_status = SourceStatus.FAILED
                 self.source_repository.save_source(source)
@@ -235,19 +234,19 @@ class GenericImportService(BaseService):
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(realtime_parking_spot_inputs)} realtime '
                     f'parking spots with {len(realtime_parking_spot_errors)} invalid items.',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SPOT_HANDLING,
                 )
             else:
                 logger.info(
                     f'Source {source.uid} successfully updated {len(realtime_parking_spot_inputs)} realtime '
                     f'parking spots.',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SPOT_HANDLING,
                 )
 
             for realtime_parking_spot_error in realtime_parking_spot_errors:
                 logger.info(
                     f'Failed to pull {source.uid} realtime parking spot item: {realtime_parking_spot_error}',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SPOT_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SPOT_HANDLING,
                 )
 
         source.realtime_status = SourceStatus.ACTIVE

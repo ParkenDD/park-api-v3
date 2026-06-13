@@ -3,10 +3,10 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import logging
 import traceback
 from datetime import datetime, timezone
 
+import structlog
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import (
     CombinedParkingSiteInput,
@@ -25,7 +25,7 @@ from webapp.repositories.exceptions import ObjectNotFoundException
 
 from .generic_base_import_service import GenericBaseImportService
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 RESTRICTION_MAPPING: dict[ParkingAudience, str] = {
     ParkingAudience.DISABLED: 'capacity_disabled',
@@ -73,7 +73,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
             except Exception as e:
                 logger.warning(
                     f'Unhandled exception at dataset {static_parking_site_input}: {e} {traceback.format_exc()}',
-                    extra={'attributes': {'type': LogMessageType.STATIC_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.STATIC_PARKING_SITE_HANDLING,
                 )
 
         # Delete remaining existing parking sites because they are not in the new dataset
@@ -186,7 +186,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
             except Exception as e:
                 logger.warning(
                     f'Unhandled exception at dataset {realtime_parking_site_input}: {e} {traceback.format_exc()}',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
                 realtime_parking_site_errors.append(
                     ImportParkingSiteException(
@@ -237,7 +237,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                 logger.warning(
                     f'At item uid {parking_site.original_uid} from source {source.uid}, realtime_free_capacity '
                     f'{parking_site.realtime_free_capacity} was higher than capacity {compare_capacity}',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
                 parking_site.realtime_free_capacity = compare_capacity
 
@@ -264,7 +264,7 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                     f'At item uid {parking_site.original_uid} from source {source.uid},  realtime_free_capacity '
                     f'{restriction.realtime_free_capacity} was higher than capacity {compare_capacity} at audience '
                     f'{restriction.type}',
-                    extra={'attributes': {'type': LogMessageType.REALTIME_PARKING_SITE_HANDLING}},
+                    type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
                 restriction.realtime_free_capacity = compare_capacity
 

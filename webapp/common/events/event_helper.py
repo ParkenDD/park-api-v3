@@ -3,8 +3,9 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-import logging
 from typing import Dict, List, Optional, Sequence
+
+import structlog
 
 from webapp.common.celery import CeleryHelper
 from webapp.common.contexts import ContextHelper
@@ -15,7 +16,7 @@ from .enum import EventSource, EventType
 from .event import Event
 from .event_receiver import EventReceiver
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class EventHelper:
@@ -103,7 +104,7 @@ class EventHelper:
                 logger.error(
                     f'got event {event_type} with missing required parameters: {data}, '
                     f'required: {self.event_receivers[event_type][event_id].required_parameters}',
-                    extra={'attributes': {'type': LogMessageType.EXCEPTION}},
+                    type=LogMessageType.EXCEPTION,
                 )
                 return
         self.event_receivers[event_type][event_id].run(event_source=event_source, data=data)

@@ -4,12 +4,12 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 import json
-import logging
 from dataclasses import dataclass
 from enum import Enum
 from json.decoder import JSONDecodeError
 from typing import Optional, Union
 
+import structlog
 from requests import request
 from requests.exceptions import ConnectionError
 from urllib3.exceptions import NewConnectionError
@@ -18,7 +18,7 @@ from webapp.common.config import ConfigHelper
 from webapp.common.json import DefaultJSONEncoder
 from webapp.common.logging.models import LogMessageType
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class RemoteServerType(Enum):
@@ -80,7 +80,7 @@ class RemoteHelper:
                 log_fragments.append(f'<< {response.text.strip()}')
             logger.info(
                 '\n'.join(log_fragments),
-                extra={'attributes': {'type': LogMessageType.REQUEST_OUT}},
+                type=LogMessageType.REQUEST_OUT,
             )
 
             try:

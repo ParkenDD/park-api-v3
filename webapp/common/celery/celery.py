@@ -6,10 +6,10 @@ This helper class is inspired by Robpol86's Flask-Celery-Helper: https://github.
 """
 
 import json
-import logging
 from abc import ABC
 from typing import Callable
 
+import structlog
 from celery import Celery, Task, _state, platforms
 from flask import Flask
 from kombu.serialization import register
@@ -18,7 +18,7 @@ from webapp.common.contexts import TelemetryContext
 from webapp.common.json import DefaultJSONEncoder
 from webapp.common.logging.models import LogMessageType
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # Monkeypatch invalid warning: in docker containers, the script fails to detect that it's not root
 platforms._warn_or_raise_security_error = lambda *args, **kwargs: None
@@ -114,7 +114,7 @@ class LogErrorsCelery(Celery):
             def on_failure(self, exc, _task_id, _args, _kwargs, exc_info):
                 logger.error(
                     f'{str(exc).strip()}: {str(exc_info).strip()}',
-                    extra={'attributes': {'type': LogMessageType.EXCEPTION}},
+                    type=LogMessageType.EXCEPTION,
                 )
 
         ContextTask.abstract = True

@@ -15,6 +15,7 @@ from webapp.cli import register_cli_to_app
 from webapp.common.config import BaseConfig, ConfigLoader
 from webapp.common.error_handling import ErrorDispatcher
 from webapp.common.flask_app import App
+from webapp.common.logging.structlog_config import configure_structlog
 from webapp.common.rest import RestApiErrorHandler
 from webapp.dependencies import dependencies
 from webapp.event_receiver import event_receivers
@@ -56,6 +57,7 @@ def configure_logging(app: App):
         os.makedirs(app.config['LOG_DIR'])
 
     dictConfig(app.config['LOGGING'])
+    configure_structlog()
 
 
 def configure_tracing(app: App) -> None:
