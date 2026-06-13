@@ -87,7 +87,8 @@ class ParkingSpotRepository(BaseRepository[ParkingSpot]):
     def count_by_source(self) -> dict[int, int]:
         result: dict[int, int] = {}
         parking_spots = (
-            self.session.query(ParkingSpot.source_id, func.count(ParkingSpot.id).label('count'))
+            self.session
+            .query(ParkingSpot.source_id, func.count(ParkingSpot.id).label('count'))
             .group_by(ParkingSpot.source_id)
             .all()
         )

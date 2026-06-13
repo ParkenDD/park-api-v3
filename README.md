@@ -118,6 +118,28 @@ failing, the underlying source problem has to be fixed first — see [Debugging 
 for how to inspect the actual upstream requests and responses. See
 [Flask command line interface](#flask-command-line-interface) for more details on the `flask source` commands.
 
+#### `has_realtime_data` and outdated realtime data in the public API
+
+Every `ParkingSite` and `ParkingSpot` carries a `has_realtime_data` flag and, when it is `true`, a set of `realtime_*`
+fields (e.g. `realtime_capacity`, `realtime_free_capacity`, `realtime_status`, `realtime_data_updated_at`).
+
+When serving public `ParkingSite` and `ParkingSpot` data, ParkAPI does not trust stale realtime data: if a dataset's
+`realtime_data_updated_at` is older than `UNSET_REALTIME_AFTER_MINUTES` (default 30 minutes, configurable), it is
+treated as if it had no realtime data at all. In that case `has_realtime_data` is returned as `false` and all
+`realtime_*` fields are dropped from the output. Datasets without realtime support (`has_realtime_data` already `false`)
+never expose `realtime_*` fields.
+
+This calculation can be turned off per request with the `calculate_has_realtime_data` query parameter, which is
+available on all four public list and item endpoints (`/v3/parking-sites`, `/v3/parking-sites/<id>`,
+`/v3/parking-spots` and `/v3/parking-spots/<id>`):
+
+- `calculate_has_realtime_data=true` (default): the behaviour described above is applied.
+- `calculate_has_realtime_data=false`: the outdating calculation is skipped and the raw, stored `has_realtime_data`
+  value (and its `realtime_*` fields) is returned unchanged.
+
+Note that this outdating logic is independent of the Prometheus `REALTIME_OUTDATED_AFTER_MINUTES` setting, which only
+affects monitoring metrics and not the public API output.
+
 
 ## Push services
 
@@ -420,6 +442,22 @@ PARK_API_CONVERTER:
 Additionally, you can add source UIDs to `DEBUG_SOURCES`. This enables a debug mode, where all requests are dumped to
 a path which is defined at `DEBUG_DUMP_DIR`, defaulting to `data/debug-dump`. Especially at realtime sources, this
 might end up into a lot of data dumped to your disk, so use this mechanism with caution (or plenty of storage space).
+
+### Import and realtime parameters
+
+The following config keys control when data is pulled and how long realtime data is considered valid. All of them have
+sensible defaults (shown below), so you only need to set them if you want to deviate from the default behaviour.
+
+| Config key                       | Default | Description                                                                                                                                                                                                                                                                            |
+|----------------------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `STATIC_IMPORT_PULL_HOUR`        | `1`     | Hour of the day (0–23, server time) at which the nightly static data pull for all pull sources is scheduled.                                                                                                                                                                           |
+| `STATIC_IMPORT_PULL_MINUTE`      | `0`     | Minute of the hour (0–59) at which the static data pull runs, combined with `STATIC_IMPORT_PULL_HOUR`.                                                                                                                                                                                 |
+| `REALTIME_IMPORT_PULL_FREQUENCY` | `300`   | Interval in seconds between realtime data pulls for realtime pull sources. The default of `300` pulls every 5 minutes.                                                                                                                                                                 |
+| `REALTIME_OUTDATED_AFTER_MINUTES`| `30`    | Age in minutes after which a parking site's / spot's realtime data is counted as outdated in the Prometheus metrics (`/metrics`). This only affects monitoring; it does not change the served API data.                                                                                |
+| `UNSET_REALTIME_AFTER_MINUTES`   | `15`    | Age in minutes after which realtime data is hidden in the public API. When a parking site's `realtime_data_updated_at` is older than this, `has_realtime_data` is set to `False` and all `realtime_*` fields are dropped from the response, so clients never receive stale realtime data. |
+
+Note that `STATIC_IMPORT_PULL_*` and `REALTIME_IMPORT_PULL_FREQUENCY` only affect **pull** sources; **push** sources
+deliver data on their own schedule. `UNSET_REALTIME_AFTER_MINUTES` applies to all sources, regardless of pull or push.
 
 
 ## Development setup

@@ -14,8 +14,8 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, IntegerField, NumericField, StringField
-from validataclass.validators import DataclassValidator
+from flask_openapi.schema import ArrayField, BooleanField, IntegerField, NumericField, StringField
+from validataclass.validators import BooleanValidator, DataclassValidator
 
 from webapp.dependencies import dependencies
 from webapp.models import ParkingSpot
@@ -62,17 +62,28 @@ class ParkingSpotBlueprint(PublicApiBaseBlueprint):
 
 class ParkingSpotBaseMethodView(PublicApiBaseMethodView):
     parking_spot_handler: ParkingSpotHandler
+    calculate_has_realtime_data_validator = BooleanValidator(allow_strings=True)
 
     def __init__(self, *, parking_spot_handler: ParkingSpotHandler, **kwargs):
         super().__init__(**kwargs)
         self.parking_spot_handler = parking_spot_handler
 
-    @staticmethod
-    def _map_parking_spot(parking_spot: ParkingSpot) -> dict:
+    def _get_calculate_has_realtime_data(self) -> bool:
+        # Defaults to True. If set to false, the has_realtime_data outdating calculation is skipped and the raw
+        # has_realtime_data value is returned.
+        raw_value = self.request_helper.get_query_args(skip_empty=True).get('calculate_has_realtime_data', 'true')
+        return self.calculate_has_realtime_data_validator.validate(raw_value)
+
+    def _map_parking_spot(self, parking_spot: ParkingSpot, *, calculate_has_realtime_data: bool = True) -> dict:
+        unset_realtime_after_minutes = None
+        if calculate_has_realtime_data:
+            unset_realtime_after_minutes = self.config_helper.get('UNSET_REALTIME_AFTER_MINUTES', 30)
+
         return parking_spot.to_dict(
             include_restrictions=True,
             include_external_identifiers=True,
             include_tags=True,
+            unset_realtime_after_minutes=unset_realtime_after_minutes,
         )
 
 
@@ -102,6 +113,13 @@ class ParkingSpotListMethodView(ParkingSpotBaseMethodView):
             Parameter('lon_min', schema=NumericField(), example=5.0, description='Bounding box'),
             Parameter('lon_max', schema=NumericField(), example=5.5, description='Bounding box'),
             Parameter('official_region_code', schema=StringField(maxLength=36), example='083110000000'),
+            Parameter(
+                'calculate_has_realtime_data',
+                schema=BooleanField(),
+                description='Defaults to true, which keeps the default behaviour of marking outdated realtime data as '
+                'has_realtime_data=false and dropping its realtime fields. If set to false, this calculation is '
+                'skipped and the raw has_realtime_data value is returned.',
+            ),
         ],
         response=[
             Response(
@@ -115,10 +133,16 @@ class ParkingSpotListMethodView(ParkingSpotBaseMethodView):
     )
     def get(self):
         search_query = self.validate_query_args(self.parking_spot_search_query_validator)
+        calculate_has_realtime_data = self._get_calculate_has_realtime_data()
 
         parking_spots = self.parking_spot_handler.get_parking_spot_list(search_query=search_query)
 
-        parking_spots = parking_spots.map(self._map_parking_spot)
+        parking_spots = parking_spots.map(
+            lambda parking_spot: self._map_parking_spot(
+                parking_spot,
+                calculate_has_realtime_data=calculate_has_realtime_data,
+            ),
+        )
 
         return self.jsonify_paginated_response(parking_spots, search_query)
 
@@ -127,6 +151,15 @@ class ParkingSpotItemMethodView(ParkingSpotBaseMethodView):
     @document(
         description='Get Parking Spot.',
         path=[Parameter('parking_spot_id', schema=int, example=1)],
+        query=[
+            Parameter(
+                'calculate_has_realtime_data',
+                schema=BooleanField(),
+                description='Defaults to true, which keeps the default behaviour of marking outdated realtime data as '
+                'has_realtime_data=false and dropping its realtime fields. If set to false, this calculation is '
+                'skipped and the raw has_realtime_data value is returned.',
+            ),
+        ],
         response=[
             Response(
                 ResponseData(
@@ -140,4 +173,9 @@ class ParkingSpotItemMethodView(ParkingSpotBaseMethodView):
     def get(self, parking_spot_id: int):
         parking_spot = self.parking_spot_handler.get_parking_spot_item(parking_spot_id)
 
-        return jsonify(self._map_parking_spot(parking_spot))
+        return jsonify(
+            self._map_parking_spot(
+                parking_spot,
+                calculate_has_realtime_data=self._get_calculate_has_realtime_data(),
+            ),
+        )
