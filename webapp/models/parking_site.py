@@ -214,6 +214,12 @@ class ParkingSite(BaseModel):
 
         result = super().to_dict(fields, ignore)
 
+        # Output coordinates as numbers instead of decimal strings
+        if result.get('lat') is not None:
+            result['lat'] = float(result['lat'])
+        if result.get('lon') is not None:
+            result['lon'] = float(result['lon'])
+
         # Add legacy field is_supervised
         if self.supervision_type is not None:
             result['is_supervised'] = self.supervision_type != SupervisionType.NO
