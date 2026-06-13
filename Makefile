@@ -125,6 +125,11 @@ generate-migration: config
 	@test -n "$(MSG)" || ( echo 'Usage: make generate-migration MSG="Example revision message"'; exit 1 )
 	$(FLASK_RUN) flask db migrate -m "$(MSG)"
 
+# Import the "Regionalschlüssel" (VG25 administrative boundaries) into the database
+.PHONY: import-regionalschluessel
+import-regionalschluessel: config
+	$(DOCKER_COMPOSE) run --rm regionalschluessel-importer
+
 
 # Cleanup
 # -------

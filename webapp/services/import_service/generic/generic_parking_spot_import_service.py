@@ -118,6 +118,8 @@ class GenericParkingSpotImportService(GenericBaseImportService):
 
         self.set_related_objects(parking_spot_input, parking_spot)
 
+        self.assign_official_region_code(parking_spot)
+
         if parking_spot_input.parking_site_uid:
             try:
                 parking_site = self.parking_site_repository.fetch_parking_site_by_source_id_and_original_uid(

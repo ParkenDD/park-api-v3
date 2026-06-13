@@ -123,6 +123,8 @@ class GenericParkingSiteImportService(GenericBaseImportService):
 
         self.set_related_objects(parking_site_input, parking_site)
 
+        self.assign_official_region_code(parking_site)
+
         # Legacy mapping
         if parking_site_input.restrictions:
             for restriction_input in parking_site_input.restrictions:

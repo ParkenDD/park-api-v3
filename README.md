@@ -167,6 +167,50 @@ It also accepts the parameter -u for overwriting the URL the data should be push
 Afterward, the password will be asked in a secure way, then the upload progress begins.
 
 
+## Official region code
+
+Every `ParkingSite` and `ParkingSpot` carries an optional `official_region_code` field. For Germany this holds the
+official *Regionalschlüssel* / *Gemeindeschlüssel*, the administrative key which identifies the municipality a parking
+site or spot is located in. The code is not provided by the data sources but derived automatically from the object's
+coordinates during import, the same way the OCPDB does it for its `Location` model.
+
+### How it is assigned
+
+Whenever a parking site or spot is imported (both via pull and push), ParkAPI tries to assign an
+`official_region_code`. A code is only assigned if:
+
+- the object does not already have a code set,
+- it has valid `lat`/`lon` coordinates, and
+- a region code database is available for the country (currently only Germany / `DEU` is supported).
+
+The actual lookup is a PostGIS spatial query: the coordinates are matched against the municipality polygons via
+`ST_Contains`. If no polygon contains the coordinates, the code is left empty and a warning is logged. If the
+coordinates fall outside of the imported data (e.g. a parking site outside of Germany), no code is assigned.
+
+Because the lookup relies on PostGIS spatial functions, the feature is **only available on PostgreSQL/PostGIS**, not on
+MySQL/MariaDB. The presence of the region code database is detected at runtime, so ParkAPI keeps working (just without
+region codes) until the database has been imported.
+
+### Importing the region code database
+
+The region codes live in a separate `regionalschluessel` table which is **not** managed by the ORM or by migrations.
+It is imported from the official German administrative boundaries geopackage (VG25) via `ogr2ogr`. The import logic is
+in `scripts/import-regionalschluessel.sh`, which downloads the geopackage (if not already present) and loads the
+`v_vg25_gem` layer into the `regionalschluessel` table, reprojecting it to EPSG:4326. A marker file
+(`/data/.vg25-imported`) prevents re-importing on subsequent runs.
+
+In the docker dev environment this runs automatically via the `regionalschluessel-importer` container (see
+`docker-compose.yml`), which uses a GDAL image and waits for PostgreSQL to be healthy before importing. You can also
+trigger the import manually with `make import-regionalschluessel`. It can be configured with the following environment
+variables:
+
+- `VG25_GEOPACKAGE_URL`: download URL of the VG25 geopackage. Defaults to the MobiData BW mirror.
+- `VG25_GEOPACKAGE_WGET_USER_AGENT`: user agent used for the download.
+
+Once the table is imported, region codes are assigned automatically on the next import of a source. To backfill codes
+for already-imported data, trigger a fresh import (e.g. via `flask source pull`).
+
+
 ## Flag duplicates via command line interface
 
 *Warning: experimental feature. Interface might change.*
@@ -411,6 +455,7 @@ manually, too. For further details, please have a look at the `Makefile`.
 - `make apply-migrations`: applies database migrations to the database
 - `make downgrade-migrations`: downgrades the database by one migration
 - `make generate-migration MSG="my new migration"`: creates a new database migration
+- `make import-regionalschluessel`: imports the region code database (VG25) into the `regionalschluessel` table
 - `make test-unit`: runs all unit tests
 - `make test-integration`: runs all integration tests
 - `make lint-fix`: runs the formatter / linter and tries to fix issues

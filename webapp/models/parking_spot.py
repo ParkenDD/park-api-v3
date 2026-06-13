@@ -82,6 +82,8 @@ class ParkingSpot(BaseModel):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     lat: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=7), nullable=False)
     lon: Mapped[Decimal] = mapped_column(Numeric(precision=10, scale=7), nullable=False)
+    # German Regionalschlüssel / Gemeindeschlüssel, derived from the coordinates via the regionalschluessel database.
+    official_region_code: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
     _geojson: Mapped[str | None] = mapped_column('geojson', Text, nullable=True)
     purpose: Mapped[PurposeType] = mapped_column(SqlalchemyEnum(PurposeType), nullable=False, index=True)
 

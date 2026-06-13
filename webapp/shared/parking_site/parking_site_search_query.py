@@ -69,6 +69,7 @@ class ParkingSiteSearchInput(ParkingSiteBaseSearchInput, CursorPaginationMixin):
     lat_max: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon_min: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon_max: Optional[Decimal] = SearchParamCustom(), NumericValidator()
+    official_region_code: str | None = SearchParamEquals(), StringValidator(min_length=1, max_length=36)
 
 
 @search_query_dataclass

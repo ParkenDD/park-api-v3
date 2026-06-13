@@ -69,6 +69,24 @@ services:
     ports:
       - "5432:5432"
 
+  regionalschluessel-importer:
+    image: ghcr.io/osgeo/gdal:alpine-small-3.13.1
+    user: *local-user
+    volumes:
+      - ./scripts:/scripts
+      - ./data/regionalschluessel:/data
+    environment:
+      - VG25_GEOPACKAGE_URL=${VG25_GEOPACKAGE_URL:-https://mobidata-bw.de/daten/ipl/verwaltungsgrenzen/251231_DE_VG25.gpkg}
+      - VG25_GEOPACKAGE_WGET_USER_AGENT='ParkAPI development'
+      - PGHOST=postgresql
+      - PGUSER=park-api
+      - PGPASSWORD=development
+      - PGDATABASE=park-api
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    command: ["/scripts/import-regionalschluessel.sh"]
+
   rabbitmq:
     image: rabbitmq:3.12
     user: rabbitmq

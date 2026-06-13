@@ -41,6 +41,12 @@ parking_spot_schema = JsonSchema(
         'address': StringField(required=False, maxLength=256),
         'lat': DecimalField(precision=10, scale=7),
         'lon': DecimalField(precision=10, scale=7),
+        'official_region_code': StringField(
+            maxLength=36,
+            required=False,
+            nullable=True,
+            description='German Regionalschlüssel / Gemeindeschlüssel, derived from the coordinates.',
+        ),
         'name': StringField(required=False),
         'purpose': EnumField(enum=PurposeType),
         'geojson': ObjectField(

@@ -101,6 +101,7 @@ class ParkingSpotListMethodView(ParkingSpotBaseMethodView):
             Parameter('lat_max', schema=NumericField(), example=55.5, description='Bounding box'),
             Parameter('lon_min', schema=NumericField(), example=5.0, description='Bounding box'),
             Parameter('lon_max', schema=NumericField(), example=5.5, description='Bounding box'),
+            Parameter('official_region_code', schema=StringField(maxLength=36), example='083110000000'),
         ],
         response=[
             Response(
