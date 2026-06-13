@@ -118,6 +118,28 @@ failing, the underlying source problem has to be fixed first — see [Debugging 
 for how to inspect the actual upstream requests and responses. See
 [Flask command line interface](#flask-command-line-interface) for more details on the `flask source` commands.
 
+#### `has_realtime_data` and outdated realtime data in the public API
+
+Every `ParkingSite` and `ParkingSpot` carries a `has_realtime_data` flag and, when it is `true`, a set of `realtime_*`
+fields (e.g. `realtime_capacity`, `realtime_free_capacity`, `realtime_status`, `realtime_data_updated_at`).
+
+When serving public `ParkingSite` and `ParkingSpot` data, ParkAPI does not trust stale realtime data: if a dataset's
+`realtime_data_updated_at` is older than `UNSET_REALTIME_AFTER_MINUTES` (default 30 minutes, configurable), it is
+treated as if it had no realtime data at all. In that case `has_realtime_data` is returned as `false` and all
+`realtime_*` fields are dropped from the output. Datasets without realtime support (`has_realtime_data` already `false`)
+never expose `realtime_*` fields.
+
+This calculation can be turned off per request with the `calculate_has_realtime_data` query parameter, which is
+available on all four public list and item endpoints (`/v3/parking-sites`, `/v3/parking-sites/<id>`,
+`/v3/parking-spots` and `/v3/parking-spots/<id>`):
+
+- `calculate_has_realtime_data=true` (default): the behaviour described above is applied.
+- `calculate_has_realtime_data=false`: the outdating calculation is skipped and the raw, stored `has_realtime_data`
+  value (and its `realtime_*` fields) is returned unchanged.
+
+Note that this outdating logic is independent of the Prometheus `REALTIME_OUTDATED_AFTER_MINUTES` setting, which only
+affects monitoring metrics and not the public API output.
+
 
 ## Push services
 

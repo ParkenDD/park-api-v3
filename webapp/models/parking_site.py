@@ -152,6 +152,7 @@ class ParkingSite(BaseModel):
         SqlalchemyEnum(LinearParkingPosition), nullable=True
     )
 
+    # TODO: Naming should be more like "possibly_has_realtime_data"
     has_realtime_data: Mapped[bool | None] = mapped_column(Boolean(), nullable=False, default=False)
     static_data_updated_at: Mapped[datetime | None] = mapped_column(UtcDateTime(), nullable=True)
     realtime_data_updated_at: Mapped[datetime | None] = mapped_column(UtcDateTime(), nullable=True)

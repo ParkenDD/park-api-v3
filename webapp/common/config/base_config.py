@@ -69,7 +69,7 @@ class BaseConfig:
 
     # At the public API, has_realtime_data is unset (and all realtime_* fields are dropped) when the
     # realtime_data_updated_at timestamp is older than this many minutes.
-    UNSET_REALTIME_AFTER_MINUTES = 15
+    UNSET_REALTIME_AFTER_MINUTES = 30
 
     # Default log config
     LOGGING = {
