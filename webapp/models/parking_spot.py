@@ -124,6 +124,12 @@ class ParkingSpot(BaseModel):
 
         result = super().to_dict(fields, ignore)
 
+        # Output coordinates as numbers instead of decimal strings
+        if result.get('lat') is not None:
+            result['lat'] = float(result['lat'])
+        if result.get('lon') is not None:
+            result['lon'] = float(result['lon'])
+
         if include_restrictions and len(self.restrictions):
             result['restrictions'] = []
             for parking_restriction in self.restrictions:
