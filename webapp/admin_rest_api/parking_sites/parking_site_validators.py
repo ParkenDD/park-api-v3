@@ -13,10 +13,12 @@ from parkapi_sources.models import (
     ParkingSiteRestrictionInput,
     ParkingSpotRestrictionInput,
 )
+from parkapi_sources.models.enums import PurposeType
 from validataclass.dataclasses import Default, validataclass
 from validataclass.validators import (
     AnythingValidator,
     DataclassValidator,
+    EnumValidator,
     IntegerValidator,
     ListValidator,
     Noneable,
@@ -36,6 +38,11 @@ CAPACITY_TYPES: dict[str, ParkingAudience] = {
 
 @validataclass
 class LegacyCombinedParkingSiteInput(CombinedParkingSiteInput):
+    # parkapi-sources 0.36.0 dropped the default value for `purpose`, making it required. We keep defaulting it to
+    # CAR here so existing clients that don't send a purpose keep working.
+    # TODO: remove this default after a migration period so `purpose` becomes required again.
+    purpose: PurposeType = EnumValidator(PurposeType), Default(PurposeType.CAR)
+
     capacity_disabled: int | None = (
         Noneable(IntegerValidator(min_value=0, allow_strings=True)),
         Default(None),

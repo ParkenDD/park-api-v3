@@ -20,6 +20,7 @@ from flask_openapi.schema import (
 )
 from parkapi_sources.models.enums import (
     ExternalIdentifierType,
+    LinearParkingPosition,
     ParkingSiteOrientation,
     ParkingSiteSide,
     ParkingType,
@@ -171,6 +172,12 @@ parking_site_schema = JsonSchema(
         'orientation': EnumField(enum=ParkingSiteOrientation, required=False),
         'side': EnumField(enum=ParkingSiteSide, required=False),
         'parking_type': EnumField(enum=ParkingType, required=False),
+        'linear_parking_position': EnumField(
+            enum=LinearParkingPosition,
+            required=False,
+            nullable=True,
+            description='Position of a linear (on-street) parking site relative to the road.',
+        ),
         'capacity_min': IntegerField(minimum=0, required=False),
         'capacity_max': IntegerField(minimum=0, required=False),
         'related_location': StringField(maxLength=256, description='A related location like a school.', required=False),
