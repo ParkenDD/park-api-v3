@@ -85,9 +85,8 @@ class ParkingSiteBaseMethodView(PublicApiBaseMethodView):
     def _get_calculate_has_realtime_data(self) -> bool:
         # Defaults to True. If set to false, the has_realtime_data outdating calculation is skipped and the raw
         # has_realtime_data value is returned.
-        raw_value = self.request_helper.get_query_args(skip_empty=True).get('calculate_has_realtime_data')
-        if raw_value is None:
-            return True
+        raw_value = self.request_helper.get_query_args(skip_empty=True).get('calculate_has_realtime_data', 'true')
+
         return self.calculate_has_realtime_data_validator.validate(raw_value)
 
     def _map_parking_site(self, parking_site: ParkingSite, *, calculate_has_realtime_data: bool = True) -> dict:
