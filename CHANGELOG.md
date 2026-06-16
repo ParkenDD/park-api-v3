@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.45.1
+
+### Fixes
+
+* [ParkAPI Sources: fix friedrichshafen easypark converter registration](https://github.com/ParkenDD/parkapi-sources-v3/pull/387)
+
+
 ## 0.45.0
 
 Released 2026-06-13
