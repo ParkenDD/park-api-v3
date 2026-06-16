@@ -23,7 +23,7 @@ lxml~=6.0.4
 parkapi-sources~=0.36.1
 isodate~=0.7.2
 shapely~=2.1.2
-urllib3~=2.6.3
+urllib3~=2.7.0
 
 # If you want to test a ParkAPI Sources version which is not yet released, you can install directly from Github:
 # git+https://github.com/ParkenDD/parkapi-sources-v3.git@your-feature-branch
