@@ -12,6 +12,7 @@ __pycache__/
 /celerybeat-schedule*
 
 /venv
+/.venv
 /logs/*
 /temp/*
 /files/*

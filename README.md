@@ -518,13 +518,12 @@ the `conftest.py` files for more details.
 ## Prepare scripts environment
 
 In order to use the scripts located in `scripts`, you will need [python requests](https://pypi.org/project/requests/).
-You can use a system-installed version of requests, or you can create a virtual environment for this:
+You can use a system-installed version of requests, or you can run the scripts with [uv](https://docs.astral.sh/uv/),
+which handles the virtual environment for you:
 
 ```bash
 cd scripts
-virtalenv venv
-pip install "requests~=2.32.3"
-source venv/bin/activate
+uv run --with "requests~=2.32.3" your_script.py
 ```
 
 
