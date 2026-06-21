@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.46.0
+
+### Features
+
+* [ParkAPI Sources: Ellwangen parking via Sensit API](https://github.com/ParkenDD/parkapi-sources-v3/pull/390)
+* [ParkAPI Sources: velobrix `park_and_ride_type=TRAIN`](https://github.com/ParkenDD/parkapi-sources-v3/pull/388)
+
+
+### Fixes
+
+* [Adapt to OSM opening time breaking change](https://github.com/ParkenDD/park-api-v3/commit/e46f76d2e7fc71f9707a22b3787cd632272ae4b6)
+* [ParkAPI Sources: fix BOM issues](https://github.com/ParkenDD/parkapi-sources-v3/pull/389)
+
+
+### Maintenance
+
+* [Move to uv](https://github.com/ParkenDD/park-api-v3/pull/391)
+* [Update GitHub actions](https://github.com/ParkenDD/park-api-v3/pull/393)
+* [ParkAPI Sources: move to uv](https://github.com/ParkenDD/parkapi-sources-v3/pull/392)
+* [ParkAPI Sources: test converter registration](https://github.com/ParkenDD/parkapi-sources-v3/pull/391)
+
+
 ## 0.45.1
 
 ### Fixes
