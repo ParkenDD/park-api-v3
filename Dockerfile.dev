@@ -1,15 +1,21 @@
 FROM python:3.12-alpine
 
 ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy \
+    # Install dependencies into the system prefix so python3/gunicorn/flask/ruff are on PATH without activating a venv
+    UV_PROJECT_ENVIRONMENT=/usr/local
+
+COPY --from=ghcr.io/astral-sh/uv:0.11.23 /uv /uvx /usr/local/bin/
 
 WORKDIR /app
 
-COPY requirements.txt requirements-dev.txt .
+COPY pyproject.toml uv.lock ./
 
 # pyproj needs alpine-sdk, but alpine-sdk should not be part of the final image, so we remove it right away
 RUN apk --no-cache add bash alpine-sdk proj proj-dev proj-util && \
-    pip install -r requirements.txt -r requirements-dev.txt && \
+    uv sync --frozen --no-install-project && \
     apk del -r alpine-sdk proj-dev
 
 CMD ["python3", "runserver.py"]

@@ -74,9 +74,12 @@ class ParkApiV2Handler(GenericParkingSiteHandler):
             if parking_site.opening_hours:
                 try:
                     oh = OpeningHours(parking_site.opening_hours)
-                    lot['latest_data']['status'] = str(oh.state())
+                    state = str(oh.state()[0])
+                    # The v2 spec only allows 'open' and 'closed' as status values.
+                    if state in ('open', 'closed'):
+                        lot['latest_data']['status'] = state
                 except ParserError:
-                    lot['latest_data']['status'] = 'unknown'
+                    pass
 
             if parking_site.has_realtime_data and parking_site.realtime_free_capacity is not None:
                 lot['latest_data']['lot_timestamp'] = (parking_site.realtime_data_updated_at,)

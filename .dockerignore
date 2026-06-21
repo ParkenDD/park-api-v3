@@ -1,5 +1,5 @@
 # Keep the Docker build context small to speed up builds. This is really all we need in the Dockerfile.
 *
 !webapp
-!requirements.txt
-!requirements-dev.txt
+!pyproject.toml
+!uv.lock

@@ -17,11 +17,14 @@ jobs:
     - name: checkout
       uses: actions/checkout@v6
 
-    - name: pip install
-      run: pip install -r requirements.txt -r requirements-dev.txt
+    - name: install uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: uv sync
+      run: uv sync --frozen
 
     - name: lint using ruff
-      run: ruff check --output-format github ./webapp ./tests ./migrations
+      run: uv run ruff check --output-format github ./webapp ./tests ./migrations
 
   test-unit:
     runs-on: ubuntu-latest
@@ -35,11 +38,14 @@ jobs:
     - name: checkout
       uses: actions/checkout@v6
 
-    - name: pip install
-      run: pip install -r requirements.txt -r requirements-dev.txt
+    - name: install uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: uv sync
+      run: uv sync --frozen
 
     - name: run pytest
-      run: python -m pytest tests/unit
+      run: uv run python -m pytest tests/unit
 
   test-integration:
     runs-on: ubuntu-latest
@@ -67,8 +73,11 @@ jobs:
     - name: checkout
       uses: actions/checkout@v6
 
-    - name: pip install
-      run: pip install -r requirements.txt -r requirements-dev.txt
+    - name: install uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: uv sync
+      run: uv sync --frozen
 
     - name: run pytest
-      run: python -m pytest tests/integration
+      run: uv run python -m pytest tests/integration

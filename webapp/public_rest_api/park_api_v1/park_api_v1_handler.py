@@ -75,7 +75,7 @@ class ParkApiV1Handler(GenericParkingSiteHandler):
             elif parking_site.opening_hours:
                 try:
                     oh = OpeningHours(parking_site.opening_hours)
-                    lot['state'] = str(oh.state())
+                    lot['state'] = str(oh.state()[0])
                 except ParserError:
                     lot['state'] = 'unknown'
 
