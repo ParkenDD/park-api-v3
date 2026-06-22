@@ -504,6 +504,87 @@ have a look at the [pre-commit-hook website](https://pre-commit.com). If you hav
 install the pre-commit-hook with `pre-commit install`.
 
 
+## Dependency management with uv
+
+ParkAPI uses [uv](https://docs.astral.sh/uv/) to manage its Python dependencies. The dependencies and dependency groups
+are declared in `pyproject.toml`, and the exact, resolved versions are pinned in `uv.lock`. Both the docker images
+(`Dockerfile.dev` / `Dockerfile.prod`) and the CI install dependencies with uv, so the lockfile is the single source of
+truth for which versions are used everywhere.
+
+You normally do **not** need uv on your host to develop ParkAPI, because the docker dev environment already runs `uv
+sync` inside the image (development is done in docker, see [Development setup](#development-setup)). You do need uv on
+your host (or inside the container) when you want to change dependencies or work with the lockfile directly. Install it
+following the [official instructions](https://docs.astral.sh/uv/getting-started/installation/).
+
+### Installing dependencies
+
+To create a local virtual environment and install all dependencies (including the `dev` group) exactly as pinned in the
+lockfile:
+
+```bash
+uv sync --frozen
+```
+
+`--frozen` makes uv install strictly from `uv.lock` without re-resolving — this is what CI and the docker images use, so
+your environment matches them. Drop `--no-dev` if you want runtime-only dependencies (the production image uses `uv sync
+--frozen --no-dev`).
+
+Keep in mind that ParkAPI still needs a PostgreSQL database and RabbitMQ to actually run, so a host-side `uv sync` is
+mostly useful for tooling (linting, IDE integration, inspecting dependencies) — for running the application, use the
+docker dev environment.
+
+### Private package index
+
+Some dependencies (the binary-butterfly shared libraries, e.g. `flask-openapi`) are not published on PyPI but on a
+private package registry. This registry is configured as a named index in `pyproject.toml` under `[[tool.uv.index]]`
+(`binary-butterfly`), and `flask-openapi` is pinned to it via `[tool.uv.sources]` to avoid dependency confusion with an
+unrelated PyPI package of the same name. uv reads this configuration automatically, so a normal `uv sync` resolves these
+packages without any extra flags.
+
+### Adding or updating dependencies
+
+To add a new runtime dependency (this updates both `pyproject.toml` and `uv.lock`):
+
+```bash
+uv add "some-package~=1.2.3"
+```
+
+For a development-only dependency (linting, testing, …), add it to the `dev` group:
+
+```bash
+uv add --dev "some-package~=1.2.3"
+```
+
+To bump the pinned versions in `uv.lock` without editing `pyproject.toml` (e.g. to pick up a new patch release of an
+already-declared dependency), re-resolve the lockfile:
+
+```bash
+uv lock --upgrade                 # re-resolve everything within the declared constraints
+uv lock --upgrade-package parkapi-sources   # re-resolve a single package
+```
+
+After changing dependencies, rebuild the docker image (`make docker-rebuild`) so the container picks up the new
+lockfile, and commit both `pyproject.toml` and `uv.lock`.
+
+### Running commands with uv
+
+`uv run <command>` runs a command inside the project environment, syncing dependencies first if needed. This is how CI
+invokes the tooling, and you can use it the same way on the host (again, keeping in mind that running the app itself
+needs the database and queue):
+
+```bash
+uv run ruff check ./webapp ./tests ./migrations
+uv run python -m pytest tests/unit
+```
+
+Inside the docker dev environment dependencies are installed into the system prefix (`UV_PROJECT_ENVIRONMENT`), so tools
+like `ruff`, `pytest` and `flask` are already on `PATH` and you do not need the `uv run` prefix there — the makefile
+targets (`make lint-check`, `make test-unit`, …) call them directly.
+
+For the standalone helper scripts in `scripts/`, uv can also handle the virtual environment on the fly — see
+[Prepare scripts environment](#prepare-scripts-environment).
+
+
 ## Testing
 
 ParkAPI provides unit- and integration-tests. Unit tests run without any external dependencies, integration tests
