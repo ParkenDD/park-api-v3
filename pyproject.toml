@@ -27,7 +27,7 @@ dependencies = [
     "opening-hours-py~=2.0.2",
     "kombu~=5.6.2",
     "lxml~=6.1.1",
-    "parkapi-sources~=0.37.0",
+    "parkapi-sources~=0.38.0",
     "isodate~=0.7.2",
     "shapely~=2.1.2",
     "urllib3~=2.7.0",
@@ -113,14 +113,14 @@ lint.select = [
     "FLY", # flynt (use f-string instead of static join)
 ]
 
-# Enable preview rules since a lot of basic pycodestyle rules are in preview mode for some reason
-preview = true
-
 lint.ignore = [
     "B008", # do not perform function calls in argument defaults
     "C901", # too complex
     "ISC001", # single-line-implicit-string-concatenation - conflicts with formatter
 ]
+
+# Enable preview rules since a lot of basic pycodestyle rules are in preview mode for some reason
+preview = true
 
 exclude = [
     ".bzr",

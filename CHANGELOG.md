@@ -2,6 +2,26 @@
 
 ## 0.46.0
 
+Released 2026-07-06
+
+### Features
+
+* [ParkAPI Sources: Toll Collect truck parking](https://github.com/ParkenDD/parkapi-sources-v3/pull/400)
+
+
+### Fixes
+
+* [ParkAPI Sources: add vrn p+r realtime fix](https://github.com/ParkenDD/parkapi-sources-v3/pull/401)
+* [ParkAPI Sources: ignore apcoa hidden, add mapping docs](https://github.com/ParkenDD/parkapi-sources-v3/pull/403)
+* [ParkAPI Sources: allow any apcoa type and ignore it](https://github.com/ParkenDD/parkapi-sources-v3/pull/404)
+* [ParkAPI Sources: fix heidelberg disabled name](https://github.com/ParkenDD/parkapi-sources-v3/pull/402)
+
+
+
+## 0.46.0
+
+Released 2026-06-21
+
 ### Features
 
 * [ParkAPI Sources: Ellwangen parking via Sensit API](https://github.com/ParkenDD/parkapi-sources-v3/pull/390)
@@ -23,6 +43,8 @@
 
 
 ## 0.45.1
+
+Released 2026-06-16
 
 ### Fixes
 
