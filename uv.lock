@@ -1021,7 +1021,7 @@ dev = [
 
 [[package]]
 name = "parkapi-sources"
-version = "0.38.0"
+version = "0.38.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1035,9 +1035,9 @@ dependencies = [
     { name = "urllib3" },
     { name = "validataclass" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4e/04/c16b4636710f8dcb13493300a185f0dfa0f110da4d901ff3a23ddcbcd545/parkapi_sources-0.38.0.tar.gz", hash = "sha256:7c95a6c36d517b45c1456f3b59aae55628c80e2847cd04fb716cf9d2ca3b96f4", size = 126077, upload-time = "2026-07-06T17:46:09.12Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/10/ba629e8f58a571146e212c5c101cca7a90d4ae0a3fa540b7cde9b1c208ce/parkapi_sources-0.38.1.tar.gz", hash = "sha256:d498dbb016264215857134ac3a62806fcb9c4504ab098c131de84f0385050ea1", size = 126493, upload-time = "2026-07-08T07:46:43.43Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5f/6a/6f2153e4bcf3f6a543f78cdd86dcaa476fbc0ebeb2e0cf42758398876ae2/parkapi_sources-0.38.0-py3-none-any.whl", hash = "sha256:fa316a167937d0169739108c9b170fe33723b3b628a16393c3fcd01cf12e5d80", size = 274885, upload-time = "2026-07-06T17:46:07.763Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/3c/5fdadcb8645d2be96cc1d21b5560ffa111434faaaeeba5d2ce4b2826aefd/parkapi_sources-0.38.1-py3-none-any.whl", hash = "sha256:bbd737f853fc0c03511ea5dea617839daf4b2ddc0d311bd2cd110a60207d05ad", size = 275320, upload-time = "2026-07-08T07:46:41.978Z" },
 ]
 
 [[package]]

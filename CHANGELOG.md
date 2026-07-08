@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.47.1
+
+Released 2026-07-08
+
+### Fixes
+
+* [ParkAPI Sources: add child class attributes at toll collect](https://github.com/ParkenDD/parkapi-sources-v3/pull/405)
+
+
 ## 0.47.0
 
 Released 2026-07-06
