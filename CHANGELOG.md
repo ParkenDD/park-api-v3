@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.47.2
+
+Released 2026-07-13
+
+### Fixes
+
+* [ParkAPI Sources: remove karlsruhe cert injection](https://github.com/ParkenDD/parkapi-sources-v3/pull/408)
+
+
 ## 0.47.1
 
 Released 2026-07-08

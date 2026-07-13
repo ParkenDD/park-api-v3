@@ -994,7 +994,7 @@ requires-dist = [
     { name = "lxml", specifier = "~=6.1.1" },
     { name = "opening-hours-py", specifier = "~=2.0.2" },
     { name = "openpyxl", specifier = "~=3.1.5" },
-    { name = "parkapi-sources", specifier = "~=0.38.0" },
+    { name = "parkapi-sources", specifier = "~=0.38.1" },
     { name = "psycopg2-binary", specifier = "~=2.9.12" },
     { name = "pymysql", specifier = "~=1.2.0" },
     { name = "python-dotenv", specifier = "~=1.2.2" },
