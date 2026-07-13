@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.47.3
+
+Released 2026-07-13
+
+### Fixes
+
+* [ParkAPI Sources: fix more karlsruhe ca](https://github.com/ParkenDD/parkapi-sources-v3/pull/409)
+
+
 ## 0.47.2
 
 Released 2026-07-13
