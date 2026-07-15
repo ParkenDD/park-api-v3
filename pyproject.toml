@@ -39,7 +39,7 @@ dependencies = [
 dev = [
     "pytest~=9.1.1",
     "pytest-cov~=7.1.0",
-    "ruff~=0.15.18",
+    "ruff~=0.15.21",
     "freezegun~=1.5.5",
     "openapi-core~=0.23.1",
 ]
