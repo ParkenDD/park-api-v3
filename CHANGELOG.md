@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.47.4
+
+Released 2026-07-13
+
+### Fixes
+
+* [ParkAPI Sources: readable name for esslingen](https://github.com/ParkenDD/parkapi-sources-v3/pull/407)
+* [ParkAPI Sources: change name to readable names from parking type](https://github.com/ParkenDD/parkapi-sources-v3/pull/410)
+* [ParkAPI Sources: fix timeout issues](https://github.com/ParkenDD/parkapi-sources-v3/pull/411)
+
+
 ## 0.47.3
 
 Released 2026-07-13
