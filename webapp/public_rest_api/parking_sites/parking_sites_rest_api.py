@@ -14,7 +14,15 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, BooleanField, EnumField, IntegerField, NumericField, StringField
+from flask_openapi.schema import (
+    ArrayField,
+    BooleanField,
+    DateTimeField,
+    EnumField,
+    IntegerField,
+    NumericField,
+    StringField,
+)
 from parkapi_sources.models import ParkingSiteType
 from parkapi_sources.models.enums import PurposeType
 from validataclass.validators import BooleanValidator, DataclassValidator
@@ -131,6 +139,12 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
             Parameter('type', schema=EnumField(enum=ParkingSiteType)),
             Parameter('not_type', schema=EnumField(enum=ParkingSiteType)),
             Parameter('official_region_code', schema=StringField(maxLength=36), example='083110000000'),
+            Parameter(
+                'modified_since',
+                schema=DateTimeField(),
+                description='Just return ParkingSites which were modified at or after this datetime.',
+                example='2025-01-01T00:00:00+00:00',
+            ),
             Parameter(
                 'ignore_duplicates',
                 schema=BooleanField(),
