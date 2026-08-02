@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 ENV PATH="${PATH}:/home/flask/.local/bin/"
 
-COPY --from=ghcr.io/astral-sh/uv:0.11.23 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.1 /uv /uvx /usr/local/bin/
 
 WORKDIR /app
 
