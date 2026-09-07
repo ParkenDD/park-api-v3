@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.48.0
+
+Released 2026-09-07
+
+### Features
+
+* [`modified_since` filter for parking sites and parking spots](https://github.com/ParkenDD/park-api-v3/pull/407)
+* [ParkAPI Sources: Nagold Bike Converter](https://github.com/ParkenDD/parkapi-sources-v3/pull/416)
+* [ParkAPI Sources: Update mapping nagold bike](https://github.com/ParkenDD/parkapi-sources-v3/pull/417)
+
+
+### Fixes
+
+* [ParkAPI Sources: Sensade: update park and ride type to CARPOOL](https://github.com/ParkenDD/parkapi-sources-v3/pull/420)
+* [ParkAPI Sources: radvis update](https://github.com/ParkenDD/parkapi-sources-v3/pull/421)
+* [ParkAPI Sources: RADVIS: add new mapping](https://github.com/ParkenDD/parkapi-sources-v3/pull/419)
+* [ParkAPI Sources: updated friedrichshafen easypark](https://github.com/ParkenDD/parkapi-sources-v3/pull/423)
+* [ParkAPI Sources: Friedrichshafen: Update permissions_translation](https://github.com/ParkenDD/parkapi-sources-v3/pull/413)
+
+
+### Maintenance
+
+* [Dependency updates](https://github.com/ParkenDD/park-api-v3/pull/409)
+* [Dependency updates](https://github.com/ParkenDD/park-api-v3/pull/418)
+* [ParkAPI Sources: dependency updates](https://github.com/ParkenDD/parkapi-sources-v3/pull/415)
+* [ParkAPI Sources: dependency updates](https://github.com/ParkenDD/parkapi-sources-v3/pull/422)
+
+
 ## 0.47.4
 
 Released 2026-07-13
