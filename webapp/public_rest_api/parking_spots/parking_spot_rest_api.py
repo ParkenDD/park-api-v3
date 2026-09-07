@@ -14,7 +14,7 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, BooleanField, IntegerField, NumericField, StringField
+from flask_openapi.schema import ArrayField, BooleanField, DateTimeField, IntegerField, NumericField, StringField
 from validataclass.validators import BooleanValidator, DataclassValidator
 
 from webapp.dependencies import dependencies
@@ -113,6 +113,12 @@ class ParkingSpotListMethodView(ParkingSpotBaseMethodView):
             Parameter('lon_min', schema=NumericField(), example=5.0, description='Bounding box'),
             Parameter('lon_max', schema=NumericField(), example=5.5, description='Bounding box'),
             Parameter('official_region_code', schema=StringField(maxLength=36), example='083110000000'),
+            Parameter(
+                'modified_since',
+                schema=DateTimeField(),
+                description='Just return ParkingSpots which were modified at or after this datetime.',
+                example='2025-01-01T00:00:00+00:00',
+            ),
             Parameter(
                 'calculate_has_realtime_data',
                 schema=BooleanField(),

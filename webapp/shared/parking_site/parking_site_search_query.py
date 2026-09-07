@@ -64,6 +64,7 @@ class ParkingSiteSearchInput(ParkingSiteBaseSearchInput, CursorPaginationMixin):
         SearchParamUntil('realtime_data_updated_at'),
         DateTimeToUtcValidator(),
     )
+    modified_since: datetime | None = SearchParamSince('modified_at'), DateTimeToUtcValidator()
 
     lat_min: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lat_max: Optional[Decimal] = SearchParamCustom(), NumericValidator()

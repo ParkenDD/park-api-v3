@@ -3,6 +3,7 @@ Copyright 2025 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -10,10 +11,17 @@ from parkapi_sources.models import ParkingSiteType
 from validataclass.dataclasses import Default
 from validataclass.exceptions import ValidationError
 from validataclass.validators import EnumValidator, IntegerValidator, NumericValidator, StringValidator
-from validataclass_search_queries.filters import SearchParamCustom, SearchParamEquals, SearchParamMultiSelect
+from validataclass_search_queries.filters import (
+    SearchParamCustom,
+    SearchParamEquals,
+    SearchParamMultiSelect,
+    SearchParamSince,
+)
 from validataclass_search_queries.pagination import CursorPaginationMixin, PaginationLimitValidator
 from validataclass_search_queries.search_queries import BaseSearchQuery, search_query_dataclass
 from validataclass_search_queries.validators import MultiSelectValidator
+
+from webapp.common.validation import DateTimeToUtcValidator
 
 
 @search_query_dataclass
@@ -24,6 +32,7 @@ class ParkingSpotSearchInput(CursorPaginationMixin, BaseSearchQuery):
     source_uids: Optional[list[str]] = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
     type: ParkingSiteType | None = SearchParamEquals(), EnumValidator(ParkingSiteType)
     official_region_code: str | None = SearchParamEquals(), StringValidator(min_length=1, max_length=36)
+    modified_since: datetime | None = SearchParamSince('modified_at'), DateTimeToUtcValidator()
 
     lat: Optional[Decimal] = SearchParamCustom(), NumericValidator()
     lon: Optional[Decimal] = SearchParamCustom(), NumericValidator()
