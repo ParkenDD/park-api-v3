@@ -168,7 +168,6 @@ class ParkingSiteXlsxImportService(BaseService):
                 'public_url',
                 'is_park_ride',
                 'description',
-                'is_supervised',
             ]
             for key in direct_copy_keys:
                 setattr(parking_site, key, getattr(parking_site_input, key))

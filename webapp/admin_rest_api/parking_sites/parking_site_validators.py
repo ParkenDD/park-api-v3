@@ -3,20 +3,11 @@ Copyright 2024 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
-from dataclasses import fields
-from typing import Any
-
-from parkapi_sources.models import (
-    CombinedParkingSiteInput,
-    ParkingRestrictionInput,
-    ParkingSiteRestrictionInput,
-    ParkingSpotRestrictionInput,
-)
+from parkapi_sources.models import CombinedParkingSiteInput
 from parkapi_sources.models.enums import PurposeType
 from validataclass.dataclasses import Default, validataclass
 from validataclass.validators import (
     AnythingValidator,
-    DataclassValidator,
     EnumValidator,
     IntegerValidator,
     ListValidator,
@@ -31,35 +22,6 @@ class LegacyCombinedParkingSiteInput(CombinedParkingSiteInput):
     # CAR here so existing clients that don't send a purpose keep working.
     # TODO: remove this default after a migration period so `purpose` becomes required again.
     purpose: PurposeType = EnumValidator(PurposeType), Default(PurposeType.CAR)
-
-    restricted_to: list[ParkingRestrictionInput] = (
-        Noneable(ListValidator(DataclassValidator(ParkingSpotRestrictionInput))),
-        Default(None),
-    )
-
-    def to_combined_parking_site_input(self) -> CombinedParkingSiteInput:
-        combined_parking_site_dict: dict[str, Any] = {}
-        # prevent recursive dataclass to dict by using fields
-        for field in fields(self):
-            key = field.name
-            if key == 'restricted_to':
-                continue
-
-            combined_parking_site_dict[key] = getattr(self, key)
-
-        combined_parking_site_input = CombinedParkingSiteInput(**combined_parking_site_dict)
-
-        if self.restricted_to is not None:
-            for restriction in self.restricted_to:
-                combined_parking_site_input.restrictions.append(
-                    ParkingSiteRestrictionInput(
-                        type=restriction.type,
-                        hours=restriction.hours,
-                        max_stay=restriction.max_stay,
-                    ),
-                )
-
-        return combined_parking_site_input
 
 
 @validataclass

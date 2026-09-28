@@ -136,11 +136,6 @@ class ParkingSpot(BaseModel):
             for parking_restriction in self.restrictions:
                 result['restrictions'].append(parking_restriction.to_dict(fields=['type', 'hours', 'max_stay']))
 
-            # Legacy output
-            result['restricted_to'] = []
-            for parking_restriction in self.restrictions:
-                result['restricted_to'].append(parking_restriction.to_dict(fields=['type', 'hours', 'max_stay']))
-
         if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []
             for external_identifier in self.external_identifiers:

@@ -204,10 +204,6 @@ class ParkingSite(BaseModel):
         if result.get('lon') is not None:
             result['lon'] = float(result['lon'])
 
-        # Add legacy field is_supervised
-        if self.supervision_type is not None:
-            result['is_supervised'] = self.supervision_type != SupervisionType.NO
-
         if include_restrictions and len(self.restrictions):
             result['restrictions'] = []
             for restrictions in self.restrictions:
@@ -216,14 +212,6 @@ class ParkingSite(BaseModel):
                         fields=['type', 'hours', 'max_stay', 'capacity', 'realtime_capacity', 'realtime_free_capacity'],
                     ),
                 )
-
-            # Legacy output
-            result['restricted_to'] = []
-            for restrictions in self.restrictions:
-                # It would be misleading to output a restriction without capacity at the legacy field
-                if restrictions.capacity is not None:
-                    continue
-                result['restricted_to'].append(restrictions.to_dict(fields=['type', 'hours', 'max_stay']))
 
         if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []
