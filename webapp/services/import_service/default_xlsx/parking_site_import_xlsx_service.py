@@ -10,10 +10,11 @@ from typing import List
 from openpyxl.cell import Cell
 from openpyxl.reader.excel import load_workbook
 from openpyxl.worksheet.worksheet import Worksheet
+from parkapi_sources.models.enums import ParkingAudience, PurposeType
 from validataclass.exceptions import ValidationError
 from validataclass.validators import DataclassValidator
 
-from webapp.models import ParkingSite, Source
+from webapp.models import ParkingRestriction, ParkingSite, Source
 from webapp.models.parking_site import ParkingSiteType
 from webapp.models.source import SourceStatus
 from webapp.repositories import ParkingSiteRepository, SourceRepository
@@ -32,6 +33,13 @@ class ParkingSiteXlsxImportService(BaseService):
     source_repository: SourceRepository
 
     parking_site_validator = DataclassValidator(ParkingSiteInput)
+
+    restriction_mapping: dict[str, ParkingAudience] = {
+        'capacity_carsharing': ParkingAudience.CARSHARING,
+        'capacity_charging': ParkingAudience.CHARGING,
+        'capacity_woman': ParkingAudience.WOMEN,
+        'capacity_disabled': ParkingAudience.DISABLED,
+    }
 
     header_row: dict[str, str] = {
         'ID': 'original_uid',
@@ -142,6 +150,8 @@ class ParkingSiteXlsxImportService(BaseService):
                 parking_site = ParkingSite()
                 parking_site.source_id = source.id
                 parking_site.original_uid = parking_site_input.original_uid
+                # The XLSX format is for car parking sites only
+                parking_site.purpose = PurposeType.CAR
 
             direct_copy_keys = [
                 'name',
@@ -151,11 +161,6 @@ class ParkingSiteXlsxImportService(BaseService):
                 'address',
                 'max_stay',
                 'capacity',
-                'capacity_carsharing',
-                'capacity_charging',
-                'capacity_charging',
-                'capacity_woman',
-                'capacity_disabled',
                 'has_lighting',
                 'has_fee',
                 'has_live_data',
@@ -169,6 +174,21 @@ class ParkingSiteXlsxImportService(BaseService):
                 setattr(parking_site, key, getattr(parking_site_input, key))
 
             parking_site.type = self.type_mapping.get(parking_site_input.type)
+
+            # Replace capacity restrictions for audiences covered by the XLSX, keep all other restrictions
+            restrictions: list[ParkingRestriction] = [
+                restriction
+                for restriction in parking_site.restrictions
+                if restriction.type not in self.restriction_mapping.values()
+            ]
+            for key, audience in self.restriction_mapping.items():
+                if getattr(parking_site_input, key) is None:
+                    continue
+                restriction = ParkingRestriction()
+                restriction.type = audience
+                restriction.capacity = getattr(parking_site_input, key)
+                restrictions.append(restriction)
+            parking_site.restrictions = restrictions
 
             if parking_site_input.opening_hours_is_24_7 is True:
                 parking_site.opening_hours = '24/7'

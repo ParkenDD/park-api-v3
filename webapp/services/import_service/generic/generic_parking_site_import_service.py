@@ -9,7 +9,6 @@ from datetime import datetime, timezone
 import structlog
 from parkapi_sources.exceptions import ImportParkingSiteException
 from parkapi_sources.models import (
-    CombinedParkingSiteInput,
     ParkingAudience,
     ParkingSiteRestrictionInput,
     RealtimeParkingSiteInput,
@@ -26,16 +25,6 @@ from webapp.repositories.exceptions import ObjectNotFoundException
 from .generic_base_import_service import GenericBaseImportService
 
 logger = structlog.get_logger(__name__)
-
-RESTRICTION_MAPPING: dict[ParkingAudience, str] = {
-    ParkingAudience.DISABLED: 'capacity_disabled',
-    ParkingAudience.WOMEN: 'capacity_woman',
-    ParkingAudience.FAMILY: 'capacity_family',
-    ParkingAudience.CHARGING: 'capacity_charging',
-    ParkingAudience.CARSHARING: 'capacity_carsharing',
-    ParkingAudience.TRUCK: 'capacity_truck',
-    ParkingAudience.BUS: 'capacity_bus',
-}
 
 
 class GenericParkingSiteImportService(GenericBaseImportService):
@@ -124,26 +113,6 @@ class GenericParkingSiteImportService(GenericBaseImportService):
         self.set_related_objects(parking_site_input, parking_site)
 
         self.assign_official_region_code(parking_site)
-
-        # Legacy mapping
-        if parking_site_input.restrictions:
-            for restriction_input in parking_site_input.restrictions:
-                if restriction_input.type not in RESTRICTION_MAPPING:
-                    continue
-                setattr(parking_site, RESTRICTION_MAPPING[restriction_input.type], restriction_input.capacity)
-
-                # Don't overwrite realtime data in case of static data
-                if isinstance(parking_site_input, CombinedParkingSiteInput):
-                    setattr(
-                        parking_site,
-                        f'realtime_{RESTRICTION_MAPPING[restriction_input.type]}',
-                        restriction_input.realtime_capacity,
-                    )
-                    setattr(
-                        parking_site,
-                        f'realtime_free_{RESTRICTION_MAPPING[restriction_input.type]}',
-                        restriction_input.realtime_free_capacity,
-                    )
 
         if parking_site_input.group_uid:
             try:
@@ -269,21 +238,6 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                     type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
                 restriction.realtime_free_capacity = compare_capacity
-
-        # Legacy mapping
-        for restriction in parking_site.restrictions:
-            if restriction.type is None or restriction.type not in RESTRICTION_MAPPING:
-                continue
-            setattr(
-                realtime_parking_site_input,
-                f'realtime_{RESTRICTION_MAPPING[restriction.type]}_capacity',
-                restriction.realtime_capacity,
-            )
-            setattr(
-                realtime_parking_site_input,
-                f'realtime_{RESTRICTION_MAPPING[restriction.type]}_free_capacity',
-                restriction.realtime_free_capacity,
-            )
 
         self.parking_site_repository.save_parking_site(parking_site)
         if history_enabled and history_changed:

@@ -110,33 +110,6 @@ def test_upsert_parking_site_list(
     }
 
 
-def test_upsert_parking_site_list_legacy_fields(
-    rest_enabled_source: None,
-    admin_api_test_client: FlaskClient,
-) -> None:
-    result = admin_api_test_client.post(
-        '/api/admin/v1/parking-sites/upsert-list',
-        auth=('source', 'test'),
-        json=load_admin_client_request_input('parking-site-list-with-legacy-fields'),
-    )
-
-    assert result.status_code == HTTPStatus.OK
-    assert result.json == {
-        'items': [PARKING_SITE_RESPONSE_ITEM_WITH_RESTRICTIONS],
-        'errors': [
-            {
-                'source_uid': 'source',
-                'message': 'Invalid parking site',
-                'data': {
-                    'code': 'field_errors',
-                    'field_errors': {'type': {'code': 'required_field'}, 'uid': {'code': 'required_field'}},
-                },
-                'parking_site_uid': None,
-            },
-        ],
-    }
-
-
 def test_upsert_parking_site_item(
     rest_enabled_source: None,
     admin_api_test_client: FlaskClient,
@@ -149,20 +122,6 @@ def test_upsert_parking_site_item(
 
     assert result.status_code == HTTPStatus.OK
     assert result.json == PARKING_SITE_RESPONSE_ITEM
-
-
-def test_upsert_parking_site_item_with_legacy_fields(
-    rest_enabled_source: None,
-    admin_api_test_client: FlaskClient,
-) -> None:
-    result = admin_api_test_client.post(
-        '/api/admin/v1/parking-sites/upsert-item',
-        auth=('source', 'test'),
-        json=load_admin_client_request_input('parking-site-item-with-legacy-fields'),
-    )
-
-    assert result.status_code == HTTPStatus.OK
-    assert result.json == PARKING_SITE_RESPONSE_ITEM_WITH_RESTRICTIONS
 
 
 def test_upsert_parking_site_item_with_legacy_restricted_to(
@@ -379,23 +338,6 @@ PARKING_SITE_RESPONSE_ITEM = {
 }
 
 
-PARKING_SITE_RESPONSE_ITEM_WITH_RESTRICTIONS = {
-    **PARKING_SITE_RESPONSE_ITEM,
-    'capacity_disabled': 11,
-    'realtime_capacity_disabled': 10,
-    'realtime_free_capacity_disabled': 2,
-    'restricted_to': [],
-    'restrictions': [
-        {
-            'capacity': 11,
-            'realtime_capacity': 10,
-            'realtime_free_capacity': 2,
-            'type': 'DISABLED',
-        },
-    ],
-}
-
-
 PARKING_SITE_RESPONSE_ITEM_WITH_RESTRICTED_TO = {
     **PARKING_SITE_RESPONSE_ITEM,
     'restricted_to': [
@@ -427,9 +369,6 @@ PARKING_SITE_RESPONSE_ITEM_WITH_RELATIONS = {
             'value': '123456789',
         },
     ],
-    'capacity_disabled': 11,
-    'realtime_capacity_disabled': 10,
-    'realtime_free_capacity_disabled': 2,
     'restricted_to': [
         {
             'max_stay': 'PT2H',
