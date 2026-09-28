@@ -163,7 +163,7 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | tags                     | str                              | *           |                                                                                                                                                           | 
 
 
-### ParkingSiteRestriction
+### ParkingRestriction
 
 | Field                  | Type            | Cardinality | Description                                                                                                                                                                                  |
 |------------------------|-----------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
