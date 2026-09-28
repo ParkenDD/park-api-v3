@@ -130,8 +130,7 @@ class ParkingSiteHandler(AdminApiBaseHandler):
                 )
                 continue
 
-            combined_parking_site_input = legacy_combined_parking_site_input.to_combined_parking_site_input()
-            combined_parking_site_inputs.append(combined_parking_site_input)
+            combined_parking_site_inputs.append(legacy_combined_parking_site_input)
 
         combined_parking_site_inputs = self.apply_static_patches(
             source_uid=source.uid,

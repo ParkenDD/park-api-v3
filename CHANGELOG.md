@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.49.1
+
+Released 2026-09-28
+
+> [!WARNING]
+> **Breaking change:** the legacy attribute `restricted_to` (parking sites and parking spots) is no longer accepted
+> as input and no longer part of the API output, use `restrictions` instead. The legacy output attribute
+> `is_supervised` has been removed as well, use `supervision_type` instead.
+
+### Maintenance
+
+* Remove legacy attributes `restricted_to` and `is_supervised`
+
+
 ## 0.49.0
 
 Released 2026-09-28

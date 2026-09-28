@@ -306,7 +306,7 @@ class ParkingSiteUpsertItemMethodView(ParkingSiteBaseMethodView):
 
         response = self.parking_site_handler.upsert_parking_site_item(
             source_uid=self.server_auth_helper.get_current_user().username,
-            combined_parking_site_input=parking_site.to_combined_parking_site_input(),
+            combined_parking_site_input=parking_site,
         )
 
         return jsonify(response), HTTPStatus.OK

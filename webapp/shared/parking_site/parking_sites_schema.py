@@ -84,10 +84,6 @@ parking_site_schema = JsonSchema(
         'max_width': IntegerField(minimum=0, required=False, description='Max width, in centimeters.'),
         'has_lighting': BooleanField(required=False),
         'park_and_ride_type': ArrayField(items=EnumField(enum=ParkAndRideType), required=False),
-        'is_supervised': BooleanField(
-            required=False,
-            description='*Deprecated, will be replaced by supervision_type.*',
-        ),
         'supervision_type': EnumField(enum=SupervisionType, required=False),
         'is_covered': BooleanField(required=False),
         'orientation': EnumField(enum=ParkingSiteOrientation, required=False),
@@ -134,12 +130,6 @@ parking_site_schema = JsonSchema(
                 'type': AnyOfField(allowed_values=['Polygon', 'MultiPolygon', 'LineString', 'MultiLineString']),
             },
             additionalProperties=True,
-        ),
-        'restricted_to': ArrayField(
-            items=Reference(obj='ParkingSiteRestriction'),
-            required=False,
-            description='*Deprecated, use restrictions instead.*<br>Restrictions which apply. If there are multiple '
-            'options, they should be understood with an logical or.',
         ),
         'restrictions': ArrayField(
             items=Reference(obj='ParkingSiteRestriction'),

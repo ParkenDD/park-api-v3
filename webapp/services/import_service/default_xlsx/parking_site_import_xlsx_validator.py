@@ -37,7 +37,6 @@ class ParkingSiteInput:
     max_stay: Optional[int] = ExcelNoneable(GermanDurationIntegerValidator()), Default(None)
     has_lighting: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)
     is_park_ride: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)
-    is_supervised: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)
     has_fee: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)
     fee_description: Optional[str] = ExcelNoneable(StringValidator(max_length=4096)), Default(None)
     has_live_data: Optional[bool] = ExcelNoneable(ExtendedBooleanValidator()), Default(None)

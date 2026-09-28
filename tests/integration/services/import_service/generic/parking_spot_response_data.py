@@ -46,13 +46,6 @@ CREATE_PARKING_SPOT_REALTIME_DATA = {
 
 CREATE_PARKING_SPOT_WITH_PARKING_RESTRICTIONS_DATA = {
     **CREATE_PARKING_SPOT_STATIC_DATA,
-    'restricted_to': [
-        {
-            'hours': 'Mo-Fr 08:00-18:00',
-            'max_stay': timedelta(hours=6),
-            'type': ParkingAudience.DISABLED,
-        },
-    ],
     'restrictions': [
         {
             'hours': 'Mo-Fr 08:00-18:00',

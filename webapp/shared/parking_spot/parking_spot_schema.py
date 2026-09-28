@@ -58,12 +58,6 @@ parking_spot_schema = JsonSchema(
             },
             additionalProperties=True,
         ),
-        'restricted_to': ArrayField(
-            items=Reference(obj='ParkingSpotRestriction'),
-            required=False,
-            description='*Deprecated, use restrictions instead.*<br>Restrictions which apply. If there are multiple '
-            'options, they should be understood with an logical or. ',
-        ),
         'restrictions': ArrayField(
             items=Reference(obj='ParkingSpotRestriction'),
             required=False,
