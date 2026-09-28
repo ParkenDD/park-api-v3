@@ -40,87 +40,8 @@ parking_site_base_properties = {
         description='Last time static fields were updated. Can be set by the client.',
     ),
     'capacity': IntegerField(minimum=0),
-    'capacity_disabled': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
-    'capacity_woman': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
-    'capacity_family': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
-    'capacity_charging': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
-    'capacity_carsharing': IntegerField(
-        minimum=0, required=False, description='*Deprecated, use restrictions instead.*'
-    ),
-    'capacity_truck': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
-    'capacity_bus': IntegerField(minimum=0, required=False, description='*Deprecated, use restrictions instead.*'),
     'realtime_capacity': IntegerField(minimum=0, required=False),
-    'realtime_capacity_disabled': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_capacity_woman': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_capacity_family': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_capacity_charging': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_capacity_carsharing': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_capacity_truck': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_capacity_bus': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
     'realtime_free_capacity': IntegerField(minimum=0, required=False),
-    'realtime_free_capacity_disabled': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_free_capacity_woman': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_free_capacity_family': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_free_capacity_charging': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_free_capacity_carsharing': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_free_capacity_truck': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
-    'realtime_free_capacity_bus': IntegerField(
-        minimum=0,
-        required=False,
-        description='*Deprecated, use restrictions instead.*',
-    ),
 }
 
 

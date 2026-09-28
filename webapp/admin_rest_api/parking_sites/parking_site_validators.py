@@ -8,7 +8,6 @@ from typing import Any
 
 from parkapi_sources.models import (
     CombinedParkingSiteInput,
-    ParkingAudience,
     ParkingRestrictionInput,
     ParkingSiteRestrictionInput,
     ParkingSpotRestrictionInput,
@@ -25,16 +24,6 @@ from validataclass.validators import (
     StringValidator,
 )
 
-CAPACITY_TYPES: dict[str, ParkingAudience] = {
-    'disabled': ParkingAudience.DISABLED,
-    'woman': ParkingAudience.WOMEN,
-    'family': ParkingAudience.FAMILY,
-    'charging': ParkingAudience.CHARGING,
-    'carsharing': ParkingAudience.CARSHARING,
-    'truck': ParkingAudience.TRUCK,
-    'bus': ParkingAudience.BUS,
-}
-
 
 @validataclass
 class LegacyCombinedParkingSiteInput(CombinedParkingSiteInput):
@@ -42,63 +31,6 @@ class LegacyCombinedParkingSiteInput(CombinedParkingSiteInput):
     # CAR here so existing clients that don't send a purpose keep working.
     # TODO: remove this default after a migration period so `purpose` becomes required again.
     purpose: PurposeType = EnumValidator(PurposeType), Default(PurposeType.CAR)
-
-    capacity_disabled: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    capacity_woman: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-    capacity_family: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-    capacity_charging: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    capacity_carsharing: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    capacity_truck: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-    capacity_bus: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-
-    realtime_capacity_disabled: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-    realtime_capacity_woman: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-    realtime_capacity_family: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-    realtime_capacity_charging: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-    realtime_capacity_carsharing: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    realtime_capacity_truck: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-    realtime_capacity_bus: int | None = Noneable(IntegerValidator(min_value=0, allow_strings=True)), Default(None)
-
-    realtime_free_capacity_disabled: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    realtime_free_capacity_woman: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    realtime_free_capacity_family: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    realtime_free_capacity_charging: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    realtime_free_capacity_carsharing: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    realtime_free_capacity_truck: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
-    realtime_free_capacity_bus: int | None = (
-        Noneable(IntegerValidator(min_value=0, allow_strings=True)),
-        Default(None),
-    )
 
     restricted_to: list[ParkingRestrictionInput] = (
         Noneable(ListValidator(DataclassValidator(ParkingSpotRestrictionInput))),
@@ -110,7 +42,7 @@ class LegacyCombinedParkingSiteInput(CombinedParkingSiteInput):
         # prevent recursive dataclass to dict by using fields
         for field in fields(self):
             key = field.name
-            if key.endswith(tuple(CAPACITY_TYPES.keys())) or key == 'restricted_to':
+            if key == 'restricted_to':
                 continue
 
             combined_parking_site_dict[key] = getattr(self, key)
@@ -124,17 +56,6 @@ class LegacyCombinedParkingSiteInput(CombinedParkingSiteInput):
                         type=restriction.type,
                         hours=restriction.hours,
                         max_stay=restriction.max_stay,
-                    ),
-                )
-
-        for key, audience in CAPACITY_TYPES.items():
-            if getattr(self, f'capacity_{key}') is not None:
-                combined_parking_site_input.restrictions.append(
-                    ParkingSiteRestrictionInput(
-                        type=audience,
-                        capacity=getattr(self, f'capacity_{key}'),
-                        realtime_capacity=getattr(self, f'realtime_capacity_{key}'),
-                        realtime_free_capacity=getattr(self, f'realtime_free_capacity_{key}'),
                     ),
                 )
 
