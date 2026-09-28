@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.49.0
+
+Released 2026-09-28
+
+> [!WARNING]
+> **Breaking change:** the legacy capacity attributes, deprecated since 0.35.0, have been removed. This affects
+> `capacity_{audience}`, `realtime_capacity_{audience}` and `realtime_free_capacity_{audience}` for the audiences
+> `disabled`, `woman`, `family`, `charging`, `carsharing`, `truck` and `bus`. They are no longer accepted as input
+> and no longer part of the API output, and the corresponding database columns are dropped by a migration. Please use
+> `restrictions` instead.
+
+### Maintenance
+
+* [Remove legacy attributes](https://github.com/ParkenDD/park-api-v3/pull/428)
+
+
 ## 0.48.0
 
 Released 2026-09-07
