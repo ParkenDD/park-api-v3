@@ -45,57 +45,57 @@ A `ParkingZone` is a geographic area which defined specific properties for the w
 
 `ParkingSite`s can to be assigned to one or many ParkingZones. It’s possible that there are `ParkingSite`s within the area of the ParkingZone which are not assigned to this zone, for example underground parking within a larger off on street parking tariff zone.
 
-| Field         | Type                    | Cardinality | Descrption                                                                   |
-|---------------|-------------------------|-------------|------------------------------------------------------------------------------|
-| uid           | str                     | 1           | Unique uid for this source                                                   |
-| geojson       | GeoJSON Geometry        | ?           | Polygon/MultiPolygon                                                         |
-| tariffs       | Tariff                  | *           |                                                                              |
-| restrictions  | ParkingRestriction      | *           | If there are multiple options, they should be understood with an logical or. |
-| name          | str                     | ?           |                                                                              |
-| abbreviation  | str                     | ?           |                                                                              |
-| color         | str (hex encoded color) | ?           | If color is used, e.g. at parking meters                                     |
+| Field        | Type                                      | Cardinality | Description                                                                  |
+|--------------|-------------------------------------------|-------------|------------------------------------------------------------------------------|
+| uid          | str                                       | 1           | Unique uid for this source                                                   |
+| geojson      | [GeoJSON Geometry](#geojson-geometry)     | ?           | Polygon/MultiPolygon                                                         |
+| tariffs      | [Tariff](#tariff)                         | *           |                                                                              |
+| restrictions | [ParkingRestriction](#parkingrestriction) | *           | If there are multiple options, they should be understood with an logical or. |
+| name         | str                                       | ?           |                                                                              |
+| abbreviation | str                                       | ?           |                                                                              |
+| color        | str (hex encoded color)                   | ?           | If color is used, e.g. at parking meters                                     |
 
 ## Tariff
 
 A `Tariff` is the whole tariff system which contains one or more tariff options. There is just one `Tariff` valid at a time. If there is any option valid for the customer, they have to take it. If there is no valid option, parking is free. Tariffs do not overrule restrictions like `max_stay` or `restrictions`.
 
-| Field           | Type                | Cardinality | Description                                                                                                                                   |
-|-----------------|---------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| uid             | str                 | 1           | Unique uid for this source                                                                                                                    |
-| currency        | str(currency)       | 1           | Currency                                                                                                                                      |
-| name            | str                 | ?           | A name for this tariff                                                                                                                        |
-| tax_rate        | str (decimal(5, 4)) | 1           | As fragment, 19 % is represented as `0.19`                                                                                                    |
-| min_price       | str (decimal)       | ?           | Gross value. Min price which is charged anyway.                                                                                               |
-| max_price       | str (decimal)       | ?           | Gross value. Max price which is charged anyway.                                                                                               |
-| start_date_time | str (date-time)     | ?           | When the tariff gets valid                                                                                                                    |
-| end_date_time   | str (date-time)     | ?           | When the tariff gets invalid                                                                                                                  |
-| updated_at      | str (date-time)     | 1           | Last update                                                                                                                                   |
-| options         | TariffOption        | +           | Different tariff options. The customer must take one option which is valid for them. If there is no option for the customer, parking is free. |
+| Field           | Type                               | Cardinality | Description                                                                                                                                   |
+|-----------------|------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| uid             | str                                | 1           | Unique uid for this source                                                                                                                    |
+| currency        | [str(currency)](#strcurrency)      | 1           | Currency                                                                                                                                      |
+| name            | str                                | ?           | A name for this tariff                                                                                                                        |
+| tax_rate        | [str (decimal(5, 4))](#strdecimal) | 1           | As fragment, 19 % is represented as `0.19`                                                                                                    |
+| min_price       | [str (decimal)](#strdecimal)       | ?           | Gross value. Min price which is charged anyway.                                                                                               |
+| max_price       | [str (decimal)](#strdecimal)       | ?           | Gross value. Max price which is charged anyway.                                                                                               |
+| start_date_time | [str (date-time)](#strdate-time)   | ?           | When the tariff gets valid                                                                                                                    |
+| end_date_time   | [str (date-time)](#strdate-time)   | ?           | When the tariff gets invalid                                                                                                                  |
+| updated_at      | [str (date-time)](#strdate-time)   | 1           | Last update                                                                                                                                   |
+| options         | [TariffOption](#tariffoption)      | +           | Different tariff options. The customer must take one option which is valid for them. If there is no option for the customer, parking is free. |
 
 ## TariffOption
 
 `TariffOption`s are not additive, this means that the customer can chose any valid option they want. If there is no option, parking is free.
 
-| Field             | Type            | Cardinality | Description                                                                                                                                                                |
-|-------------------|-----------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| components        | TariffComponent | +           | All valid TariffComponents apply.                                                                                                                                          |
-| valid_start_time  | str (time)      | ?           | Local time when the option gets valid. Has to be set together with `valid_start_end`. If neither are set, the option is valid for all day. `24:00` is an allowed value.    |
-| valid_end_time    | str (time)      | ?           | Local time when the option gets invalid. Has to be set together with `valid_start_time`. If neither are set, the option is valid for all day. `24:00` is an allowed value. |
-| valid_day_of_week | Weekday         | *           | Ability to set the weekdays when this tariff is valid. If no weekday is set, it’s valid for all weekdays.                                                                  |
-| valid_audience    | ParkingAudience | *           | List of audiences for which this option is valid. If no audience is set, it’s valid for all audiences.                                                                     |
-| description       | str             | ?           |                                                                                                                                                                            |
+| Field             | Type                                | Cardinality | Description                                                                                                                                                                |
+|-------------------|-------------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| components        | [TariffComponent](#tariffcomponent) | +           | All valid TariffComponents apply.                                                                                                                                          |
+| valid_start_time  | [str (time)](#strtime)              | ?           | Local time when the option gets valid. Has to be set together with `valid_start_end`. If neither are set, the option is valid for all day. `24:00` is an allowed value.    |
+| valid_end_time    | [str (time)](#strtime)              | ?           | Local time when the option gets invalid. Has to be set together with `valid_start_time`. If neither are set, the option is valid for all day. `24:00` is an allowed value. |
+| valid_day_of_week | [Weekday](#weekday)                 | *           | Ability to set the weekdays when this tariff is valid. If no weekday is set, it’s valid for all weekdays.                                                                  |
+| valid_audience    | [ParkingAudience](#parkingaudience) | *           | List of audiences for which this option is valid. If no audience is set, it’s valid for all audiences.                                                                     |
+| description       | str                                 | ?           |                                                                                                                                                                            |
 
 ## TariffComponent
 
-TariffComponent are additive, this means all TariffComponent applies if they are valid. 
+TariffComponent are additive, this means all TariffComponent applies if they are valid.
 
-| Field        | Type                | Cardinality | Description                                                                                                                       |
-|--------------|---------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| type         | TariffComponentType | 1           |                                                                                                                                   |
-| price        | str (decimal)       | 1           | Gross price, per `step_size` unit if type is `TIME`                                                                               |
-| step_size    | str (duration)      | ?           | Step size: as soon as the time enters this amount of time, the `price` is charged. Required if type is `TIME` and price is not 0. |
-| min_duration | str (duration)      | ?           | Min duration for this component, just for type `TIME`.                                                                            |
-| max_duration | str (duration)      | ?           | Max duration for this component, just for type `TIME`.                                                                            |
+| Field        | Type                                        | Cardinality | Description                                                                                                                       |
+|--------------|---------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| type         | [TariffComponentType](#tariffcomponenttype) | 1           |                                                                                                                                   |
+| price        | [str (decimal)](#strdecimal)                | 1           | Gross price, per `step_size` unit if type is `TIME`                                                                               |
+| step_size    | [str (duration)](#strduration)              | ?           | Step size: as soon as the time enters this amount of time, the `price` is charged. Required if type is `TIME` and price is not 0. |
+| min_duration | [str (duration)](#strduration)              | ?           | Min duration for this component, just for type `TIME`.                                                                            |
+| max_duration | [str (duration)](#strduration)              | ?           | Max duration for this component, just for type `TIME`.                                                                            |
 
 ## ParkingSite
 
@@ -120,86 +120,86 @@ in order to provide data in a more consistent way, we decided against this (in t
 
 A `ParkingSite` needs the following extension fields in addition to the existing fields:
 
-| Field                    | Type                             | Cardinality | Descrption                                                                                                                                                |
-|--------------------------|----------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| uid                      | str                              | 1           | Unique uid for this source                                                                                                                                |
-| name                     | str                              | 1           |                                                                                                                                                           |
-| static_data_updated_at   | string (date-time)               | 1           |                                                                                                                                                           |
-| has_realtime_data        | bool                             | 1           |                                                                                                                                                           |
-| realtime_data_updated_at | string (date-time)               | ?           | Required has_realtime_data is true                                                                                                                        |
-| realtime_opening_status  | OpeningStatus                    | ?           | Required has_realtime_data is true                                                                                                                        |
-| operator_name            | str                              | ?           |                                                                                                                                                           |
-| public_url               | str(url)                         | ?           | URL for human users to get more details about this parking site.                                                                                          |
-| type                     | ParkingSiteType                  | ?           |                                                                                                                                                           |
-| description              | str                              | ?           |                                                                                                                                                           |
-| address                  | str                              | ?           | Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city}                                         |
-| max_height               | int                              | ?           | Max height, in centimeters.                                                                                                                               |
-| max_width                | int                              | ?           | Max width, in centimeters.                                                                                                                                |
-| has_lighting             | bool                             | ?           |                                                                                                                                                           |
-| fee_description          | str                              | ?           |                                                                                                                                                           |
-| park_and_ride_type       | ParkAndRideType                  | *           |                                                                                                                                                           |
-| supervision_type         | SupervisionType                  | ?           |                                                                                                                                                           |
-| photo_url                | str(url)                        | ?           |                                                                                                                                                           |
-| related_location         | str                              | ?           | A related location like a school.                                                                                                                         |
-| opening_hours            | str (OSM OH) string                          | ?           |                                                                                                                                                           |
-| lat                      | float                            | 1           | lat                                                                                                                                                       |
-| lon                      | float                            | 1           | lon                                                                                                                                                       |
-| geojson                  | GeoJSON Geometry                 | ?           | Polygon to describe the ParkingSite. The center of this shape will be calculated to the point if the point is not given explicitly.                       |
-| tariffs                  | Tariff                           | *           |                                                                                                                                                           |
-| restrictions             | ParkingSiteRestriction           | *           | If there are multiple options, they should be understood with an logical or. If there are multiple options, they should be understood with an logical or. |
-| purpose                  | PurposeType                      | 1           |                                                                                                                                                           |
-| capacity                 | int                              | 1           |                                                                                                                                                           |
-| capacity_min             | int                              | ?           | The min capacity if there is a uncertainty of measurement                                                                                                 |
-| capacity_max             | int                              | ?           | The max capacity if there is a uncertainty of measurement                                                                                                 |
-| realtime_capacity        | int                              | ?           |                                                                                                                                                           |
-| realtime_free_capacity   | int                              | ?           |                                                                                                                                                           |
-| parking_type             | LinearParkingSiteSideParkingType | ?           | How the car is parked                                                                                                                                     |
-| orientation              | LinearParkingSiteSideOrientation | ?           | How the car is parked in relation to driving direction                                                                                                    |
-| side                     | LinearParkingSiteSideType        | ?           |                                                                                                                                                           |
-| external_identifiers     | ExternalIdentifier               | *           |                                                                                                                                                           |
-| tags                     | str                              | *           |                                                                                                                                                           | 
+| Field                    | Type                                                                  | Cardinality | Descrption                                                                                                                                                |
+|--------------------------|-----------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| uid                      | str                                                                   | 1           | Unique uid for this source                                                                                                                                |
+| name                     | str                                                                   | 1           |                                                                                                                                                           |
+| static_data_updated_at   | [string (date-time)](#strdate-time)                                   | 1           |                                                                                                                                                           |
+| has_realtime_data        | bool                                                                  | 1           |                                                                                                                                                           |
+| realtime_data_updated_at | [string (date-time)](#strdate-time)                                   | ?           | Required has_realtime_data is true                                                                                                                        |
+| realtime_opening_status  | [OpeningStatus](#openingstatus)                                       | ?           | Required has_realtime_data is true                                                                                                                        |
+| operator_name            | str                                                                   | ?           |                                                                                                                                                           |
+| public_url               | str(url)                                                              | ?           | URL for human users to get more details about this parking site.                                                                                          |
+| type                     | [ParkingSiteType](#parkingsitetype)                                   | ?           |                                                                                                                                                           |
+| description              | str                                                                   | ?           |                                                                                                                                                           |
+| address                  | str                                                                   | ?           | Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city}                                         |
+| max_height               | int                                                                   | ?           | Max height, in centimeters.                                                                                                                               |
+| max_width                | int                                                                   | ?           | Max width, in centimeters.                                                                                                                                |
+| has_lighting             | bool                                                                  | ?           |                                                                                                                                                           |
+| fee_description          | str                                                                   | ?           |                                                                                                                                                           |
+| park_and_ride_type       | [ParkAndRideType](#parkandridetype)                                   | *           |                                                                                                                                                           |
+| supervision_type         | [SupervisionType](#supervisiontype)                                   | ?           |                                                                                                                                                           |
+| photo_url                | str(url)                                                              | ?           |                                                                                                                                                           |
+| related_location         | str                                                                   | ?           | A related location like a school.                                                                                                                         |
+| opening_hours            | str (OSM OH) string                                                   | ?           |                                                                                                                                                           |
+| lat                      | float                                                                 | 1           | lat                                                                                                                                                       |
+| lon                      | float                                                                 | 1           | lon                                                                                                                                                       |
+| geojson                  | [GeoJSON Geometry](#geojson-geometry)                                 | ?           | Polygon to describe the ParkingSite. The center of this shape will be calculated to the point if the point is not given explicitly.                       |
+| tariffs                  | [Tariff](#tariff)                                                     | *           |                                                                                                                                                           |
+| restrictions             | ParkingSiteRestriction                                                | *           | If there are multiple options, they should be understood with an logical or. If there are multiple options, they should be understood with an logical or. |
+| purpose                  | [PurposeType](#purposetype)                                           | 1           |                                                                                                                                                           |
+| capacity                 | int                                                                   | 1           |                                                                                                                                                           |
+| capacity_min             | int                                                                   | ?           | The min capacity if there is a uncertainty of measurement                                                                                                 |
+| capacity_max             | int                                                                   | ?           | The max capacity if there is a uncertainty of measurement                                                                                                 |
+| realtime_capacity        | int                                                                   | ?           |                                                                                                                                                           |
+| realtime_free_capacity   | int                                                                   | ?           |                                                                                                                                                           |
+| parking_type             | [LinearParkingSiteSideParkingType](#linearparkingsitesideparkingtype) | ?           | How the car is parked                                                                                                                                     |
+| orientation              | [LinearParkingSiteSideOrientation](#linearparkingsitesideorientation) | ?           | How the car is parked in relation to driving direction                                                                                                    |
+| side                     | [LinearParkingSiteSideType](#linearparkingsitesidetype)               | ?           |                                                                                                                                                           |
+| external_identifiers     | ExternalIdentifier                                                    | *           |                                                                                                                                                           |
+| tags                     | str                                                                   | *           |                                                                                                                                                           |
 
 ## ParkingRestriction
 
-| Field                  | Type            | Cardinality | Description                                                                                                                                                                                  |
-|------------------------|-----------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| type                   | ParkingAudience | ?           | If type is not set, all audiences are restricted.                                                                                                                                            |
-| hours                  | str (OSM OH)    | ?           | OSM-OpeningHours formatted string, that describes when the restriction applies. If none is given, this corresponds to 24/7. If hours are set, all other times are not available for parking. |
-| max_stay               | str (duration)  | ?           | Maximum stay period.                                                                                                                                                                         |
-| capacity               | int             | ?           | Amount of parking spaces where the restriction applies.                                                                                                                                      |
-| realtime_capacity      | int             | ?           |                                                                                                                                                                                              |
-| realtime_free_capacity | int             | ?           |                                                                                                                                                                                              |
+| Field                  | Type                                | Cardinality | Description                                                                                                                                                                                  |
+|------------------------|-------------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| type                   | [ParkingAudience](#parkingaudience) | ?           | If type is not set, all audiences are restricted.                                                                                                                                            |
+| hours                  | [str (OSM OH)](#str-osm-oh)         | ?           | OSM-OpeningHours formatted string, that describes when the restriction applies. If none is given, this corresponds to 24/7. If hours are set, all other times are not available for parking. |
+| max_stay               | [str (duration)](#strduration)      | ?           | Maximum stay period.                                                                                                                                                                         |
+| capacity               | int                                 | ?           | Amount of parking spaces where the restriction applies.                                                                                                                                      |
+| realtime_capacity      | int                                 | ?           |                                                                                                                                                                                              |
+| realtime_free_capacity | int                                 | ?           |                                                                                                                                                                                              |
 
 ## ParkingSpot
 
 The `ParkingSpot` represents a single spot for a single car / bike. The only required relation is between `Source` and `ParkingSpot`, because every dataset needs a source where it comes from. It’s recommended to group `ParkingSpot` s at least to `ParkingSite`s, though, because in most times, it reflects reality: on street parking is usually a group of parking spots at one street.
 
-| Field                    | Type                   | Cardinality | Description                                                                                                       |
-|--------------------------|------------------------|-------------|-------------------------------------------------------------------------------------------------------------------|
-| uid                      | str                    | 1           | Unique uid for this source                                                                                        |
-| lat                      | float                  | 1           | lat                                                                                                               |
-| lon                      | float                  | 1           |lon                                                                                                               |
-| name                     | str                    | ?           |                                                                                                                   |
-| type                     | ParkingSpotType        |             |                                                                                                                   |
-| parking_site_uid         | str                    | ?           | Refererence to ParkingSite. Will be outputted as `parking_site_id`.                                               |
-| address                  | str                    | ?           | Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city} |
-| geojson                  | GeoJSON Geometry       | ?           | Polygon to describe                                                                                               |
-| purpose                  | PurposeType            | 1           |                                                                                                                   |
-| static_data_updated_at   | string (date-time)     | 1           |                                                                                                                   |
-| realtime_status          | ParkingSpotStatus      | ?           |                                                                                                                   |
-| realtime_data_updated_at | string (date-time)     | ?           |                                                                                                                   |
-| restrictions             | ParkingSpotRestriction | *           | If there are multiple options, they should be understood with an logical or.                                      |
-| tariffs                  | Tariff                 | *           |                                                                                                                   |
-| external_identifiers     | ExternalIdentifier     | *           |                                                                                                                   |
-| tags                     | str                    | *           |                                                                                                                   |
+| Field                    | Type                                              | Cardinality | Description                                                                                                       |
+|--------------------------|---------------------------------------------------|-------------|-------------------------------------------------------------------------------------------------------------------|
+| uid                      | str                                               | 1           | Unique uid for this source                                                                                        |
+| lat                      | float                                             | 1           | lat                                                                                                               |
+| lon                      | float                                             | 1           | lon                                                                                                               |
+| name                     | str                                               | ?           |                                                                                                                   |
+| type                     | ParkingSpotType                                   |             |                                                                                                                   |
+| parking_site_uid         | str                                               | ?           | Refererence to ParkingSite. Will be outputted as `parking_site_id`.                                               |
+| address                  | str                                               | ?           | Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city} |
+| geojson                  | [GeoJSON Geometry](#geojson-geometry)             | ?           | Polygon to describe                                                                                               |
+| purpose                  | [PurposeType](#purposetype)                       | 1           |                                                                                                                   |
+| static_data_updated_at   | string (date-time)                                | 1           |                                                                                                                   |
+| realtime_status          | [ParkingSpotStatus](#parkingspotstatus)           | ?           |                                                                                                                   |
+| realtime_data_updated_at | string (date-time)                                | ?           |                                                                                                                   |
+| restrictions             | [ParkingSpotRestriction](#parkingspotrestriction) | *           | If there are multiple options, they should be understood with an logical or.                                      |
+| tariffs                  | [Tariff](#tariff)                                 | *           |                                                                                                                   |
+| external_identifiers     | ExternalIdentifier                                | *           |                                                                                                                   |
+| tags                     | str                                               | *           |                                                                                                                   |
 
 ## ParkingSpotRestriction
 
-| Field    | Type            | Cardinality | Description                                                                                                                                                                                  |
-|----------|-----------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| type     | ParkingAudience | ?           | If type is not set, all audiences are restricted.                                                                                                                                            |
-| hours    | str (OSM OH)    | ?           | OSM-OpeningHours formatted string, that describes when the restriction applies. If none is given, this corresponds to 24/7. If hours are set, all other times are not available for parking. |
-| max_stay | str (duration)  | ?           | Maximum stay period.                                                                                                                                                                         |
+| Field    | Type                                | Cardinality | Description                                                                                                                                                                                  |
+|----------|-------------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| type     | [ParkingAudience](#parkingaudience) | ?           | If type is not set, all audiences are restricted.                                                                                                                                            |
+| hours    | [str (OSM OH)](#str-osm-oh)         | ?           | OSM-OpeningHours formatted string, that describes when the restriction applies. If none is given, this corresponds to 24/7. If hours are set, all other times are not available for parking. |
+| max_stay | [str (duration)](#strduration)      | ?           | Maximum stay period.                                                                                                                                                                         |
 
 ## ParkingSiteGroup
 
@@ -368,11 +368,9 @@ String representation of an [URL](https://de.wikipedia.org/wiki/Uniform_Resource
 
 * `https://mobidata-bw.de/`
 
-## Examples
-
 ### GeoJSON Geometry
 
-GeoJSON geometry is the `geometry` part of a GeoJSON `feature`. Example: 
+GeoJSON geometry is the `geometry` part of a GeoJSON `feature`. Example:
 
 ```json
 {
@@ -380,6 +378,8 @@ GeoJSON geometry is the `geometry` part of a GeoJSON `feature`. Example:
     "coordinates": [[9.15489,47.704448],[9.178068,47.699018]]
 }
 ```
+
+## Examples
 
 ### ParkingZone
 
