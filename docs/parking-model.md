@@ -1,3 +1,5 @@
+# ParkAPI datamodel
+
 Single parking sites and on street parking are an extension to ParkAPI parking sites.
 
 ```mermaid
@@ -20,7 +22,7 @@ flowchart TD
     ParkingSpot -- n:m --- ParkingRestriction
 ```
 
-### Source
+## Source
 
 The source object represents a specific data source. Every data source has a unique identifier called `source.uid`.
 The `uid` is the central identifier which defines the data handling and, at push endpoints, even the user for basic
@@ -37,8 +39,7 @@ main object for collecting data was city, not source. This turned out not to be 
 multiple operators per city. ParkAPI v2 changed this to a source-based approach, and added geo-based queries to
 searches in order not to rely on a city as a query parameter.
 
-
-### ParkingZone
+## ParkingZone
 
 A `ParkingZone` is a geographic area which defined specific properties for the whole zone. This can be tariffs as well as restrictions.
 
@@ -54,8 +55,7 @@ A `ParkingZone` is a geographic area which defined specific properties for the w
 | abbreviation  | str                     | ?           |                                                                              |
 | color         | str (hex encoded color) | ?           | If color is used, e.g. at parking meters                                     |
 
-
-### Tariff
+## Tariff
 
 A `Tariff` is the whole tariff system which contains one or more tariff options. There is just one `Tariff` valid at a time. If there is any option valid for the customer, they have to take it. If there is no valid option, parking is free. Tariffs do not overrule restrictions like `max_stay` or `restrictions`.
 
@@ -72,8 +72,7 @@ A `Tariff` is the whole tariff system which contains one or more tariff options.
 | updated_at      | str (date-time)     | 1           | Last update                                                                                                                                   |
 | options         | TariffOption        | +           | Different tariff options. The customer must take one option which is valid for them. If there is no option for the customer, parking is free. |
 
-
-### TariffOption
+## TariffOption
 
 `TariffOption`s are not additive, this means that the customer can chose any valid option they want. If there is no option, parking is free.
 
@@ -86,8 +85,7 @@ A `Tariff` is the whole tariff system which contains one or more tariff options.
 | valid_audience    | ParkingAudience | *           | List of audiences for which this option is valid. If no audience is set, it’s valid for all audiences.                                                                     |
 | description       | str             | ?           |                                                                                                                                                                            |
 
-
-### TariffComponent
+## TariffComponent
 
 TariffComponent are additive, this means all TariffComponent applies if they are valid. 
 
@@ -99,8 +97,7 @@ TariffComponent are additive, this means all TariffComponent applies if they are
 | min_duration | str (duration)      | ?           | Min duration for this component, just for type `TIME`.                                                                            |
 | max_duration | str (duration)      | ?           | Max duration for this component, just for type `TIME`.                                                                            |
 
-
-### ParkingSite
+## ParkingSite
 
 `ParkingSite` represents a location where multiple parking spaces are located as a defined area or building. Every
 parking site has a data source where it comes from. It also has all the relevant data which describes the parking site:
@@ -162,8 +159,7 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | external_identifiers     | ExternalIdentifier               | *           |                                                                                                                                                           |
 | tags                     | str                              | *           |                                                                                                                                                           | 
 
-
-### ParkingRestriction
+## ParkingRestriction
 
 | Field                  | Type            | Cardinality | Description                                                                                                                                                                                  |
 |------------------------|-----------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -174,11 +170,9 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | realtime_capacity      | int             | ?           |                                                                                                                                                                                              |
 | realtime_free_capacity | int             | ?           |                                                                                                                                                                                              |
 
-
-### ParkingSpot
+## ParkingSpot
 
 The `ParkingSpot` represents a single spot for a single car / bike. The only required relation is between `Source` and `ParkingSpot`, because every dataset needs a source where it comes from. It’s recommended to group `ParkingSpot` s at least to `ParkingSite`s, though, because in most times, it reflects reality: on street parking is usually a group of parking spots at one street.
-
 
 | Field                    | Type                   | Cardinality | Description                                                                                                       |
 |--------------------------|------------------------|-------------|-------------------------------------------------------------------------------------------------------------------|
@@ -199,8 +193,7 @@ The `ParkingSpot` represents a single spot for a single car / bike. The only req
 | external_identifiers     | ExternalIdentifier     | *           |                                                                                                                   |
 | tags                     | str                    | *           |                                                                                                                   |
 
-
-### ParkingSpotRestriction
+## ParkingSpotRestriction
 
 | Field    | Type            | Cardinality | Description                                                                                                                                                                                  |
 |----------|-----------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -208,21 +201,18 @@ The `ParkingSpot` represents a single spot for a single car / bike. The only req
 | hours    | str (OSM OH)    | ?           | OSM-OpeningHours formatted string, that describes when the restriction applies. If none is given, this corresponds to 24/7. If hours are set, all other times are not available for parking. |
 | max_stay | str (duration)  | ?           | Maximum stay period.                                                                                                                                                                         |
 
-
-### ParkingSiteGroup
+## ParkingSiteGroup
 
 A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 
-
-### PurposeType
+## PurposeType
 
 * CAR
 * BIKE
 * MOTORCYCLE
 * ITEM
 
-
-### ParkingSiteType
+## ParkingSiteType
 
 * ON_STREET
 * OFF_STREET_PARKING_GROUND
@@ -239,8 +229,7 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 * LOCKBOX
 * OTHER
 
-
-### ParkAndRideType
+## ParkAndRideType
 
 * CARPOOL
 * TRAIN
@@ -249,23 +238,20 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 * YES
 * NO
 
+## OpeningStatus
 
-### OpeningStatus
-
-* OPEN 
+* OPEN
 * CLOSED
 * UNKNOWN
 
-
-### SupervisionType
+## SupervisionType
 
 * YES
 * NO
 * VIDEO
 * ATTENDED
 
-
-### Weekday
+## Weekday
 
 * MONDAY
 * TUESDAY
@@ -275,35 +261,32 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 * SATURDAY
 * SUNDAY
 
-### LinearParkingSiteSideType
+## LinearParkingSiteSideType
 
 * LEFT
 * RIGHT
 * BOTH
 
-### LinearParkingSiteSideParkingType
+## LinearParkingSiteSideParkingType
 
 * LANE
 * ON_KERB
 * HALF_ON_KERB
 * SHOULDER
 
-
-### LinearParkingSiteSideOrientation
+## LinearParkingSiteSideOrientation
 
 * PARALLEL
 * DIAGONAL
 * PERPENDICULAR
 
-
-### ParkingSpotStatus
+## ParkingSpotStatus
 
 * AVAILABLE
 * TAKEN
 * UNKNOWN
 
-
-### ParkingSpotType 
+## ParkingSpotType
 
 * ON_STREET
 * OFF_STREET_PARKING_GROUND
@@ -312,8 +295,7 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 * LOCKERS
 * LOCKBOX
 
-
-### ParkingAudience
+## ParkingAudience
 
 * DISABLED
 * WOMEN
@@ -330,61 +312,61 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 * CUSTOMER
 * RESIDENT
 
-
-### TariffComponentType
+## TariffComponentType
 
 * FLAT: constant fee, charged one time
 * TIME: time based fee, charged depending on duration
-
 
 ## Generic data types
 
 ### str (OSM OH)
 
 Opening hours described in [OSM format](https://wiki.openstreetmap.org/wiki/Key:opening_hours). Examples:
+
 * `Mo-Fr 08:00-17:00`
 * `Mo,We 08:00-12:00`
 
 ### str(duration)
 
-Duration is based on ISO 8601 format. Examples: 
+Duration is based on ISO 8601 format. Examples:
+
 * `P1H`
 * `P5H30M`.
-
 
 ### str(date-time)
 
 Date-Time is based on ISO 8601 format. We recommend time-zone aware datetimes. Examples:
+
 * `2007-08-31T16:47+00:00` for UTC datetime
 * `2007-08-31T16:47Z` for UTC datetime, `Z` representation
 * `2007-08-31T16:47+02:00` for a local timezone
 * `2007-08-31T16:47` for a not recommended non aware datetime.
 
-
 ### str(time)
 
 Time based on ISO 8601 format. Examples:
-* `10:00`
 
+* `10:00`
 
 ### str(currency)
 
 Currency based on ISO 4217 format. Examples:
+
 * `EUR`
 * `CHF`
-
 
 ### str(decimal)
 
 String representation of a decimal value. Not a float to prevent float rounding issues. Examples:
+
 * `0.20`
 * `10.30`.
 
 ### str(url)
 
 String representation of an [URL](https://de.wikipedia.org/wiki/Uniform_Resource_Locator). Example:
-* `https://mobidata-bw.de/`
 
+* `https://mobidata-bw.de/`
 
 ## Examples
 
@@ -398,7 +380,6 @@ GeoJSON geometry is the `geometry` part of a GeoJSON `feature`. Example:
     "coordinates": [[9.15489,47.704448],[9.178068,47.699018]]
 }
 ```
-
 
 ### ParkingZone
 
@@ -530,7 +511,6 @@ time limit.
 }
 ```
 
-
 A on-street parking polygon for 3 hours max parking, and 2 € per hour.
 
 ```json
@@ -577,7 +557,6 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
 }
 ```
 
-
 ### ParkingSpot
 
 ```json
@@ -596,8 +575,6 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
     ]
 }
 ```
-
-
 
 ### Tariffs
 
@@ -656,7 +633,6 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
     }
 ]
 ```
-
 
 2 € for every hour entered into from 8 - 18 o’Clock, except for sunday, there it’s 12 - 18 o’Clock. First 30 Minutes free.
 
