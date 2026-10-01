@@ -132,7 +132,7 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | realtime_data_updated_at | string (date-time)               | ?           | Required has_realtime_data is true                                                                                                                        |
 | realtime_opening_status  | OpeningStatus                    | ?           | Required has_realtime_data is true                                                                                                                        |
 | operator_name            | str                              | ?           |                                                                                                                                                           |
-| public_url               | str                              | ?           | URL for human users to get more details about this parking site.                                                                                          |
+| public_url               | str(url)                         | ?           | URL for human users to get more details about this parking site.                                                                                          |
 | type                     | ParkingSiteType                  | ?           |                                                                                                                                                           |
 | description              | str                              | ?           |                                                                                                                                                           |
 | address                  | str                              | ?           | Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city}                                         |
@@ -142,11 +142,11 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | fee_description          | str                              | ?           |                                                                                                                                                           |
 | park_and_ride_type       | ParkAndRideType                  | *           |                                                                                                                                                           |
 | supervision_type         | SupervisionType                  | ?           |                                                                                                                                                           |
-| photo_url                | str (url)                        | ?           |                                                                                                                                                           |
+| photo_url                | str(url)                        | ?           |                                                                                                                                                           |
 | related_location         | str                              | ?           | A related location like a school.                                                                                                                         |
-| opening_hours            | str                              | ?           |                                                                                                                                                           |
-| lat                      | str (decimal) \| float           | 1           | lat                                                                                                                                                       |
-| lon                      | str (decimal) \| float           | 1           | lon                                                                                                                                                       |
+| opening_hours            | str (OSM OH) string                          | ?           |                                                                                                                                                           |
+| lat                      | float                            | 1           | lat                                                                                                                                                       |
+| lon                      | float                            | 1           | lon                                                                                                                                                       |
 | geojson                  | GeoJSON Geometry                 | ?           | Polygon to describe the ParkingSite. The center of this shape will be calculated to the point if the point is not given explicitly.                       |
 | tariffs                  | Tariff                           | *           |                                                                                                                                                           |
 | restrictions             | ParkingSiteRestriction           | *           | If there are multiple options, they should be understood with an logical or. If there are multiple options, they should be understood with an logical or. |
@@ -183,8 +183,8 @@ The `ParkingSpot` represents a single spot for a single car / bike. The only req
 | Field                    | Type                   | Cardinality | Description                                                                                                       |
 |--------------------------|------------------------|-------------|-------------------------------------------------------------------------------------------------------------------|
 | uid                      | str                    | 1           | Unique uid for this source                                                                                        |
-| lat                      | str (decimal) \| float | 1           | lat                                                                                                               |
-| lon                      | str (decimal) \| float | 1           | lon                                                                                                               |
+| lat                      | float                  | 1           | lat                                                                                                               |
+| lon                      | float                  | 1           |lon                                                                                                               |
 | name                     | str                    | ?           |                                                                                                                   |
 | type                     | ParkingSpotType        |             |                                                                                                                   |
 | parking_site_uid         | str                    | ?           | Refererence to ParkingSite. Will be outputted as `parking_site_id`.                                               |
@@ -339,6 +339,12 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 
 ## Generic data types
 
+### str (OSM OH)
+
+Opening hours described in [OSM format](https://wiki.openstreetmap.org/wiki/Key:opening_hours). Examples:
+* `Mo-Fr 08:00-17:00`
+* `Mo,We 08:00-12:00`
+
 ### str(duration)
 
 Duration is based on ISO 8601 format. Examples: 
@@ -374,6 +380,10 @@ String representation of a decimal value. Not a float to prevent float rounding 
 * `0.20`
 * `10.30`.
 
+### str(url)
+
+String representation of an [URL](https://de.wikipedia.org/wiki/Uniform_Resource_Locator). Example:
+* `https://mobidata-bw.de/`
 
 
 ## Examples
