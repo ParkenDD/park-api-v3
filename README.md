@@ -120,22 +120,33 @@ for how to inspect the actual upstream requests and responses. See
 
 #### `has_realtime_data` and outdated realtime data in the public API
 
-Every `ParkingSite` and `ParkingSpot` carries a `has_realtime_data` flag and, when it is `true`, a set of `realtime_*`
+Every `ParkingSite` and `ParkingSpot` carries a `has_realtime_data` flag and, if it is dynamic, a set of `realtime_*`
 fields (e.g. `realtime_capacity`, `realtime_free_capacity`, `realtime_status`, `realtime_data_updated_at`).
 
-When serving public `ParkingSite` and `ParkingSpot` data, ParkAPI does not trust stale realtime data: if a dataset's
-`realtime_data_updated_at` is older than `UNSET_REALTIME_AFTER_MINUTES` (default 30 minutes, configurable), it is
-treated as if it had no realtime data at all. In that case `has_realtime_data` is returned as `false` and all
-`realtime_*` fields are dropped from the output. Datasets without realtime support (`has_realtime_data` already `false`)
-never expose `realtime_*` fields.
+When serving public `ParkingSite` and `ParkingSpot` data, `has_realtime_data == false` means:
 
-This calculation can be turned off per request with the `calculate_has_realtime_data` query parameter, which is
+- either the parking site / spot is static,
+- or the parking site / spot is dynamic, but `realtime_data_updated_at` shows that the realtime information is outdated.
+
+An application like [verkehrsinfo-bw.de](https://verkehrsinfo-bw.de/) thus will treat outdated dynamic sites / spots
+like static sites / spots. The detection of outdated realtime data distinguishes between pull and push sources:
+
+- The realtime data of a pull source is outdated after `UNSET_REALTIME_PULL_AFTER_MINUTES` (default 30 minutes).
+- The realtime data of a push source is outdated after `UNSET_REALTIME_PUSH_AFTER_MINUTES` (default 24 hours).
+
+A source counts as pull source if its converter is a parkapi-sources pull converter. Everything else (push converters
+and generic sources) counts as push source.
+
+No attributes are removed if `has_realtime_data` is `false`: outdated sites / spots still provide their `realtime_*`
+fields, including `realtime_data_updated_at`, so clients can see how old the realtime information is.
+
+Applications for other use cases can turn this calculation off per request with the `calculate_has_realtime_data` query parameter, which is
 available on all four public list and item endpoints (`/v3/parking-sites`, `/v3/parking-sites/<id>`,
 `/v3/parking-spots` and `/v3/parking-spots/<id>`):
 
 - `calculate_has_realtime_data=true` (default): the behaviour described above is applied.
 - `calculate_has_realtime_data=false`: the outdating calculation is skipped and the raw, stored `has_realtime_data`
-  value (and its `realtime_*` fields) is returned unchanged.
+  value is returned.
 
 Note that this outdating logic is independent of the Prometheus `REALTIME_OUTDATED_AFTER_MINUTES` setting, which only
 affects monitoring metrics and not the public API output.
@@ -154,6 +165,7 @@ not supported so far. The `hash` is a `sha256` hash. You can create such a hash 
 
 ```python
 from hashlib import sha256
+
 sha256(b'your-very-long-random-generated-password').hexdigest()
 ```
 
@@ -454,10 +466,11 @@ sensible defaults (shown below), so you only need to set them if you want to dev
 | `STATIC_IMPORT_PULL_MINUTE`      | `0`     | Minute of the hour (0–59) at which the static data pull runs, combined with `STATIC_IMPORT_PULL_HOUR`.                                                                                                                                                                                 |
 | `REALTIME_IMPORT_PULL_FREQUENCY` | `300`   | Interval in seconds between realtime data pulls for realtime pull sources. The default of `300` pulls every 5 minutes.                                                                                                                                                                 |
 | `REALTIME_OUTDATED_AFTER_MINUTES`| `30`    | Age in minutes after which a parking site's / spot's realtime data is counted as outdated in the Prometheus metrics (`/metrics`). This only affects monitoring; it does not change the served API data.                                                                                |
-| `UNSET_REALTIME_AFTER_MINUTES`   | `15`    | Age in minutes after which realtime data is hidden in the public API. When a parking site's `realtime_data_updated_at` is older than this, `has_realtime_data` is set to `False` and all `realtime_*` fields are dropped from the response, so clients never receive stale realtime data. |
+| `UNSET_REALTIME_PULL_AFTER_MINUTES` | `30` | Age in minutes after which realtime data of **pull** sources is flagged as outdated in the public API. When a parking site's / spot's `realtime_data_updated_at` is older than this, `has_realtime_data` is set to `False`. The `realtime_*` fields are kept in the response. |
+| `UNSET_REALTIME_PUSH_AFTER_MINUTES` | `1440` | Same as `UNSET_REALTIME_PULL_AFTER_MINUTES`, but for **push** sources. The default of `1440` is 24 hours. |
 
 Note that `STATIC_IMPORT_PULL_*` and `REALTIME_IMPORT_PULL_FREQUENCY` only affect **pull** sources; **push** sources
-deliver data on their own schedule. `UNSET_REALTIME_AFTER_MINUTES` applies to all sources, regardless of pull or push.
+deliver data on their own schedule, which is why they get a separate `UNSET_REALTIME_PUSH_AFTER_MINUTES` threshold.
 
 
 ## Development setup

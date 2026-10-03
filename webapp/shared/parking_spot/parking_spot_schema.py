@@ -65,7 +65,10 @@ parking_spot_schema = JsonSchema(
             'logical or.',
         ),
         'has_realtime_data': BooleanField(
-            description='Whether the parking spot has realtime data or not.',
+            description='Whether the parking spot has usable realtime data. False if the parking spot is static, or if it is dynamic, but its '
+            'realtime data is outdated (older than 30 minutes for pull sources, older than 24 hours for push '
+            'sources). Realtime fields are provided anyway, so realtime_data_updated_at shows their age. Can be '
+            'disabled with calculate_has_realtime_data=false.',
         ),
         'realtime_status': EnumField(enum=ParkingSpotStatus, required=False),
         'static_data_updated_at': DateTimeField(
