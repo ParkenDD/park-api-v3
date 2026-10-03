@@ -21,7 +21,6 @@ from parkapi_sources.models import (
 from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.common.rest.exceptions import InvalidInputException
 from webapp.models import Source
-from webapp.models.source import SourceStatus
 from webapp.repositories import (
     ParkingSiteHistoryRepository,
     ParkingSiteRepository,
@@ -146,7 +145,6 @@ class GenericHandler(AdminApiBaseHandler):
                 static_parking_site_inputs,
                 parking_site_errors,
             )
-            source.static_status = SourceStatus.ACTIVE
 
         realtime_parking_site_inputs = [item for item in parking_inputs if isinstance(item, RealtimeParkingSiteInput)]
         if len(realtime_parking_site_inputs):
@@ -155,7 +153,6 @@ class GenericHandler(AdminApiBaseHandler):
                 realtime_parking_site_inputs,
                 parking_site_errors,
             )
-            source.realtime_status = SourceStatus.ACTIVE
 
         # ParkingSpots
         parking_spot_errors = [item for item in parking_errors if isinstance(item, ImportParkingSpotException)]
@@ -167,7 +164,6 @@ class GenericHandler(AdminApiBaseHandler):
                 static_parking_spot_inputs,
                 parking_spot_errors,
             )
-            source.static_status = SourceStatus.ACTIVE
 
         realtime_parking_spot_inputs = [item for item in parking_inputs if isinstance(item, RealtimeParkingSpotInput)]
         if len(realtime_parking_spot_inputs):
@@ -176,6 +172,11 @@ class GenericHandler(AdminApiBaseHandler):
                 realtime_parking_spot_inputs,
                 parking_spot_errors,
             )
-            source.realtime_status = SourceStatus.ACTIVE
+
+        self._update_source_status_after_push(
+            source,
+            has_static_data=len(static_parking_site_inputs) > 0 or len(static_parking_spot_inputs) > 0,
+            has_realtime_data=len(realtime_parking_site_inputs) > 0 or len(realtime_parking_spot_inputs) > 0,
+        )
 
         self.source_repository.save_source(source)
