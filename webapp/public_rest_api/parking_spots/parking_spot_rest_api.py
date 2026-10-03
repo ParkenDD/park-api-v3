@@ -14,7 +14,16 @@ from flask_openapi.decorator import (
     SchemaReference,
     document,
 )
-from flask_openapi.schema import ArrayField, BooleanField, DateTimeField, IntegerField, NumericField, StringField
+from flask_openapi.schema import (
+    ArrayField,
+    BooleanField,
+    DateTimeField,
+    EnumField,
+    IntegerField,
+    NumericField,
+    StringField,
+)
+from parkapi_sources.models.enums import ParkingSpotType
 from validataclass.validators import BooleanValidator, DataclassValidator
 
 from webapp.dependencies import dependencies
@@ -97,12 +106,16 @@ class ParkingSpotListMethodView(ParkingSpotBaseMethodView):
             'cursor pagination instead of offset pagination.'
         ),
         query=[
+            Parameter('source_id', schema=IntegerField(), example=1),
             Parameter('source_uid', schema=StringField(), example='source-uid'),
             Parameter(
                 'source_uids',
                 schema=ArrayField(items=StringField()),
+                description='Comma-separated list of source UIDs.',
                 example='source-uid-1,source-uid-2',
             ),
+            Parameter('parking_site_id', schema=IntegerField(), example=1),
+            Parameter('type', schema=EnumField(enum=ParkingSpotType)),
             Parameter('lat', schema=NumericField(), example=55.5),
             Parameter('lon', schema=NumericField(), example=55.5),
             Parameter('radius', schema=NumericField(), description='Radius, in m', example='3500'),

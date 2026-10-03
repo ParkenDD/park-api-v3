@@ -119,16 +119,36 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
         'maintain consistency at all situations, especially if datasets get deleted, we decided to do cursor pagination '
         'instead of offset pagination.',
         query=[
+            Parameter('source_id', schema=IntegerField(), example=1),
+            Parameter(
+                'not_source_ids',
+                schema=ArrayField(items=IntegerField()),
+                description='Comma-separated list of source IDs to exclude.',
+                example='1,2',
+            ),
             Parameter('source_uid', schema=StringField(), example='source-uid'),
             Parameter(
                 'source_uids',
                 schema=ArrayField(items=StringField()),
+                description='Comma-separated list of source UIDs.',
                 example='source-uid-1,source-uid-2',
             ),
-            Parameter('name', schema=StringField(), example='Bahnhof'),
+            Parameter(
+                'name',
+                schema=StringField(),
+                description='Just return ParkingSites whose name contains this string.',
+                example='Bahnhof',
+            ),
             Parameter('lat', schema=NumericField(), example=55.5),
             Parameter('lon', schema=NumericField(), example=5.5),
             Parameter('radius', schema=NumericField(), description='Radius, in m', example='3500'),
+            Parameter(
+                'location',
+                schema=ArrayField(items=NumericField()),
+                description='*Deprecated, use lat and lon instead.*<br> Comma-separated lon,lat. If set, radius is '
+                'interpreted in km.',
+                example='5.5,55.5',
+            ),
             Parameter('lat_min', schema=NumericField(), example=55.0, description='Bounding box'),
             Parameter('lat_max', schema=NumericField(), example=55.5, description='Bounding box'),
             Parameter('lon_min', schema=NumericField(), example=5.0, description='Bounding box'),
@@ -144,6 +164,36 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
                 schema=DateTimeField(),
                 description='Just return ParkingSites which were modified at or after this datetime.',
                 example='2025-01-01T00:00:00+00:00',
+            ),
+            Parameter(
+                'static_data_updated_at_since',
+                schema=DateTimeField(),
+                description='Just return ParkingSites whose static data was updated at or after this datetime.',
+                example='2025-01-01T00:00:00+00:00',
+            ),
+            Parameter(
+                'static_data_updated_at_until',
+                schema=DateTimeField(),
+                description='Just return ParkingSites whose static data was updated at or before this datetime.',
+                example='2025-01-01T00:00:00+00:00',
+            ),
+            Parameter(
+                'realtime_data_updated_at_since',
+                schema=DateTimeField(),
+                description='Just return ParkingSites whose realtime data was updated at or after this datetime.',
+                example='2025-01-01T00:00:00+00:00',
+            ),
+            Parameter(
+                'realtime_data_updated_at_until',
+                schema=DateTimeField(),
+                description='Just return ParkingSites whose realtime data was updated at or before this datetime.',
+                example='2025-01-01T00:00:00+00:00',
+            ),
+            Parameter(
+                'is_duplicate',
+                schema=BooleanField(),
+                description='If set, just return ParkingSites which are (true) or are not (false) flagged as '
+                'duplicates. Combine is_duplicate=true with ignore_duplicates=false.',
             ),
             Parameter(
                 'ignore_duplicates',
