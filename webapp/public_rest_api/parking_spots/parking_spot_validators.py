@@ -7,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
-from parkapi_sources.models import ParkingSiteType
+from parkapi_sources.models.enums import ParkingSpotType
 from validataclass.dataclasses import Default
 from validataclass.exceptions import ValidationError
 from validataclass.validators import EnumValidator, IntegerValidator, NumericValidator, StringValidator
@@ -30,7 +30,7 @@ class ParkingSpotSearchInput(CursorPaginationMixin, BaseSearchQuery):
     parking_site_id: Optional[int] = SearchParamEquals(), IntegerValidator(allow_strings=True)
     source_uid: Optional[str] = SearchParamEquals(), StringValidator()
     source_uids: Optional[list[str]] = SearchParamMultiSelect(), MultiSelectValidator(StringValidator(min_length=1))
-    type: ParkingSiteType | None = SearchParamEquals(), EnumValidator(ParkingSiteType)
+    type: ParkingSpotType | None = SearchParamEquals(), EnumValidator(ParkingSpotType)
     official_region_code: str | None = SearchParamEquals(), StringValidator(min_length=1, max_length=36)
     modified_since: datetime | None = SearchParamSince('modified_at'), DateTimeToUtcValidator()
 

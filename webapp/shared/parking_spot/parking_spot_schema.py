@@ -47,7 +47,7 @@ parking_spot_schema = JsonSchema(
             nullable=True,
             description='German Regionalschlüssel / Gemeindeschlüssel, derived from the coordinates.',
         ),
-        'name': StringField(required=False),
+        'name': StringField(maxLength=256, required=False),
         'purpose': EnumField(enum=PurposeType),
         'geojson': ObjectField(
             required=False,
@@ -85,12 +85,33 @@ parking_spot_schema = JsonSchema(
             ),
             required=False,
         ),
-        'tags': ArrayField(items=StringField(maxLength=256), required=False),
+        'tags': ArrayField(
+            items=StringField(maxLength=256),
+            required=False,
+            description='Free-form tags provided by the data source. Omitted if there are no tags.',
+        ),
     },
 )
 
 
-parking_spot_example = {}
+parking_spot_example = {
+    'id': 1,
+    'created_at': '2025-03-21T17:53:29Z',
+    'modified_at': '2025-03-21T17:53:29Z',
+    'source_id': 1,
+    'parking_site_id': 1,
+    'original_uid': 'demo-parking-spot-1',
+    'name': 'Demo Parking Spot 1',
+    'type': 'ON_STREET',
+    'purpose': 'CAR',
+    'lat': 50.1,
+    'lon': 10.1,
+    'has_realtime_data': True,
+    'realtime_status': 'AVAILABLE',
+    'static_data_updated_at': '2025-03-21T17:53:29Z',
+    'realtime_data_updated_at': '2025-03-21T18:00:00Z',
+    'tags': ['demo-tag'],
+}
 
 
 parking_spot_component = Schema('ParkingSpot', parking_spot_schema, parking_spot_example)
