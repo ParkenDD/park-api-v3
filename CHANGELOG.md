@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.49.2
+
+Released 2026-10-03
+
+> [!NOTE]
+> Outdated realtime data no longer removes the `realtime_*` fields from the API output, it just sets
+> `has_realtime_data` to `false`. The config value `UNSET_REALTIME_AFTER_MINUTES` has been replaced by
+> `UNSET_REALTIME_PULL_AFTER_MINUTES` (default 30 minutes) and `UNSET_REALTIME_PUSH_AFTER_MINUTES` (default 24 hours).
+
+
+### Fixes
+
+* [More sophisticated `has_realtime_data` output](https://github.com/ParkenDD/park-api-v3/pull/435)
+* [Better source status at push endpoints](https://github.com/ParkenDD/park-api-v3/pull/434)
+* [Extend OpenAPI docs](https://github.com/ParkenDD/park-api-v3/pull/433)
+* [Fix parking site group schema](https://github.com/ParkenDD/park-api-v3/pull/432)
+* [Fix schema title from `ParkingSiteHistory` to `ParkingSiteGroup`](https://github.com/ParkenDD/park-api-v3/pull/420)
+* [ParkAPI Sources: Correct usage of Push and PullConverter](https://github.com/ParkenDD/parkapi-sources-v3/pull/427)
+* [ParkAPI Sources: Correct Mapping Spec for Orientation in Esslingen](https://github.com/ParkenDD/parkapi-sources-v3/pull/430)
+* [ParkAPI Sources: Update mapping konstanz disabled](https://github.com/ParkenDD/parkapi-sources-v3/pull/424)
+* [ParkAPI Sources: Add missing public_urls](https://github.com/ParkenDD/parkapi-sources-v3/pull/432)
+
+
+### Maintenance
+
+* [Dependency updates](https://github.com/ParkenDD/park-api-v3/pull/436)
+* [ParkAPI Sources: Add Esslingen to README](https://github.com/ParkenDD/parkapi-sources-v3/pull/429)
+* [ParkAPI Sources: fix readme sources](https://github.com/ParkenDD/parkapi-sources-v3/pull/435)
+* [ParkAPI Sources: dependency updates](https://github.com/ParkenDD/parkapi-sources-v3/pull/433)
+
+
 ## 0.49.1
 
 Released 2026-09-28
