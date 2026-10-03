@@ -232,10 +232,9 @@ class ParkingSite(BaseModel):
             )
 
         # Realtime data is considered outdated once realtime_data_updated_at is older than the configured
-        # threshold. In that case we behave as if there was no realtime data at all.
-        has_realtime_data = self.has_realtime_data
+        # threshold. In that case has_realtime_data is set to false, but all realtime fields are kept.
         if (
-            has_realtime_data
+            self.has_realtime_data
             and unset_realtime_after_minutes is not None
             and (
                 self.realtime_data_updated_at is None
@@ -243,14 +242,7 @@ class ParkingSite(BaseModel):
                 < datetime.now(tz=timezone.utc) - timedelta(minutes=unset_realtime_after_minutes)
             )
         ):
-            has_realtime_data = False
             result['has_realtime_data'] = False
-
-        # If we don't have realtime support, we don't need realtime data
-        if not has_realtime_data:
-            return filter_unset_value_and_none(
-                {key: value for key, value in result.items() if not key.startswith('realtime_')},
-            )
 
         return filter_unset_value_and_none(result)
 

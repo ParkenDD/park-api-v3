@@ -33,6 +33,7 @@ from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 from webapp.public_rest_api.parking_sites.parking_sites_handler import ParkingSiteHandler
 from webapp.public_rest_api.parking_sites.parking_sites_validators import ParkingSiteHistorySearchQueryInput
+from webapp.services.import_service import GenericImportService
 from webapp.shared.parking_restriction.parking_restriction_schema import parking_site_restriction_component
 from webapp.shared.parking_site.parking_site_search_query import ParkingSiteGeoSearchInput
 from webapp.shared.parking_site.parking_sites_schema import parking_site_component
@@ -60,6 +61,7 @@ class ParkingSiteBlueprint(PublicApiBaseBlueprint):
                 'parking-sites',
                 **self.get_base_method_view_dependencies(),
                 parking_site_handler=self.parking_site_handler,
+                generic_import_service=dependencies.get_generic_import_service(),
             ),
         )
 
@@ -69,6 +71,7 @@ class ParkingSiteBlueprint(PublicApiBaseBlueprint):
                 'parking-site-by-id',
                 **self.get_base_method_view_dependencies(),
                 parking_site_handler=self.parking_site_handler,
+                generic_import_service=dependencies.get_generic_import_service(),
             ),
         )
 
@@ -78,6 +81,7 @@ class ParkingSiteBlueprint(PublicApiBaseBlueprint):
                 'parking-site-history-by-id',
                 **self.get_base_method_view_dependencies(),
                 parking_site_handler=self.parking_site_handler,
+                generic_import_service=dependencies.get_generic_import_service(),
             ),
         )
 
@@ -86,9 +90,16 @@ class ParkingSiteBaseMethodView(PublicApiBaseMethodView):
     parking_site_handler: ParkingSiteHandler
     calculate_has_realtime_data_validator = BooleanValidator(allow_strings=True)
 
-    def __init__(self, *, parking_site_handler: ParkingSiteHandler, **kwargs):
+    def __init__(
+        self,
+        *,
+        parking_site_handler: ParkingSiteHandler,
+        generic_import_service: GenericImportService,
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.parking_site_handler = parking_site_handler
+        self.generic_import_service = generic_import_service
 
     def _get_calculate_has_realtime_data(self) -> bool:
         # Defaults to True. If set to false, the has_realtime_data outdating calculation is skipped and the raw
@@ -100,7 +111,11 @@ class ParkingSiteBaseMethodView(PublicApiBaseMethodView):
     def _map_parking_site(self, parking_site: ParkingSite, *, calculate_has_realtime_data: bool = True) -> dict:
         unset_realtime_after_minutes = None
         if calculate_has_realtime_data:
-            unset_realtime_after_minutes = self.config_helper.get('UNSET_REALTIME_AFTER_MINUTES', 30)
+            # Realtime data of pull sources is outdated after 30 minutes, realtime data of push sources after 24 hours
+            if self.generic_import_service.is_pull_source(parking_site.source.uid):
+                unset_realtime_after_minutes = self.config_helper.get('UNSET_REALTIME_PULL_AFTER_MINUTES')
+            else:
+                unset_realtime_after_minutes = self.config_helper.get('UNSET_REALTIME_PUSH_AFTER_MINUTES')
 
         return parking_site.to_dict(
             include_restrictions=True,
@@ -203,9 +218,10 @@ class ParkingSiteListMethodView(ParkingSiteBaseMethodView):
             Parameter(
                 'calculate_has_realtime_data',
                 schema=BooleanField(),
-                description='Defaults to true, which keeps the default behaviour of marking outdated realtime data as '
-                'has_realtime_data=false and dropping its realtime fields. If set to false, this calculation is '
-                'skipped and the raw has_realtime_data value is returned.',
+                description='Defaults to true: realtime data is treated as outdated if realtime_data_updated_at is '
+                'older than 30 minutes for pull sources or older than 24 hours for push sources. Outdated datasets are '
+                'returned with has_realtime_data=false, but keep their realtime fields. If set to false, this calculation is skipped and the raw has_realtime_data '
+                'value is returned.',
             ),
         ],
         response=[
@@ -247,9 +263,10 @@ class ParkingSiteItemMethodView(ParkingSiteBaseMethodView):
             Parameter(
                 'calculate_has_realtime_data',
                 schema=BooleanField(),
-                description='Defaults to true, which keeps the default behaviour of marking outdated realtime data as '
-                'has_realtime_data=false and dropping its realtime fields. If set to false, this calculation is '
-                'skipped and the raw has_realtime_data value is returned.',
+                description='Defaults to true: realtime data is treated as outdated if realtime_data_updated_at is '
+                'older than 30 minutes for pull sources or older than 24 hours for push sources. Outdated datasets are '
+                'returned with has_realtime_data=false, but keep their realtime fields. If set to false, this calculation is skipped and the raw has_realtime_data '
+                'value is returned.',
             ),
         ],
         response=[

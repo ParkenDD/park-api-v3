@@ -98,7 +98,13 @@ parking_site_schema = JsonSchema(
         'capacity_min': IntegerField(minimum=0, required=False),
         'capacity_max': IntegerField(minimum=0, required=False),
         'related_location': StringField(maxLength=256, description='A related location like a school.', required=False),
-        'has_realtime_data': BooleanField(default=False),
+        'has_realtime_data': BooleanField(
+            default=False,
+            description='Whether the parking site has usable realtime data. False if the parking site is static, or if it is dynamic, but its '
+            'realtime data is outdated (older than 30 minutes for pull sources, older than 24 hours for push '
+            'sources). Realtime fields are provided anyway, so realtime_data_updated_at shows their age. Can be '
+            'disabled with calculate_has_realtime_data=false.',
+        ),
         'fee_description': StringField(
             maxLength=4096,
             required=False,

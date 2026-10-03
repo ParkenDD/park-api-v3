@@ -70,6 +70,10 @@ class GenericImportService(BaseService):
         )
         self.park_api_sources.check_credentials()
 
+    def is_pull_source(self, source_uid: str) -> bool:
+        # Generic sources and push converters are not part of the pull converters, so everything else is push
+        return isinstance(self.park_api_sources.converter_by_uid.get(source_uid), PullConverter)
+
     def update_sources_static(self):
         for source_uid in self.park_api_sources.converter_by_uid.keys():
             if isinstance(self.park_api_sources.converter_by_uid[source_uid], PullConverter):

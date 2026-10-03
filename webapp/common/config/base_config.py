@@ -67,9 +67,11 @@ class BaseConfig:
     REALTIME_IMPORT_PULL_FREQUENCY = 5 * 60
     REALTIME_OUTDATED_AFTER_MINUTES = 30
 
-    # At the public API, has_realtime_data is unset (and all realtime_* fields are dropped) when the
-    # realtime_data_updated_at timestamp is older than this many minutes.
-    UNSET_REALTIME_AFTER_MINUTES = 30
+    # At the public API, has_realtime_data is set to false (realtime_* fields are kept) when the
+    # realtime_data_updated_at timestamp is older than this many minutes. Pull and push sources have different
+    # thresholds, as push sources deliver data on their own schedule.
+    UNSET_REALTIME_PULL_AFTER_MINUTES = 30
+    UNSET_REALTIME_PUSH_AFTER_MINUTES = 24 * 60
 
     # Default log config
     LOGGING = {
