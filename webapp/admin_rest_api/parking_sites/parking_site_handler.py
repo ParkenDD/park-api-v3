@@ -146,6 +146,14 @@ class ParkingSiteHandler(AdminApiBaseHandler):
 
             response.items.append(self._map_parking_site(parking_site))
 
+        if len(combined_parking_site_inputs):
+            self._update_source_status_after_push(
+                source,
+                has_static_data=True,
+                has_realtime_data=any(item.has_realtime_data is True for item in combined_parking_site_inputs),
+            )
+            self.source_repository.save_source(source)
+
         return response
 
     def upsert_parking_site_item(
@@ -165,6 +173,13 @@ class ParkingSiteHandler(AdminApiBaseHandler):
             parking_site_input=combined_parking_site_input,
             existing_parking_site_ids=[],
         )
+
+        self._update_source_status_after_push(
+            source,
+            has_static_data=True,
+            has_realtime_data=combined_parking_site_input.has_realtime_data is True,
+        )
+        self.source_repository.save_source(source)
 
         return self._map_parking_site(parking_site)
 

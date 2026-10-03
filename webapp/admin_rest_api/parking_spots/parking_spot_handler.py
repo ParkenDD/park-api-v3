@@ -81,4 +81,11 @@ class ParkingSpotHandler(AdminApiBaseHandler):
             parking_spot_input=combined_parking_spot_input,
         )
 
+        self._update_source_status_after_push(
+            source,
+            has_static_data=True,
+            has_realtime_data=combined_parking_spot_input.has_realtime_data is True,
+        )
+        self.source_repository.save_source(source)
+
         return parking_spot, created
