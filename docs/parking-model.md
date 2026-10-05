@@ -100,7 +100,7 @@ TariffComponent are additive, this means all TariffComponent applies if they are
 ## ParkingSite
 
 `ParkingSite` represents a location where multiple parking spaces are located as a defined area or building. Every
-parking site has a data source where it comes from. It also has all the relevant data which describes the parking site:
+parking site has a data [source](#source) where it comes from. It also has all the relevant data which describes the parking site:
 a name, an address, a url and other meta information. Additionally, it has static and, if the data source provides it,
 realtime data for capacities. It also has opening times in OSM format and also, if available, a realtime opening status.
 For a complete overview, please have a look at the
@@ -123,7 +123,7 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | Field                    | Type                                                                  | Cardinality | Descrption                                                                                                                                                |
 |--------------------------|-----------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
 | uid                      | str                                                                   | 1           | Unique uid for this source                                                                                                                                |
-| name                     | str                                                                   | 1           |                                                                                                                                                           |
+| name                     | str                                                                   | 1           | name is considered required, based on earlier versions of the datamodel, can also be an empty string                                                      |
 | static_data_updated_at   | [string (date-time)](#strdate-time)                                   | 1           |                                                                                                                                                           |
 | has_realtime_data        | bool                                                                  | 1           |                                                                                                                                                           |
 | realtime_data_updated_at | [string (date-time)](#strdate-time)                                   | ?           | Required has_realtime_data is true                                                                                                                        |
