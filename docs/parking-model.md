@@ -41,9 +41,9 @@ searches in order not to rely on a city as a query parameter.
 
 ## ParkingZone
 
-A `ParkingZone` is a geographic area which defined specific properties for the whole zone. This can be tariffs as well as restrictions.
+A `ParkingZone` is a geographic area which defines specific properties for the whole zone. This can be tariffs as well as restrictions.
 
-`ParkingSite`s can to be assigned to one or many ParkingZones. It’s possible that there are `ParkingSite`s within the area of the ParkingZone which are not assigned to this zone, for example underground parking within a larger off on street parking tariff zone.
+`ParkingSite`s can be assigned to one or many ParkingZones. It’s possible that there are `ParkingSite`s within the area of the ParkingZone which are not assigned to this zone, for example underground parking within a larger off on street parking tariff zone.
 
 | Field        | Type                                      | Cardinality | Description                                                                  |
 |--------------|-------------------------------------------|-------------|------------------------------------------------------------------------------|
@@ -57,7 +57,7 @@ A `ParkingZone` is a geographic area which defined specific properties for the w
 
 ## Tariff
 
-A `Tariff` is the whole tariff system which contains one or more tariff options. There is just one `Tariff` valid at a time. If there is any option valid for the customer, they have to take it. If there is no valid option, parking is free. Tariffs do not overrule restrictions like `max_stay` or `restrictions`.
+A `Tariff` is the whole tariff system which contains one or more tariff options. There is just one `Tariff` valid at a time. If there is any option valid for the customer, they have to take it. If the customer has multiple options, they are free to decide. If there is no valid option, parking is free. Tariffs do not overrule restrictions like `restrictions.max_stay` or `restrictions.type`.
 
 | Field           | Type                               | Cardinality | Description                                                                                                                                   |
 |-----------------|------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
@@ -74,7 +74,7 @@ A `Tariff` is the whole tariff system which contains one or more tariff options.
 
 ## TariffOption
 
-`TariffOption`s are not additive, this means that the customer can chose any valid option they want. If there is no option, parking is free.
+`TariffOption`s are not additive, this means that the customer can choose any valid option they want. If there is no option, parking is free.
 
 | Field             | Type                                | Cardinality | Description                                                                                                                                                                |
 |-------------------|-------------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -120,9 +120,9 @@ in order to provide data in a more consistent way, we decided against this (in t
 
 A `ParkingSite` needs the following extension fields in addition to the existing fields:
 
-| Field                    | Type                                                                  | Cardinality | Descrption                                                                                                                                                |
+| Field                    | Type                                                                  | Cardinality | Description                                                                                                                                               |
 |--------------------------|-----------------------------------------------------------------------|-------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| uid                      | str                                                                   | 1           | Unique uid for this source                                                                                                                                |
+| uid                      | str                                                                   | 1           | Unique uid for this ParkingSite                                                                                                                           |
 | name                     | str                                                                   | 1           | name is considered required, based on earlier versions of the datamodel, can also be an empty string                                                      |
 | static_data_updated_at   | [string (date-time)](#strdate-time)                                   | 1           |                                                                                                                                                           |
 | has_realtime_data        | bool                                                                  | 1           |                                                                                                                                                           |
@@ -132,10 +132,12 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | public_url               | str(url)                                                              | ?           | URL for human users to get more details about this parking site.                                                                                          |
 | type                     | [ParkingSiteType](#parkingsitetype)                                   | ?           |                                                                                                                                                           |
 | description              | str                                                                   | ?           |                                                                                                                                                           |
-| address                  | str                                                                   | ?           | Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city}                                         |
+| address                  | str                                                                   | ?           | Full address including street postal code and city. Preferable in format {street with number}, {postal code} {city}                                         |
 | max_height               | int                                                                   | ?           | Max height, in centimeters.                                                                                                                               |
 | max_width                | int                                                                   | ?           | Max width, in centimeters.                                                                                                                                |
 | has_lighting             | bool                                                                  | ?           |                                                                                                                                                           |
+| has_fee                  | bool                                                                  | ?           |                                                                                                                                                           |
+| is_covered               | bool                                                                  | ?           |                                                                                                                                                           |
 | fee_description          | str                                                                   | ?           |                                                                                                                                                           |
 | park_and_ride_type       | [ParkAndRideType](#parkandridetype)                                   | *           |                                                                                                                                                           |
 | supervision_type         | [SupervisionType](#supervisiontype)                                   | ?           |                                                                                                                                                           |
@@ -153,10 +155,10 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | capacity_max             | int                                                                   | ?           | The max capacity if there is a uncertainty of measurement                                                                                                 |
 | realtime_capacity        | int                                                                   | ?           |                                                                                                                                                           |
 | realtime_free_capacity   | int                                                                   | ?           |                                                                                                                                                           |
-| parking_type             | [LinearParkingSiteSideParkingType](#linearparkingsitesideparkingtype) | ?           | How the car is parked                                                                                                                                     |
+| type                     | [LinearParkingSiteSideParkingType](#linearparkingsitesideparkingtype) | ?           | How the car is parked                                                                                                                                     |
 | orientation              | [LinearParkingSiteSideOrientation](#linearparkingsitesideorientation) | ?           | How the car is parked in relation to driving direction                                                                                                    |
 | side                     | [LinearParkingSiteSideType](#linearparkingsitesidetype)               | ?           |                                                                                                                                                           |
-| external_identifiers     | ExternalIdentifier                                                    | *           |                                                                                                                                                           |
+| external_identifiers     | [ExternalIdentifier](#external-identifier)                                                    | *           |                                                                                                                                                           |
 | tags                     | str                                                                   | *           |                                                                                                                                                           |
 
 ## ParkingRestriction
@@ -181,8 +183,8 @@ The `ParkingSpot` represents a single spot for a single car / bike. The only req
 | lon                      | float                                             | 1           | lon                                                                                                               |
 | name                     | str                                               | ?           |                                                                                                                   |
 | type                     | ParkingSpotType                                   |             |                                                                                                                   |
-| parking_site_uid         | str                                               | ?           | Refererence to ParkingSite. Will be outputted as `parking_site_id`.                                               |
-| address                  | str                                               | ?           | Full address including street postalcode and city. Preferable in format {street with number}, {postalcode} {city} |
+| parking_site_uid         | str                                               | ?           | Reference to ParkingSite. Will be outputted as `parking_site_id`.                                                 |
+| address                  | str                                               | ?           | Full address including street postal code and city. Preferable in format {street with number}, {postal code} {city} |
 | geojson                  | [GeoJSON Geometry](#geojson-geometry)             | ?           | Polygon to describe                                                                                               |
 | purpose                  | [PurposeType](#purposetype)                       | 1           |                                                                                                                   |
 | static_data_updated_at   | string (date-time)                                | 1           |                                                                                                                   |
@@ -203,7 +205,14 @@ The `ParkingSpot` represents a single spot for a single car / bike. The only req
 
 ## ParkingSiteGroup
 
-A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
+A generic grouping of several `ParkingSite` or `ParkingSpot` objects.
+
+| Field        | Type                             | Cardinality | Description                                                                |
+|--------------|----------------------------------|-------------|----------------------------------------------------------------------------|
+| id           | int                              | 1           | Internal ID, generated by ParkAPI Service.                                 |
+| created_at   | [str (date-time)](#strdate-time) | 1           | Creation date in ParkAPI Service database, cannot be set by clients.       |
+| modified_at  | [str (date-time)](#strdate-time) | 1           | Last modified value in ParkAPI Service database, cannot be set by clients. |
+| original_uid | str                              | 1           | Unique Identifier in original system.                                      |
 
 ## PurposeType
 
@@ -294,6 +303,8 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 * CAR_PARK
 * LOCKERS
 * LOCKBOX
+* CARAVAN
+* CARGOBIKE
 
 ## ParkingAudience
 
@@ -308,6 +319,18 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 * BUS
 * CUSTOMER
 * RESIDENT
+
+## External identifier
+
+| Field | Type                                                | Cardinality | Description                                       |
+|-------|-----------------------------------------------------|-------------|---------------------------------------------------|
+| type  | [ExternalIdentifierType](#external-identifier-type) | 1           | If type is not set, all audiences are restricted. |
+| value | str                                                 | 1           |                                                   |
+
+## External identifier type
+
+* OSM
+* DHID
 
 ## TariffComponentType
 
@@ -846,7 +869,7 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
 ]
 ```
 
-0,10 € for every entered 10 Minutes for the first 2 hours, afterwards 2 € for every entered hour from 8 - 18 o’Clock … does not work. Could be modelld like this, but that gets even more complicated:
+0,10 € for every entered 10 Minutes for the first 2 hours, afterwards 2 € for every entered hour from 8 - 18 o’Clock … does not work.
 
 ```json
 [
