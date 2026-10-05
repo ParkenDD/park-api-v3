@@ -79,7 +79,7 @@ A `Tariff` is the whole tariff system which contains one or more tariff options.
 | Field             | Type                                | Cardinality | Description                                                                                                                                                                |
 |-------------------|-------------------------------------|-------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | components        | [TariffComponent](#tariffcomponent) | +           | All valid TariffComponents apply.                                                                                                                                          |
-| valid_start_time  | [str (time)](#strtime)              | ?           | Local time when the option gets valid. Has to be set together with `valid_start_end`. If neither are set, the option is valid for all day. `24:00` is an allowed value.    |
+| valid_start_time  | [str (time)](#strtime)              | ?           | Local time when the option gets valid. Has to be set together with `valid_end_time`. If neither are set, the option is valid for all day. `24:00` is an allowed value.     |
 | valid_end_time    | [str (time)](#strtime)              | ?           | Local time when the option gets invalid. Has to be set together with `valid_start_time`. If neither are set, the option is valid for all day. `24:00` is an allowed value. |
 | valid_day_of_week | [Weekday](#weekday)                 | *           | Ability to set the weekdays when this tariff is valid. If no weekday is set, it’s valid for all weekdays.                                                                  |
 | valid_audience    | [ParkingAudience](#parkingaudience) | *           | List of audiences for which this option is valid. If no audience is set, it’s valid for all audiences.                                                                     |
@@ -146,7 +146,7 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | lon                      | float                                                                 | 1           | lon                                                                                                                                                       |
 | geojson                  | [GeoJSON Geometry](#geojson-geometry)                                 | ?           | Polygon to describe the ParkingSite. The center of this shape will be calculated to the point if the point is not given explicitly.                       |
 | tariffs                  | [Tariff](#tariff)                                                     | *           |                                                                                                                                                           |
-| restrictions             | ParkingSiteRestriction                                                | *           | If there are multiple options, they should be understood with an logical or. If there are multiple options, they should be understood with an logical or. |
+| restrictions             | ParkingRestriction                                                    | *           | If there are multiple options, they should be understood with an logical or. If there are multiple options, they should be understood with an logical or. |
 | purpose                  | [PurposeType](#purposetype)                                           | 1           |                                                                                                                                                           |
 | capacity                 | int                                                                   | 1           |                                                                                                                                                           |
 | capacity_min             | int                                                                   | ?           | The min capacity if there is a uncertainty of measurement                                                                                                 |
@@ -303,12 +303,9 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objetcs.
 * CARSHARING
 * CHARGING
 * TAXI
-* PRIVATE: Private parking for companies, police cars, ambulance, …
 * DELIVERY
 * TRUCK
 * BUS
-* NO_PARKING
-* NO_STOPPING
 * CUSTOMER
 * RESIDENT
 
@@ -434,7 +431,7 @@ Simple parking sites with 100 parking spots.
     "static_data_updated_at": "2020-01-01T00:00:00Z",
     "purpose": "CAR",
     "has_realtime_data": false,
-    "capacy": 100,
+    "capacity": 100,
     "lat": "48.783333",
     "lon": "9.183333"
 }
@@ -449,7 +446,7 @@ Parking sites with 100 parking spots, all of them restricted to women.
     "static_data_updated_at": "2020-01-01T00:00:00Z",
     "purpose": "CAR",
     "has_realtime_data": false,
-    "capacy": 100,
+    "capacity": 100,
     "lat": "48.783333",
     "lon": "9.183333",
     "restrictions": [
@@ -469,12 +466,11 @@ Simple parking sites with 100 parking spots, all of them restricted to max 4h, 1
     "static_data_updated_at": "2020-01-01T00:00:00Z",
     "purpose": "CAR",
     "has_realtime_data": false,
-    "capacy": 100,
+    "capacity": 100,
     "lat": "48.783333",
     "lon": "9.183333",
     "restrictions": [
         {
-            "capacity": 10,
             "max_stay": "P4H"
         },
         {
@@ -496,7 +492,7 @@ time limit.
     "static_data_updated_at": "2020-01-01T00:00:00Z",
     "purpose": "CAR",
     "has_realtime_data": false,
-    "capacy": 100,
+    "capacity": 100,
     "lat": "48.783333",
     "lon": "9.183333",
     "restrictions": [
@@ -649,13 +645,13 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
                     {
                         "type": "TIME",
                         "price": "0.00",
-                        "max_duration": "P30M"
+                        "max_duration": "PT30M"
                     },
                     {
                         "type": "TIME",
                         "price": "2.00",
                         "step_size": "P1H",
-                        "min_duration": "P30M"
+                        "min_duration": "PT30M"
                     }
                 ],
                 "valid_start_time": "08:00",
@@ -666,14 +662,14 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
                 "components": [
                     {
                         "type": "TIME",
-                        "price": "0.50",
-                        "max_duration": "P30M"
+                        "price": "0.00",
+                        "max_duration": "PT30M"
                     },
                     {
                         "type": "TIME",
                         "price": "2.00",
                         "step_size": "P1H",
-                        "min_duration": "P30M"
+                        "min_duration": "PT30M"
                     }
                 ],               
                 "valid_start_time": "12:00",
@@ -762,7 +758,7 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
                 ],
                 "valid_start_time": "08:00",
                 "valid_end_time": "18:00",
-                "valid_audience": ["RESIDENTS"]
+                "valid_audience": ["RESIDENT"]
             }
         ]
     }
@@ -888,40 +884,7 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
 ```json
 [
     {
-        "uid": "tariff-9",
-        "currency": "EUR",
-        "tax_rate": "0.19",
-        "updated_at": "2024-11-11T11:11:11Z",
-        "opention": [
-            {
-                "components": [
-                    {
-                        "type": "TIME",
-                        "price": "1.00",
-                        "step_size": "1m",
-                        "max_duration": "1h"
-                    },
-                    {
-                        "type": "TIME",
-                        "price": "2.00",
-                        "step_size": "1h",
-                        "min_duration": "1h"
-                    }
-                ],
-                "valid_start_time": "08:00",
-                "valid_end_time": "18:00"
-            }
-        ]
-    }
-]
-```
-
-2 € for every hour entered hour from 8 - 18 o’Clock, customers get 2 hours free parking:
-
-```json
-[
-    {
-        "uid": "tariff-7",
+        "uid": "tariff-10",
         "currency": "EUR",
         "tax_rate": "0.19",
         "updated_at": "2024-11-11T11:11:11Z",
@@ -929,28 +892,16 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
             {
                 "components": [
                     {
-                        "price": "0.00",
-                        "step_size": "1h",
                         "type": "TIME",
-                        "max_duration": "2h"
+                        "price": "1.00",
+                        "step_size": "1h",
+                        "max_duration": "1h"
                     },
                     {
-                        "price": "1.00",
-                        "step_size": "1h",
                         "type": "TIME",
-                        "min_duration": "2h"
-                    }
-                ],
-                "valid_start_time": "08:00",
-                "valid_end_time": "18:00",
-                "valid_audience": ["CUSTOMER"]
-            },
-            {
-                "components": [
-                    {
-                        "price": "1.00",
+                        "price": "2.00",
                         "step_size": "1h",
-                        "type": "TIME"
+                        "min_duration": "1h"
                     }
                 ],
                 "valid_start_time": "08:00",
