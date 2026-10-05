@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 
+from validataclass.dataclasses import Default
 from validataclass.helpers import OptionalUnset, UnsetValue
 
 from webapp.common.dataclass import DataclassMixin
@@ -217,7 +218,7 @@ class Datex2LocationAndDimension(DataclassMixin):
 @dataclass(kw_only=True)
 class Datex2ParkingSite(DataclassMixin):
     uid: str
-    assignedFor: OptionalUnset[list[Datex2Assignment]] = UnsetValue
+    assignedFor: OptionalUnset[list[Datex2Assignment]] = Default([])
     locationAndDimension: Datex2LocationAndDimension
     availableSpaces: OptionalUnset[int] = UnsetValue  # should be >= 0
     description: OptionalUnset[str] = UnsetValue
