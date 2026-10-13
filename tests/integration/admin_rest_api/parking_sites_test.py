@@ -124,20 +124,6 @@ def test_upsert_parking_site_item(
     assert result.json == PARKING_SITE_RESPONSE_ITEM
 
 
-def test_upsert_parking_site_item_with_legacy_restricted_to(
-    rest_enabled_source: None,
-    admin_api_test_client: FlaskClient,
-) -> None:
-    result = admin_api_test_client.post(
-        '/api/admin/v1/parking-sites/upsert-item',
-        auth=('source', 'test'),
-        json=load_admin_client_request_input('parking-site-item-with-restricted-to'),
-    )
-
-    assert result.status_code == HTTPStatus.OK
-    assert result.json == PARKING_SITE_RESPONSE_ITEM_WITH_RESTRICTED_TO
-
-
 def test_upsert_parking_site_list_with_relations(
     rest_enabled_source: None,
     admin_api_test_client: FlaskClient,
@@ -199,20 +185,6 @@ def test_upsert_parking_site_item_with_patch(
     assert parking_site.park_and_ride_type == [ParkAndRideType.TRAM]
     assert parking_site.type == ParkingSiteType.UNDERGROUND
     assert len(parking_site.external_identifiers) == 1
-
-
-def test_upsert_parking_site_list_with_restricted_to(
-    rest_enabled_source: None,
-    admin_api_test_client: FlaskClient,
-) -> None:
-    result = admin_api_test_client.post(
-        '/api/admin/v1/parking-sites/upsert-item',
-        auth=('source', 'test'),
-        json=load_admin_client_request_input('parking-site-item-with-restricted-to'),
-    )
-
-    assert result.status_code == HTTPStatus.OK
-    assert result.json == PARKING_SITE_RESPONSE_ITEM_WITH_RESTRICTED_TO
 
 
 def test_generate_duplicates_simple(
@@ -338,40 +310,12 @@ PARKING_SITE_RESPONSE_ITEM = {
 }
 
 
-PARKING_SITE_RESPONSE_ITEM_WITH_RESTRICTED_TO = {
-    **PARKING_SITE_RESPONSE_ITEM,
-    'restricted_to': [
-        {
-            'max_stay': 'PT2H',
-        },
-        {
-            'max_stay': 'PT12H',
-            'type': 'DISABLED',
-        },
-    ],
-    'restrictions': [
-        {
-            'max_stay': 'PT2H',
-        },
-        {
-            'max_stay': 'PT12H',
-            'type': 'DISABLED',
-        },
-    ],
-}
-
-
 PARKING_SITE_RESPONSE_ITEM_WITH_RELATIONS = {
     **PARKING_SITE_RESPONSE_ITEM,
     'external_identifiers': [
         {
             'type': 'OSM',
             'value': '123456789',
-        },
-    ],
-    'restricted_to': [
-        {
-            'max_stay': 'PT2H',
         },
     ],
     'restrictions': [

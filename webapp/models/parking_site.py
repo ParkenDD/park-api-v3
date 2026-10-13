@@ -204,10 +204,6 @@ class ParkingSite(BaseModel):
         if result.get('lon') is not None:
             result['lon'] = float(result['lon'])
 
-        # Add legacy field is_supervised
-        if self.supervision_type is not None:
-            result['is_supervised'] = self.supervision_type != SupervisionType.NO
-
         if include_restrictions and len(self.restrictions):
             result['restrictions'] = []
             for restrictions in self.restrictions:
@@ -216,14 +212,6 @@ class ParkingSite(BaseModel):
                         fields=['type', 'hours', 'max_stay', 'capacity', 'realtime_capacity', 'realtime_free_capacity'],
                     ),
                 )
-
-            # Legacy output
-            result['restricted_to'] = []
-            for restrictions in self.restrictions:
-                # It would be misleading to output a restriction without capacity at the legacy field
-                if restrictions.capacity is not None:
-                    continue
-                result['restricted_to'].append(restrictions.to_dict(fields=['type', 'hours', 'max_stay']))
 
         if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []
@@ -244,10 +232,9 @@ class ParkingSite(BaseModel):
             )
 
         # Realtime data is considered outdated once realtime_data_updated_at is older than the configured
-        # threshold. In that case we behave as if there was no realtime data at all.
-        has_realtime_data = self.has_realtime_data
+        # threshold. In that case has_realtime_data is set to false, but all realtime fields are kept.
         if (
-            has_realtime_data
+            self.has_realtime_data
             and unset_realtime_after_minutes is not None
             and (
                 self.realtime_data_updated_at is None
@@ -255,14 +242,7 @@ class ParkingSite(BaseModel):
                 < datetime.now(tz=timezone.utc) - timedelta(minutes=unset_realtime_after_minutes)
             )
         ):
-            has_realtime_data = False
             result['has_realtime_data'] = False
-
-        # If we don't have realtime support, we don't need realtime data
-        if not has_realtime_data:
-            return filter_unset_value_and_none(
-                {key: value for key, value in result.items() if not key.startswith('realtime_')},
-            )
 
         return filter_unset_value_and_none(result)
 

@@ -84,10 +84,6 @@ parking_site_schema = JsonSchema(
         'max_width': IntegerField(minimum=0, required=False, description='Max width, in centimeters.'),
         'has_lighting': BooleanField(required=False),
         'park_and_ride_type': ArrayField(items=EnumField(enum=ParkAndRideType), required=False),
-        'is_supervised': BooleanField(
-            required=False,
-            description='*Deprecated, will be replaced by supervision_type.*',
-        ),
         'supervision_type': EnumField(enum=SupervisionType, required=False),
         'is_covered': BooleanField(required=False),
         'orientation': EnumField(enum=ParkingSiteOrientation, required=False),
@@ -102,8 +98,18 @@ parking_site_schema = JsonSchema(
         'capacity_min': IntegerField(minimum=0, required=False),
         'capacity_max': IntegerField(minimum=0, required=False),
         'related_location': StringField(maxLength=256, description='A related location like a school.', required=False),
-        'has_realtime_data': BooleanField(default=False),
-        'fee_description': StringField(required=False),
+        'has_realtime_data': BooleanField(
+            default=False,
+            description='Whether the parking site has usable realtime data. False if the parking site is static, or if it is dynamic, but its '
+            'realtime data is outdated (older than 30 minutes for pull sources, older than 24 hours for push '
+            'sources). Realtime fields are provided anyway, so realtime_data_updated_at shows their age. Can be '
+            'disabled with calculate_has_realtime_data=false.',
+        ),
+        'fee_description': StringField(
+            maxLength=4096,
+            required=False,
+            description='Human-readable description of the fees, e.g. prices for different durations.',
+        ),
         'has_fee': BooleanField(required=False),
         'static_data_updated_at': DateTimeField(
             description='Last time static fields were updated. Can be set by the client.',
@@ -135,12 +141,6 @@ parking_site_schema = JsonSchema(
             },
             additionalProperties=True,
         ),
-        'restricted_to': ArrayField(
-            items=Reference(obj='ParkingSiteRestriction'),
-            required=False,
-            description='*Deprecated, use restrictions instead.*<br>Restrictions which apply. If there are multiple '
-            'options, they should be understood with an logical or.',
-        ),
         'restrictions': ArrayField(
             items=Reference(obj='ParkingSiteRestriction'),
             required=False,
@@ -157,7 +157,11 @@ parking_site_schema = JsonSchema(
             required=False,
         ),
         'group': Reference(obj='ParkingSiteGroup', required=False),
-        'tags': ArrayField(items=StringField(maxLength=256), required=False),
+        'tags': ArrayField(
+            items=StringField(maxLength=256),
+            required=False,
+            description='Free-form tags provided by the data source. Omitted if there are no tags.',
+        ),
         'opening_hours': StringField(maxLength=512, required=False, description='OSM opening_hours format'),
         **parking_site_base_properties,
     },
@@ -172,12 +176,14 @@ parking_site_example = {
     'description': 'Demo Description',
     'type': 'CAR_PARK',
     'purpose': 'CAR',
-    'has_fee': False,
+    'has_fee': True,
+    'fee_description': '1 EUR per hour, max. 10 EUR per day',
     'has_realtime_data': False,
     'lat': 50.1,
     'lon': 10.1,
     'capacity': 100,
     'opening_hours': 'Mo - Su 08:00-18:00',
+    'tags': ['demo-tag'],
     'id': 1,
     'created_at': '2025-03-21T17:53:29Z',
     'modified_at': '2025-03-21T17:53:29Z',

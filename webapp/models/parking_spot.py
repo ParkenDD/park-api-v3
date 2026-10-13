@@ -136,11 +136,6 @@ class ParkingSpot(BaseModel):
             for parking_restriction in self.restrictions:
                 result['restrictions'].append(parking_restriction.to_dict(fields=['type', 'hours', 'max_stay']))
 
-            # Legacy output
-            result['restricted_to'] = []
-            for parking_restriction in self.restrictions:
-                result['restricted_to'].append(parking_restriction.to_dict(fields=['type', 'hours', 'max_stay']))
-
         if include_external_identifiers and len(self.external_identifiers):
             result['external_identifiers'] = []
             for external_identifier in self.external_identifiers:
@@ -155,10 +150,9 @@ class ParkingSpot(BaseModel):
                 result['tags'].append(tag.value)
 
         # Realtime data is considered outdated once realtime_data_updated_at is older than the configured
-        # threshold. In that case we behave as if there was no realtime data at all.
-        has_realtime_data = self.has_realtime_data
+        # threshold. In that case has_realtime_data is set to false, but all realtime fields are kept.
         if (
-            has_realtime_data
+            self.has_realtime_data
             and unset_realtime_after_minutes is not None
             and (
                 self.realtime_data_updated_at is None
@@ -166,14 +160,7 @@ class ParkingSpot(BaseModel):
                 < datetime.now(tz=timezone.utc) - timedelta(minutes=unset_realtime_after_minutes)
             )
         ):
-            has_realtime_data = False
             result['has_realtime_data'] = False
-
-        # If we don't have realtime support, we don't need realtime data
-        if not has_realtime_data:
-            return filter_unset_value_and_none(
-                {key: value for key, value in result.items() if not key.startswith('realtime_')},
-            )
 
         return filter_unset_value_and_none(result)
 

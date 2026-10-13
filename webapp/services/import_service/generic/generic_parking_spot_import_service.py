@@ -71,7 +71,7 @@ class GenericParkingSpotImportService(GenericBaseImportService):
         if len(static_parking_spot_inputs):
             source.static_status = SourceStatus.ACTIVE
         elif len(static_parking_spot_errors):
-            source.realtime_status = SourceStatus.FAILED
+            source.static_status = SourceStatus.FAILED
 
         source.static_data_updated_at = datetime.now(tz=timezone.utc)
         source.static_parking_spot_error_count = len(static_parking_spot_errors)
