@@ -16,7 +16,13 @@ from flask_openapi.schema import (
     ObjectField,
     StringField,
 )
-from parkapi_sources.models.enums import ParkingAudience, ParkingSpotStatus, ParkingSpotType, PurposeType
+from parkapi_sources.models.enums import (
+    ParkingAudience,
+    ParkingOrientation,
+    ParkingSpotStatus,
+    ParkingSpotType,
+    PurposeType,
+)
 
 parking_spot_request_schema = JsonSchema(
     title='Parking Spot Request',
@@ -27,6 +33,7 @@ parking_spot_request_schema = JsonSchema(
         'address': StringField(maxLength=256, required=False, nullable=True),
         'purpose': EnumField(enum=PurposeType, default=PurposeType.CAR, required=False),
         'type': EnumField(enum=ParkingSpotType, required=False, nullable=True),
+        'orientation': EnumField(enum=ParkingOrientation, required=False, nullable=True),
         'description': StringField(maxLength=4096, required=False, nullable=True),
         'static_data_updated_at': DateTimeField(),
         'has_realtime_data': BooleanField(),

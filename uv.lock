@@ -1169,7 +1169,7 @@ requires-dist = [
     { name = "lxml", specifier = "~=6.1.3" },
     { name = "opening-hours-py", specifier = "~=2.1.4" },
     { name = "openpyxl", specifier = "~=3.1.5" },
-    { name = "parkapi-sources", specifier = "~=0.39.1" },
+    { name = "parkapi-sources", specifier = "~=0.40.0" },
     { name = "psycopg2-binary", specifier = "~=2.9.13" },
     { name = "pymysql", specifier = "~=1.2.3" },
     { name = "python-dotenv", specifier = "~=1.2.4" },
@@ -1196,7 +1196,7 @@ dev = [
 
 [[package]]
 name = "parkapi-sources"
-version = "0.39.1"
+version = "0.40.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
@@ -1210,9 +1210,9 @@ dependencies = [
     { name = "urllib3" },
     { name = "validataclass" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e4/95/4f9c8361599a7794dbbf2791603869efb4db89c3b77762864e3b33f83b39/parkapi_sources-0.39.1.tar.gz", hash = "sha256:ab2b1bdbc8a45fcf8cb8b48728aa9dff80131e90de12503e3262d33a17f391d1", size = 133200, upload-time = "2026-10-03T09:23:24.187Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/62/f2/a870be4cd1a8518b53e1e1923774089230034c0cb1d58eec92b3645b7e07/parkapi_sources-0.40.0.tar.gz", hash = "sha256:c674eee6d5ca208af101b0c096762d22a00249ea4e2c5c2e9d9ca220b6dde356", size = 148217, upload-time = "2026-10-20T15:44:03.643Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/32/7e/2fb0d8d0b4edc6a0d50f9808d8b58297bfcacc43918c1c2a6c2bb4013817/parkapi_sources-0.39.1-py3-none-any.whl", hash = "sha256:126a440446813fbf4f93802c9f0a8784a8f1e99a7b0ce63f5f2ef5e7a61b59df", size = 277329, upload-time = "2026-10-03T09:23:22.666Z" },
+    { url = "https://files.pythonhosted.org/packages/7f/58/7fcc2e2c3ddd1920df3b06964a5422928ad847942d4c80d4bcced0dd372e/parkapi_sources-0.40.0-py3-none-any.whl", hash = "sha256:2e986352b2a405d091a5bbb90a0ff309387f0afc0b360116f39eb37df97c91b1", size = 277477, upload-time = "2026-10-20T15:44:01.911Z" },
 ]
 
 [[package]]

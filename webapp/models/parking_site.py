@@ -12,7 +12,7 @@ from parkapi_sources.models.enums import (
     LinearParkingPosition,
     OpeningStatus,
     ParkAndRideType,
-    ParkingSiteOrientation,
+    ParkingOrientation,
     ParkingSiteSide,
     ParkingSiteType,
     ParkingType,
@@ -143,9 +143,7 @@ class ParkingSite(BaseModel):
     _park_and_ride_type: Mapped[str | None] = mapped_column('park_and_ride_type', String(256), nullable=True)
     supervision_type: Mapped[SupervisionType | None] = mapped_column(SqlalchemyEnum(SupervisionType), nullable=True)
     related_location: Mapped[str | None] = mapped_column(String(256), nullable=True)
-    orientation: Mapped[ParkingSiteOrientation | None] = mapped_column(
-        SqlalchemyEnum(ParkingSiteOrientation), nullable=True
-    )
+    orientation: Mapped[ParkingOrientation | None] = mapped_column(SqlalchemyEnum(ParkingOrientation), nullable=True)
     side: Mapped[ParkingSiteSide | None] = mapped_column(SqlalchemyEnum(ParkingSiteSide), nullable=True)
     parking_type: Mapped[ParkingType | None] = mapped_column(SqlalchemyEnum(ParkingType), nullable=True)
     linear_parking_position: Mapped[LinearParkingPosition | None] = mapped_column(

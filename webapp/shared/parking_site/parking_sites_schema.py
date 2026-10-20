@@ -21,7 +21,7 @@ from flask_openapi.schema import (
 from parkapi_sources.models.enums import (
     ExternalIdentifierType,
     LinearParkingPosition,
-    ParkingSiteOrientation,
+    ParkingOrientation,
     ParkingSiteSide,
     ParkingType,
     PurposeType,
@@ -86,7 +86,7 @@ parking_site_schema = JsonSchema(
         'park_and_ride_type': ArrayField(items=EnumField(enum=ParkAndRideType), required=False),
         'supervision_type': EnumField(enum=SupervisionType, required=False),
         'is_covered': BooleanField(required=False),
-        'orientation': EnumField(enum=ParkingSiteOrientation, required=False),
+        'orientation': EnumField(enum=ParkingOrientation, required=False),
         'side': EnumField(enum=ParkingSiteSide, required=False),
         'parking_type': EnumField(enum=ParkingType, required=False),
         'linear_parking_position': EnumField(
