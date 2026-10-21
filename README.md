@@ -6,49 +6,12 @@ ParkAPI v3 is a web service which collects and provides access to parking data f
 
 ## Data model
 
-The data model is rather simple (for now): we have data sources and parking sites in an 1:n relation.
+The data model is documented [here](docs/parking-model.md).
 
 The data model is documented using an OpenAPI documentation:
  - [public endpoints](https://api.mobidata-bw.de/park-api/documentation/public.html) for public data access
  - [admin endpoints](https://api.mobidata-bw.de/park-api/documentation/admin.html) for pushing or managing data
 
-### Source
-
-The source object represents a specific data source. Every data source has a unique identifier called `source.uid`.
-The `uid` is the central identifier which defines the data handling and, at push endpoints, even the user for basic
-authorization.
-
-Additionally, every source has a human-readable name and a public URL where the user gets more information.
-
-There are a few other fields at source, mostly related to import status including error counters and licence
-information. For a complete overview, please have a look at the
-[OpenAPI documentation](https://api.mobidata-bw.de/park-api/documentation/public.html#/paths/v3-parking-sites/get).
-
-If, until now, you used the ParkAPI v1 model, you might recognize that there is a change of perspective: at v1, the
-main object for collecting data was city, not source. This turned out not to be very realistic, because often there are
-multiple operators per city. ParkAPI v2 changed this to a source-based approach, and added geo-based queries to
-searches in order not to rely on a city as a query parameter.
-
-### Parking Site
-
-`ParkingSite` represents a location where multiple parking spaces are located as a defined area or building. Every
-parking site has a data source where it comes from. It also has all the relevant data which describes the parking site:
-a name, an address, a url and other meta information. Additionally, it has static and, if the data source provides it,
-realtime data for capacities. It also has opening times in OSM format and also, if available, a realtime opening status.
-For a complete overview, please have a look at the
-[OpenAPI documentation](https://api.mobidata-bw.de/park-api/documentation/public.html#/paths/v3-parking-sites/get).
-
-This data model has its limits for on-street parking, where there is no user-visible area which creates the
-borders of a specific parking site. Usually, there are definitions for areas like parts of streets, which also apply
-on fees or rules for this area, so it's a good idea to stick to them instead of importing every single parking space as
-a whole parking site.
-
-There is a limit if it comes to attributes of parking spots: it's simple to define capacities for a single defined
-attribute, like family parking or parking with a charge station. The difficulty begins if there are parking spaces with
-multiple attributes at once, for example one parking spot which is for families and has a charge station at the same
-time. A possible solution would be to extend the data model to a parking space perspective, where every single parking
-space has a representation in the data model. Most data sources are not able to provide such in-detail information, so
-in order to provide data in a more consistent way, we decided against this (in the first place).
 
 ## Input: push and pull
 
