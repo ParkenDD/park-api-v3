@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.50.0
+
+Released 2026-10-20
+
+### Features
+
+* [Parking spot orientation](https://github.com/ParkenDD/park-api-v3/pull/440)
+* [ParkAPI Sources: Parking spot orientation](https://github.com/ParkenDD/parkapi-sources-v3/pull/436)
+
+
+### Fixes
+
+* [ParkAPI Sources: BFRK: Update bike parking types for SAFE_WALL_LOOPS and WALL_LOOPS](https://github.com/ParkenDD/parkapi-sources-v3/pull/437)
+* [ParkAPI Sources: fix definition](https://github.com/ParkenDD/parkapi-sources-v3/pull/444)
+* [ParkAPI Sources: Hotfix: bfrk_bw_bike - Add SAFE_WALL_LOOPS and WALL_LOOPS](https://github.com/ParkenDD/parkapi-sources-v3/pull/445)
+
+
+### Maintenance
+
+* [ParkAPI Sources: Add Herrenberg mapping for ParkingSite and ParkingSpot](https://github.com/ParkenDD/parkapi-sources-v3/pull/412)
+
+
 ## 0.49.2
 
 Released 2026-10-03
