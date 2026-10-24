@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
+from mercantile import LngLatBbox
 from parkapi_sources.models.enums import PurposeType
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Query, aliased, joinedload, selectinload
@@ -26,6 +27,20 @@ class ParkingSiteLocation:
     lat: float
     lon: float
     purpose: PurposeType
+
+
+@dataclass
+class ParkingSiteTileItem:
+    id: int
+    source_uid: str
+    name: str
+    lat: float
+    lon: float
+    purpose: PurposeType
+    capacity: int | None
+    has_realtime_data: bool
+    realtime_data_updated_at: datetime | None
+    realtime_free_capacity: int | None
 
 
 class ParkingSiteRepository(BaseRepository):
@@ -227,6 +242,56 @@ class ParkingSiteRepository(BaseRepository):
                 ),
             )
         return result
+
+    def fetch_parking_site_tile_items_by_bounds(
+        self,
+        bbox: LngLatBbox,
+        purpose: PurposeType | None = None,
+        ignore_duplicates: bool = True,
+    ) -> list[ParkingSiteTileItem]:
+        query = (
+            self.session
+            .query(
+                ParkingSite.id,
+                Source.uid.label('source_uid'),
+                ParkingSite.name,
+                ParkingSite.lat,
+                ParkingSite.lon,
+                ParkingSite.purpose,
+                ParkingSite.capacity,
+                ParkingSite.has_realtime_data,
+                ParkingSite.realtime_data_updated_at,
+                ParkingSite.realtime_free_capacity,
+            )
+            .join(Source, Source.id == ParkingSite.source_id)
+            .filter(
+                func.ST_Within(
+                    ParkingSite.geometry,
+                    func.ST_MakeEnvelope(bbox.west, bbox.south, bbox.east, bbox.north, 4326),
+                ),
+            )
+        )
+
+        if purpose is not None:
+            query = query.filter(ParkingSite.purpose == purpose)
+        if ignore_duplicates:
+            query = query.filter(ParkingSite.duplicate_of_parking_site_id.is_(None))
+
+        return [
+            ParkingSiteTileItem(
+                id=item.id,
+                source_uid=item.source_uid,
+                name=item.name,
+                lat=float(item.lat),
+                lon=float(item.lon),
+                purpose=item.purpose,
+                capacity=item.capacity,
+                has_realtime_data=bool(item.has_realtime_data),
+                realtime_data_updated_at=item.realtime_data_updated_at,
+                realtime_free_capacity=item.realtime_free_capacity,
+            )
+            for item in query.all()
+        ]
 
     def fetch_parking_sites_duplicates(self, source_ids: list[int] | None = None) -> list[tuple[int, int]]:
         query = self.session.query(ParkingSite.id, ParkingSite.duplicate_of_parking_site_id)
