@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.51.0
+
+Released 2026-10-24
+
+### Features
+
+* [Internal vector tile server](https://github.com/ParkenDD/park-api-v3/pull/443)
+
+
+### Maintenance
+
+* [Dependency updates](https://github.com/ParkenDD/park-api-v3/pull/442)
+* [ParkAPI Sources: introduce syrupy](https://github.com/ParkenDD/parkapi-sources-v3/pull/434)
+* [ParkAPI Sources: dependency updates](https://github.com/ParkenDD/parkapi-sources-v3/pull/446)
+
+
 ## 0.50.0
 
 Released 2026-10-20
