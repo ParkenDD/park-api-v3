@@ -12,6 +12,7 @@ from .park_api_v2 import ParkApiV2Blueprint
 from .parking_sites import ParkingSiteBlueprint
 from .parking_spots import ParkingSpotBlueprint
 from .sources import SourceBlueprint
+from .tiles import TilesBlueprint
 
 
 class PublicRestApi(Blueprint):
@@ -24,6 +25,7 @@ class PublicRestApi(Blueprint):
         ParkingSpotBlueprint,
         ParkingSiteBlueprint,
         SourceBlueprint,
+        TilesBlueprint,
     ]
 
     def __init__(self):
