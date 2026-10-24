@@ -10,6 +10,11 @@ Released 2026-10-24
 * [ParkAPI Sources: several smaller fixes](https://github.com/ParkenDD/parkapi-sources-v3/pull/448)
 
 
+### Fixes
+
+* [Handle negative realtime_free_capacity by setting it to zero](https://github.com/ParkenDD/park-api-v3/pull/438)
+
+
 ## 0.51.0
 
 Released 2026-10-24
