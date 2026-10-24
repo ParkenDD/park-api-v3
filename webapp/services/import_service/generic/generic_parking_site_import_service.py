@@ -211,6 +211,13 @@ class GenericParkingSiteImportService(GenericBaseImportService):
                     type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
                 )
                 parking_site.realtime_free_capacity = compare_capacity
+            elif parking_site.realtime_free_capacity < 0:
+                logger.warning(
+                    f'At item uid {parking_site.original_uid} from source {source.uid}, realtime_free_capacity '
+                    f'{parking_site.realtime_free_capacity} was lower than 0',
+                    type=LogMessageType.REALTIME_PARKING_SITE_HANDLING,
+                )
+                parking_site.realtime_free_capacity = 0
 
         restrictions_by_audience: dict[ParkingAudience, ParkingSiteRestrictionInput] = {
             item.type: item for item in realtime_parking_site_input.restrictions
