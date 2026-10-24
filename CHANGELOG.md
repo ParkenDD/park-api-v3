@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.52.0
+
+Released 2026-10-24
+
+### Features
+
+* [ParkAPI Sources: migrate ParkAPI v2 converters](https://github.com/ParkenDD/parkapi-sources-v3/pull/447)
+* [ParkAPI Sources: several smaller fixes](https://github.com/ParkenDD/parkapi-sources-v3/pull/448)
+
+
 ## 0.51.0
 
 Released 2026-10-24
