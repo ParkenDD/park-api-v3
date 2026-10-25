@@ -10,7 +10,6 @@ class BaseConfig:
     INSTANCE_FOLDER_PATH = os.path.join('/tmp', 'instance')  # noqa: S108
 
     PROJECT_NAME = 'park-api'
-    PROJECT_VERSION = '0.9'
 
     DEBUG = False
     TESTING = False

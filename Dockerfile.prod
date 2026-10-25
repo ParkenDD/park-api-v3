@@ -20,9 +20,13 @@ RUN apk --no-cache add alpine-sdk proj proj-dev proj-util && \
     uv sync --frozen --no-dev --no-install-project && \
     apk del -r alpine-sdk proj-dev
 
+# Project version shown at the root endpoint, set by the build workflow. Without the build arg, it falls back to 'dev'.
+ARG PROJECT_VERSION=dev
+ENV PROJECT_VERSION=${PROJECT_VERSION}
+
 COPY .flaskenv ./.flaskenv
 COPY migrations ./migrations
 COPY webapp ./webapp
 
 EXPOSE 5000
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "webapp.entry_point_gunicorn:app"]

@@ -1,15 +1,12 @@
 # ParkAPIv3 Push Script
 
 In order to test push tasks or to upload files you got per e-mail, there is an upload script included in this
-repository. It requires python requests, so either, you have that installed at your system, or you create a virtual
-environment for that:
+repository. It requires python requests, so either, you have that installed at your system, or you run the script with
+[uv](https://docs.astral.sh/uv/), which handles the virtual environment for you:
 
-```
-cd push-client
-virtalenv venv
-pip install "requests~=2.32.3"
-source venv/bin/activate
-python push-client.py
+```bash
+cd scripts
+uv run --with "requests~=2.32.3" push-client.py source_uid some/file.csv
 ```
 
 If you have requests, you can run the script with two arguments:

@@ -51,6 +51,9 @@ class ConfigLoader:
 
         app.config['MODE'] = os.getenv('APPLICATION_MODE', 'DEVELOPMENT')
 
+        # Project version is set at container build, see Dockerfile.prod
+        app.config['PROJECT_VERSION'] = os.getenv('PROJECT_VERSION', 'dev')
+
         # Transform REMOTE_SERVERS entries into RemoteServer dataclass objects
         app.config['REMOTE_SERVERS'] = {
             RemoteServerType[key]: RemoteServer(
