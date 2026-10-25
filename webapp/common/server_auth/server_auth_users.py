@@ -84,6 +84,9 @@ class ServerAuthDatabase:
             # Just converters with hash are push converters which can be used as credentials
             if not converter.get('hash'):
                 continue
+            # Mirror converters pull their data from another ParkAPI instance, so they don't accept pushed data
+            if converter.get('mirror_base_url'):
+                continue
 
             users_parsed[converter['uid']] = ServerAuthUser(
                 username=converter['uid'],

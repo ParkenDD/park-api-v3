@@ -77,6 +77,27 @@ the realtime frequency using `REALTIME_IMPORT_PULL_FREQUENCY`, which should be i
 `REALTIME_OUTDATED_AFTER_MINUTES`, which will flag sources at outdated in our Prometheus endpoint after the defined
 amount of time. It defaults to 30 minutes.
 
+### Mirror mode
+
+Every source can be mirrored from another ParkAPI v3 instance instead of being pulled or pushed directly. To do so, set
+`mirror_base_url` at the source config to the base URL of the upstream instance, e.g.
+`https://api.mobidata-bw.de/park-api/`. The source `uid` has to be the same as the source uid at the upstream instance.
+
+A mirrored source is handled like a pull source, using the same schedule:
+
+* At the static pull, the source metadata (name, public URL, attribution, whether there is realtime data) is taken from
+  `<mirror_base_url>/api/public/v3/sources`. Parking sites and parking spots are taken from
+  `<mirror_base_url>/api/public/v3/parking-sites?source_uid=<uid>` and
+  `<mirror_base_url>/api/public/v3/parking-spots?source_uid=<uid>`. Parking site groups and the link between parking
+  spots and parking sites are mirrored, too.
+* At the realtime pull, the same endpoints are used to update realtime data.
+
+Mirrored sources don't need a converter at ParkAPI Sources, and any `hash`, `env` or `generic_source` config of that
+source is ignored, as mirrored sources cannot receive pushed data. The official region code is not mirrored, but
+assigned locally as described at [Official region code](#official-region-code).
+
+This is especially useful for development, as push sources cannot push to a local instance.
+
 ### Source status: static and realtime
 
 Every source tracks two independent import states, `static_status` and `realtime_status`. Both are exposed in the
@@ -437,6 +458,8 @@ PARK_API_CONVERTER:
     env:
       PARK_API_DEMO_ENV_VAR: demo_env_value
       PARK_API_OTHER_DEMO_ENV_VAR: other_demo_env_value
+  - uid: mirror_converter
+    mirror_base_url: https://api.mobidata-bw.de/park-api/
 ```
 
 * `pull_converter` is an example for a simple pull converter. If the pull converter works without credentials,
@@ -450,6 +473,7 @@ PARK_API_CONVERTER:
   `push_converter`.
 * `env_var_converter` is an example for a converter needing additional information to work, usually credentials. You
   can look up these env vars at the specific ParkAPI sources converter.
+* `mirror_converter` is an example for a mirrored source, see [Mirror mode](#mirror-mode).
 
 Additionally, you can add source UIDs to `DEBUG_SOURCES`. This enables a debug mode, where all requests are dumped to
 a path which is defined at `DEBUG_DUMP_DIR`, defaulting to `data/debug-dump`. Especially at realtime sources, this

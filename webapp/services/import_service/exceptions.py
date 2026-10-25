@@ -36,3 +36,7 @@ class ImportDatasetException(AppException):
 
 class ConverterMissingException(AppException):
     code = 'converter_missing'
+
+
+class MirrorSourceNotFoundException(AppException):
+    code = 'mirror_source_not_found'
