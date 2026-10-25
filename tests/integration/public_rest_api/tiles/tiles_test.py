@@ -11,7 +11,7 @@ import pytest
 from flask.testing import FlaskClient
 from freezegun import freeze_time
 from mapbox_vector_tile import decode
-from parkapi_sources.models.enums import PurposeType
+from parkapi_sources.models.enums import ParkingSiteType, PurposeType
 
 from tests.model_generator.parking_site import get_parking_site
 from tests.model_generator.source import get_source
@@ -34,11 +34,13 @@ def parking_sites(db: SQLAlchemy) -> None:
         realtime_data_updated_at=REALTIME_DATA_UPDATED_AT,
         realtime_free_capacity=42,
     )
+    other_source = get_source(uid='other-source')
     bike_parking_site = get_parking_site(
-        source=source,
+        source=other_source,
         original_uid='bike',
         name='Bike Parking',
         purpose=PurposeType.BIKE,
+        type=ParkingSiteType.STANDS,
         capacity=20,
         lat=Decimal('50.001'),
         lon=Decimal('10.001'),
@@ -69,8 +71,15 @@ def test_get_tile(public_api_test_client: FlaskClient, parking_sites: None) -> N
     features = get_features(public_api_test_client, TILE_PATH)
 
     assert [feature['properties'] for feature in features] == [
-        {'id': 1, 'name': 'Demo Parking Site', 'purpose': 'CAR', 'capacity': 100, 'free_capacity': 42},
-        {'id': 2, 'name': 'Bike Parking', 'purpose': 'BIKE', 'capacity': 20},
+        {
+            'id': 1,
+            'name': 'Demo Parking Site',
+            'purpose': 'CAR',
+            'type': 'CAR_PARK',
+            'capacity': 100,
+            'free_capacity': 42,
+        },
+        {'id': 2, 'name': 'Bike Parking', 'purpose': 'BIKE', 'type': 'STANDS', 'capacity': 20},
     ]
 
 
@@ -94,6 +103,34 @@ def test_get_tile_by_purpose(public_api_test_client: FlaskClient, parking_sites:
     features = get_features(public_api_test_client, f'{TILE_PATH}?purpose=BIKE')
 
     assert [feature['properties']['id'] for feature in features] == [2]
+
+
+@freeze_time('2025-01-01 12:10:00')
+def test_get_tile_by_type(public_api_test_client: FlaskClient, parking_sites: None) -> None:
+    features = get_features(public_api_test_client, f'{TILE_PATH}?types=STANDS')
+
+    assert [feature['properties']['id'] for feature in features] == [2]
+
+
+@freeze_time('2025-01-01 12:10:00')
+def test_get_tile_by_multiple_types(public_api_test_client: FlaskClient, parking_sites: None) -> None:
+    features = get_features(public_api_test_client, f'{TILE_PATH}?types=CAR_PARK,STANDS')
+
+    assert [feature['properties']['id'] for feature in features] == [1, 2]
+
+
+@freeze_time('2025-01-01 12:10:00')
+def test_get_tile_by_source_uids(public_api_test_client: FlaskClient, parking_sites: None) -> None:
+    features = get_features(public_api_test_client, f'{TILE_PATH}?source_uids=other-source')
+
+    assert [feature['properties']['id'] for feature in features] == [2]
+
+
+@freeze_time('2025-01-01 12:10:00')
+def test_get_tile_by_multiple_source_uids(public_api_test_client: FlaskClient, parking_sites: None) -> None:
+    features = get_features(public_api_test_client, f'{TILE_PATH}?source_uids=source,other-source')
+
+    assert [feature['properties']['id'] for feature in features] == [1, 2]
 
 
 def test_get_tile_zoomed_out(public_api_test_client: FlaskClient, parking_sites: None) -> None:

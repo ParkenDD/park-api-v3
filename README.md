@@ -92,7 +92,11 @@ A mirrored source is handled like a pull source, using the same schedule:
   `<mirror_base_url>/api/public/v3/parking-sites?source_uid=<uid>` and
   `<mirror_base_url>/api/public/v3/parking-spots?source_uid=<uid>`. Parking site groups and the link between parking
   spots and parking sites are mirrored, too.
-* At the realtime pull, the same endpoints are used to update realtime data.
+* At the realtime pull, the same endpoints are used to update realtime data. Realtime pulls are incremental: the highest
+  upstream `modified_at` of parking sites and parking spots is stored per source, and the next realtime pull just
+  requests items with `modified_since` set to this value minus one minute. As only upstream timestamps are compared,
+  clock differences between both instances don't matter. Every static pull resets this, so the first realtime pull
+  after a static pull is a full one.
 
 Mirrored sources don't need a converter at ParkAPI Sources, and any `hash`, `env` or `generic_source` config of that
 source is ignored, as mirrored sources cannot receive pushed data. The official region code is not mirrored, but

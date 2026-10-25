@@ -5,8 +5,8 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from flask import make_response
 from flask_openapi.decorator import Parameter, Response, ResponseData, document
-from flask_openapi.schema import BooleanField, EnumField
-from parkapi_sources.models.enums import PurposeType
+from flask_openapi.schema import ArrayField, BooleanField, EnumField, StringField
+from parkapi_sources.models.enums import ParkingSiteType, PurposeType
 from validataclass.validators import DataclassValidator
 
 from webapp.dependencies import dependencies
@@ -50,7 +50,7 @@ class TilesMethodView(PublicApiBaseMethodView):
 
     @document(
         description='Generates a Mapbox Vector Tile with a layer `parking_sites`. Each feature contains the properties '
-        '`id`, `name`, `purpose`, `capacity` (if known) and `free_capacity` (only if current realtime data is '
+        '`id`, `name`, `purpose`, `type` (if known), `capacity` (if known) and `free_capacity` (only if current realtime data is '
         f'available). Tiles with a zoom level below {RENDER_PARKING_SITES_MIN_ZOOM} contain an empty layer.',
         path=[
             Parameter('z', schema=int, example=12),
@@ -62,6 +62,19 @@ class TilesMethodView(PublicApiBaseMethodView):
                 'purpose',
                 schema=EnumField(enum=PurposeType),
                 description='If set, just ParkingSites with this purpose are shown.',
+            ),
+            Parameter(
+                'types',
+                schema=ArrayField(items=EnumField(enum=ParkingSiteType)),
+                description='Comma-separated list of ParkingSite types. If set, just ParkingSites with one of these types '
+                'are shown.',
+                example='CAR_PARK,UNDERGROUND',
+            ),
+            Parameter(
+                'source_uids',
+                schema=ArrayField(items=StringField()),
+                description='Comma-separated list of source UIDs. If set, just ParkingSites of these sources are shown.',
+                example='source-uid-1,source-uid-2',
             ),
             Parameter(
                 'ignore_duplicates',

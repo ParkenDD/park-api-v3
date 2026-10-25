@@ -3,6 +3,7 @@ Copyright 2026 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from datetime import datetime, timedelta, timezone
 from typing import Any, Generator
 
 from parkapi_sources.converters.base_converter.pull import ParkingSitePullConverter, ParkingSpotPullConverter
@@ -24,10 +25,20 @@ class MirrorPullConverter(ParkingSitePullConverter, ParkingSpotPullConverter):
     """
     Pulls parking sites and parking spots of a single source from the public v3 API of another ParkAPI instance. The
     source metadata is taken from the upstream instance, too, and gets updated with every static pull.
+
+    Realtime pulls are incremental: parking_site_cursor and parking_spot_cursor hold the highest upstream modified_at
+    seen so far. They are set by the import service before a realtime pull, just items modified since then (minus
+    cursor_overlap) are requested, and the cursors are moved forward afterwards. If a cursor is None, everything is
+    pulled. Using upstream timestamps only makes this independent of clock differences between both instances.
     """
 
     mirror_base_url: str
     page_limit: int = 1000
+    # Re-requesting a bit of already known data is harmless, missing data because of concurrent upstream writes is not
+    cursor_overlap: timedelta = timedelta(minutes=1)
+
+    parking_site_cursor: datetime | None = None
+    parking_spot_cursor: datetime | None = None
 
     _source_info: SourceInfo
     # Upstream parking site ids mapped to upstream parking site original uids, used to link parking spots
@@ -102,7 +113,10 @@ class MirrorPullConverter(ParkingSitePullConverter, ParkingSpotPullConverter):
         realtime_parking_site_inputs: list[RealtimeParkingSiteInput] = []
         realtime_parking_site_errors: list[ImportParkingSiteException] = []
 
-        for parking_site_dict in self._get_items('parking-sites'):
+        parking_site_dicts = list(self._get_items('parking-sites', modified_since=self.parking_site_cursor))
+        self.parking_site_cursor = self._get_cursor(self.parking_site_cursor, parking_site_dicts)
+
+        for parking_site_dict in parking_site_dicts:
             if not parking_site_dict.get('has_realtime_data') or not parking_site_dict.get('realtime_data_updated_at'):
                 continue
             try:
@@ -148,7 +162,10 @@ class MirrorPullConverter(ParkingSitePullConverter, ParkingSpotPullConverter):
         realtime_parking_spot_inputs: list[RealtimeParkingSpotInput] = []
         realtime_parking_spot_errors: list[ImportParkingSpotException] = []
 
-        for parking_spot_dict in self._get_items('parking-spots'):
+        parking_spot_dicts = list(self._get_items('parking-spots', modified_since=self.parking_spot_cursor))
+        self.parking_spot_cursor = self._get_cursor(self.parking_spot_cursor, parking_spot_dicts)
+
+        for parking_spot_dict in parking_spot_dicts:
             if not parking_spot_dict.get('has_realtime_data') or not parking_spot_dict.get('realtime_data_updated_at'):
                 continue
             try:
@@ -169,7 +186,11 @@ class MirrorPullConverter(ParkingSitePullConverter, ParkingSpotPullConverter):
 
         return realtime_parking_spot_inputs, realtime_parking_spot_errors
 
-    def _get_items(self, endpoint: str) -> Generator[dict[str, Any], None, None]:
+    def _get_items(
+        self,
+        endpoint: str,
+        modified_since: datetime | None = None,
+    ) -> Generator[dict[str, Any], None, None]:
         """
         Iterates over all items of a paginated upstream endpoint. The upstream next_path is not used, because it does
         not contain the path prefix of mirror_base_url.
@@ -180,6 +201,8 @@ class MirrorPullConverter(ParkingSitePullConverter, ParkingSpotPullConverter):
             # We want the raw realtime state of upstream, the outdating calculation is done locally
             'calculate_has_realtime_data': 'false',
         }
+        if modified_since is not None:
+            params['modified_since'] = (modified_since - self.cursor_overlap).isoformat()
         while True:
             response = self.request_get(url=f'{self.mirror_base_url}/api/public/v3/{endpoint}', params=params)
             response.raise_for_status()
@@ -190,6 +213,18 @@ class MirrorPullConverter(ParkingSitePullConverter, ParkingSpotPullConverter):
             if not response_data.get('items') or response_data.get('next_id') is None:
                 return
             params['start'] = response_data['next_id']
+
+    @staticmethod
+    def _get_cursor(cursor: datetime | None, item_dicts: list[dict[str, Any]]) -> datetime | None:
+        for item_dict in item_dicts:
+            if not item_dict.get('modified_at'):
+                continue
+            modified_at = datetime.fromisoformat(item_dict['modified_at'])
+            if modified_at.tzinfo is None:
+                modified_at = modified_at.replace(tzinfo=timezone.utc)
+            if cursor is None or modified_at > cursor:
+                cursor = modified_at
+        return cursor
 
     @staticmethod
     def _map_parking_site_dict(parking_site_dict: dict[str, Any]) -> dict[str, Any]:

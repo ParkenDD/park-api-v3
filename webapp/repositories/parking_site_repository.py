@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Optional
 
 from mercantile import LngLatBbox
-from parkapi_sources.models.enums import PurposeType
+from parkapi_sources.models.enums import ParkingSiteType, PurposeType
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Query, aliased, joinedload, selectinload
 from sqlalchemy.orm.interfaces import LoaderOption
@@ -37,6 +37,7 @@ class ParkingSiteTileItem:
     lat: float
     lon: float
     purpose: PurposeType
+    type: ParkingSiteType | None
     capacity: int | None
     has_realtime_data: bool
     realtime_data_updated_at: datetime | None
@@ -247,6 +248,8 @@ class ParkingSiteRepository(BaseRepository):
         self,
         bbox: LngLatBbox,
         purpose: PurposeType | None = None,
+        types: list[ParkingSiteType] | None = None,
+        source_uids: list[str] | None = None,
         ignore_duplicates: bool = True,
     ) -> list[ParkingSiteTileItem]:
         query = (
@@ -258,6 +261,7 @@ class ParkingSiteRepository(BaseRepository):
                 ParkingSite.lat,
                 ParkingSite.lon,
                 ParkingSite.purpose,
+                ParkingSite.type,
                 ParkingSite.capacity,
                 ParkingSite.has_realtime_data,
                 ParkingSite.realtime_data_updated_at,
@@ -274,6 +278,10 @@ class ParkingSiteRepository(BaseRepository):
 
         if purpose is not None:
             query = query.filter(ParkingSite.purpose == purpose)
+        if types:
+            query = query.filter(ParkingSite.type.in_(types))
+        if source_uids:
+            query = query.filter(Source.uid.in_(source_uids))
         if ignore_duplicates:
             query = query.filter(ParkingSite.duplicate_of_parking_site_id.is_(None))
 
@@ -285,6 +293,7 @@ class ParkingSiteRepository(BaseRepository):
                 lat=float(item.lat),
                 lon=float(item.lon),
                 purpose=item.purpose,
+                type=item.type,
                 capacity=item.capacity,
                 has_realtime_data=bool(item.has_realtime_data),
                 realtime_data_updated_at=item.realtime_data_updated_at,
