@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.53.0
+
+Released 2026-10-25
+
+### Features
+
+* [Mirror Mode support](https://github.com/ParkenDD/park-api-v3/pull/444)
+* [CORS support for all public endpoints](https://github.com/ParkenDD/park-api-v3/pull/445)
+* [ParkAPI Sources: licence clarifications](https://github.com/ParkenDD/parkapi-sources-v3/pull/449)
+* [ParkAPI Sources: BFRK stellplatzanzahl filter](https://github.com/ParkenDD/parkapi-sources-v3/pull/450)
+* [ParkAPI Sources: BFRK privatparkplatz filter](https://github.com/ParkenDD/parkapi-sources-v3/pull/451)
+* [ParkAPI Sources: Basel filter](https://github.com/ParkenDD/parkapi-sources-v3/pull/452)
+* [ParkAPI Sources: BFRK coordinates filter](https://github.com/ParkenDD/parkapi-sources-v3/pull/453)
+* [ParkAPI Sources: better defaults at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/456)
+* [ParkAPI Sources: new DATEX II converters via Mobilithek](https://github.com/ParkenDD/parkapi-sources-v3/pull/458)
+* [ParkAPI Sources: new Karlsruhe and Dortmund converters](https://github.com/ParkenDD/parkapi-sources-v3/pull/459)
+* [ParkAPI Sources: User-Agent for all HTTP requests](https://github.com/ParkenDD/parkapi-sources-v3/pull/460)
+
+
+### Fixes
+
+* [ParkAPI Sources: Freiburg capacity fix](https://github.com/ParkenDD/parkapi-sources-v3/pull/454)
+* [ParkAPI Sources: fix several Herrenberg bike issues](https://github.com/ParkenDD/parkapi-sources-v3/pull/455)
+* [ParkAPI Sources: fix missing readings at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/457)
+
+
+### Maintenance
+
+* [Project maintenance and User-Agent](https://github.com/ParkenDD/park-api-v3/pull/446)
+
+
 ## 0.52.0
 
 Released 2026-10-24
