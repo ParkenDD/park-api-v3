@@ -61,6 +61,10 @@ class BaseConfig:
     # set
     STATIC_GEOJSON_BASE_URL = 'https://raw.githubusercontent.com/ParkenDD/parkapi-sources-v3/main/data/'
 
+    # User-Agent for all outgoing requests, including the ones from ParkAPI Sources. If not set, the ParkAPI Sources
+    # default `ParkApiSources/{version}` is used.
+    USER_AGENT: str | None = None
+
     # If enabled, all public endpoints send `Access-Control-Allow-Origin: *`, so that web applications on any domain can
     # use them, e.g. maps loading the vector tiles.
     CORS_ALLOW_ALL = False

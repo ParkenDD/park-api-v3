@@ -57,6 +57,8 @@ class GenericImportService(BaseService):
             'DEBUG_DUMP_DIR': app.config['DEBUG_DUMP_DIR'],
             'DEBUG_SOURCES': app.config['DEBUG_SOURCES'],
         }
+        if app.config.get('USER_AGENT'):
+            park_api_sources_config['USER_AGENT'] = app.config['USER_AGENT']
         mirror_source_dicts: list[dict] = []
         for source_dict in app.config.get('PARK_API_CONVERTER', []):
             # Mirror sources pull from another ParkAPI instance, so they don't use a parkapi-sources converter

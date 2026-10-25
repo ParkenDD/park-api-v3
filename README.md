@@ -508,6 +508,11 @@ The root endpoint `/` outputs the project version (`version`) and the installed 
 version is `dev`. The ParkAPI Sources version is provided by the ParkAPI Sources package itself, which is `dev` as well
 if ParkAPI Sources is not installed from a release, e.g. directly from Github.
 
+### User-Agent
+
+All outgoing HTTP requests, including the ones of ParkAPI Sources converters and of mirror sources, are sent with the
+User-Agent set in `USER_AGENT`. If it is not set, the ParkAPI Sources default `ParkApiSources/{version}` is used.
+
 ### CORS
 
 Web applications served from another domain than ParkAPI, e.g. maps loading the vector tiles at
