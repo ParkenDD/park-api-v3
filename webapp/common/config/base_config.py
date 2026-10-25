@@ -62,6 +62,10 @@ class BaseConfig:
     # set
     STATIC_GEOJSON_BASE_URL = 'https://raw.githubusercontent.com/ParkenDD/parkapi-sources-v3/main/data/'
 
+    # If enabled, all public endpoints send `Access-Control-Allow-Origin: *`, so that web applications on any domain can
+    # use them, e.g. maps loading the vector tiles.
+    CORS_ALLOW_ALL = False
+
     STATIC_IMPORT_PULL_MINUTE = 0
     STATIC_IMPORT_PULL_HOUR = 1
     REALTIME_IMPORT_PULL_FREQUENCY = 5 * 60
