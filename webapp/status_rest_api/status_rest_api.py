@@ -4,6 +4,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 """
 
 from flask import jsonify
+from parkapi_sources.version import __version__ as parkapi_sources_version
 
 from webapp.common.blueprint import Blueprint
 from webapp.common.rest import BaseMethodView
@@ -26,6 +27,8 @@ class RootStatusMethodView(BaseMethodView):
     def get(self):
         return jsonify({
             'application': 'park-api-v3',
+            'version': self.config_helper.get('PROJECT_VERSION'),
+            'parkapi_sources_version': parkapi_sources_version,
             'documentation': {
                 'public': f'{self.config_helper.get("PROJECT_URL")}/documentation/public.html',
                 'admin': f'{self.config_helper.get("PROJECT_URL")}/documentation/admin.html',

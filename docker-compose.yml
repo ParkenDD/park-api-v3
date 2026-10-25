@@ -21,8 +21,6 @@ x-flask-defaults: &flask-defaults
   depends_on:
     postgresql:
       condition: service_healthy
-    mysql:
-      condition: service_healthy
     rabbitmq:
       condition: service_healthy
 
@@ -37,8 +35,6 @@ services:
   flask:
     <<: *flask-defaults
     command: ["python3", "run_flask_dev.py"]
-    ports:
-      - '5000:5000'
 
   worker:
     <<: *flask-defaults
@@ -54,8 +50,6 @@ services:
 
   postgresql:
     image: postgis/postgis:15-3.5-alpine
-    volumes:
-      - postgresql:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=park-api
       - POSTGRES_PASSWORD=development
@@ -66,8 +60,6 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
-    ports:
-      - "5432:5432"
 
   regionalschluessel-importer:
     image: ghcr.io/osgeo/gdal:alpine-small-3.13.1
@@ -104,6 +96,3 @@ services:
     <<: *mocked-service-defaults
     volumes:
       - ./dev/test_services/mocked_loki:/app
-
-volumes:
-  postgresql:

@@ -42,3 +42,5 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         file: Dockerfile.prod
+        build-args: |
+          PROJECT_VERSION=${{ github.ref_name }}

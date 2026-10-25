@@ -6,7 +6,9 @@ ParkAPI v3 is a web service which collects and provides access to parking data f
 
 ## Data model
 
-The data model is rather simple (for now): we have data sources and parking sites in an 1:n relation.
+The data model is rather simple (for now): we have data sources, and every source has parking sites and / or parking
+spots in an 1:n relation. Parking sites can be organized in parking site groups, parking spots can be linked to a
+parking site, and both can carry external identifiers and tags.
 
 The data model is documented using an OpenAPI documentation:
  - [public endpoints](https://api.mobidata-bw.de/park-api/documentation/public.html) for public data access
@@ -22,7 +24,7 @@ Additionally, every source has a human-readable name and a public URL where the 
 
 There are a few other fields at source, mostly related to import status including error counters and licence
 information. For a complete overview, please have a look at the
-[OpenAPI documentation](https://api.mobidata-bw.de/park-api/documentation/public.html#/paths/v3-parking-sites/get).
+[OpenAPI documentation](https://api.mobidata-bw.de/park-api/documentation/public.html#/paths/v3-sources/get).
 
 If, until now, you used the ParkAPI v1 model, you might recognize that there is a change of perspective: at v1, the
 main object for collecting data was city, not source. This turned out not to be very realistic, because often there are
@@ -62,7 +64,7 @@ Source UIDs which should be pulled have to be in `PARK_API_CONVERTER` as describ
 need to correspond to an implementation in ParkAPI-sources which actually does the data pulling. ParkAPI-sources
 supports JSON data handling as well as HTML scraping, so almost every data format can be converted.
 
-Data pulling is done every five minutes. It uses
+Data pulling is done on a regular schedule (see below). It uses
 [Celery's beat system](https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html) which creates tasks per source
 regularly, the Celery workers actually do the work then. If you decide to run a subset of ParkAPIv3s services or
 build your own infrastructure (e.g. run ParkAPIv3 per systemd services), please keep in mind that both, heartbeat and
@@ -74,7 +76,7 @@ If you want to create new data sources, please have a look at
 Per default, static data will be fetched every night at 1 am, and realtime data will be fetched every 5 minutes. You
 can change the static moment using the config vars `STATIC_IMPORT_PULL_HOUR` and `STATIC_IMPORT_PULL_MINUTE`, and
 the realtime frequency using `REALTIME_IMPORT_PULL_FREQUENCY`, which should be in seconds. Additionally, you can set
-`REALTIME_OUTDATED_AFTER_MINUTES`, which will flag sources at outdated in our Prometheus endpoint after the defined
+`REALTIME_OUTDATED_AFTER_MINUTES`, which will flag sources as outdated in our Prometheus endpoint after the defined
 amount of time. It defaults to 30 minutes.
 
 ### Mirror mode
@@ -155,8 +157,8 @@ like static sites / spots. The detection of outdated realtime data distinguishes
 - The realtime data of a pull source is outdated after `UNSET_REALTIME_PULL_AFTER_MINUTES` (default 30 minutes).
 - The realtime data of a push source is outdated after `UNSET_REALTIME_PUSH_AFTER_MINUTES` (default 24 hours).
 
-A source counts as pull source if its converter is a parkapi-sources pull converter. Everything else (push converters
-and generic sources) counts as push source.
+A source counts as pull source if its converter is a parkapi-sources pull converter or if it is a mirrored source (see
+[Mirror mode](#mirror-mode)). Everything else (push converters and generic sources) counts as push source.
 
 No attributes are removed if `has_realtime_data` is `false`: outdated sites / spots still provide their `realtime_*`
 fields, including `realtime_data_updated_at`, so clients can see how old the realtime information is.
@@ -181,7 +183,7 @@ best realtime experience using push services. Push-services can also be used for
 data transport channels, e.g. per mail client.
 
 Each source uid used for pushing requires an entry in config value `PARK_API_CONVERTER`, mapping the uid to the basic
-auth credentials that clients must provide to push to this source. have basic auth credentials. Other auth methods are
+auth credentials that clients must provide to push to this source. Other auth methods are
 not supported so far. The `hash` is a `sha256` hash. You can create such a hash by
 
 ```python
@@ -200,7 +202,7 @@ Push services have four different entrypoints for common data formats: XML, JSON
 endpoints. The endpoints do some basic file loading and then hand it over to ParkAPI-sources.
 
 If you want to create new data sources, please have a look at
-[ParkAPI-sources' README.md](https://github.com/ParkenDD/parkapi-sources-v3?tab=readme-ov-file#write-a-new-converter.
+[ParkAPI-sources' README.md](https://github.com/ParkenDD/parkapi-sources-v3?tab=readme-ov-file#write-a-new-converter).
 
 ### Using the push command line interface
 
@@ -278,7 +280,7 @@ key `SERVER_AUTH_USERS`. Please have a look at `config_dist_dev.yaml` for an exa
 
 ### Get possible duplicates
 
-In order to get possible duplicates, you have to use the endpoint `/api/admin/v1/parking-sites/duplicates`. To use this
+In order to get possible duplicates, you have to use the endpoint `/api/admin/v1/parking-sites/duplicates/generate`. To use this
 endpoint, there is a helper script in `scripts`. You can use it by:
 
 ```
@@ -291,8 +293,9 @@ using following optional options:
   duplicates. This helps to just append new duplicates.
 - `-n` for a new duplicate file path. The script saves an CSV to this file path instead of using stdout for results.
   If it's the same file path as the old duplicate file, the script will append the new duplicates to the old file.
-- `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For
-  example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
+- `-u` for a custom URL. If you want to use this script for another environment, you will have to set the url. For
+  example, if you want to do a local test, you have to set it to `-u http://localhost:5000`.
+- `-r` for a custom search radius in meters.
 - `-s` to silence the status output. Using this, you can pipe the JSON output to other applications like `json_pp`.
 - `-si` to limit sources to a list of source ids. Has to be used like `-si 1 2 3`
 - `-su` to limit sources to a list of source uids. Has to be used like `-su source1 source2 source3`
@@ -335,8 +338,8 @@ python apply-duplicates.py username your/duplicate-file.csv
 Please keep in mind that you will have to apply all duplicates at this command, because the server cannot un-flag
 duplicates without a full list of duplicates.
 
-There is again `-u` as option for a custom URL. If you cant to use this script for another environment, you will have
-to set the url. For example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
+There is again `-u` as option for a custom URL. If you want to use this script for another environment, you will have
+to set the url. For example, if you want to do a local test, you have to set it to `-u http://localhost:5000`.
 
 
 ### Reset duplicates
@@ -350,8 +353,8 @@ python reset-duplicates.py username
 ```
 
 It accepts following parameters:
-- `-u` for a custom URL. If you cant to use this script for another environment, you will have to set the url. For
-  example, if you cant to do a local test, you have to set it to `-u http://localhost:5000`.
+- `-u` for a custom URL. If you want to use this script for another environment, you will have to set the url. For
+  example, if you want to do a local test, you have to set it to `-u http://localhost:5000`.
 - `-p` for a purpose to filter for.
 
 
@@ -428,7 +431,8 @@ environment they are wired up as container commands in `docker-compose.yml`, so 
 - `run_celery_heartbeat_dev.py`: starts the Celery beat scheduler which regularly enqueues the periodic import tasks
   (the `worker-heartbeat` container). Both worker and heartbeat are required for pull imports to run.
 
-For production deployments, the application is served as a WSGI app via `webapp:launch()` and the Celery worker/beat
+For production deployments, the application is served as a WSGI app via `webapp.entry_point_gunicorn:app` (the default
+command of `Dockerfile.prod`) and the Celery worker/beat
 are started with the regular Celery CLI against `webapp.entry_point_celery:celery`.
 
 
@@ -438,9 +442,9 @@ Besides `PARK_API_CONVERTER`, there are a few other configuration options to set
 `config_dist_dev.yaml`. You can set config values by two different approaches (or even mix them):
 
 1) You can create a config file called `config.yaml` in your root folder.
-2) You can set any config value by env var, but you have to prefix the config name with `PARKAPI_` then. For example,
-   you can configure `SECRET_KEY` using the env var `PARKAPI_SECRET_KEY`. ENV vars overwrite values given via config
-   file.
+2) You can set any config value by env var, but you have to prefix the config name with `PARK_API_` then. For example,
+   you can configure `SECRET_KEY` using the env var `PARK_API_SECRET_KEY`. Values given via config file overwrite
+   ENV vars, so don't set a config value at both places.
 
 ### Source configuration
 
@@ -496,6 +500,19 @@ sensible defaults (shown below), so you only need to set them if you want to dev
 Note that `STATIC_IMPORT_PULL_*` and `REALTIME_IMPORT_PULL_FREQUENCY` only affect **pull** sources; **push** sources
 deliver data on their own schedule, which is why they get a separate `UNSET_REALTIME_PUSH_AFTER_MINUTES` threshold.
 
+### Versions
+
+The root endpoint `/` outputs the project version (`version`) and the installed ParkAPI Sources version
+(`parkapi_sources_version`). The project version is set at container build via the build arg `PROJECT_VERSION` of
+`Dockerfile.prod`, which the GitHub build workflow sets to the git tag. If it is not set, e.g. at the dev container, the
+version is `dev`. The ParkAPI Sources version is provided by the ParkAPI Sources package itself, which is `dev` as well
+if ParkAPI Sources is not installed from a release, e.g. directly from Github.
+
+### User-Agent
+
+All outgoing HTTP requests, including the ones of ParkAPI Sources converters and of mirror sources, are sent with the
+User-Agent set in `USER_AGENT`. If it is not set, the ParkAPI Sources default `ParkApiSources/{version}` is used.
+
 ### CORS
 
 Web applications served from another domain than ParkAPI, e.g. maps loading the vector tiles at
@@ -520,6 +537,8 @@ The ParkAPI dev environment starts the following containers:
 - `worker-heartbeat`: a celery heartbeat, responsible for regular creating tasks for the worker
 - `flask-init-converters`: an init container which will create / update configured datasources in our database
 - `postgresql`: the database, reachable at `localhost:5432` (eg for looking into data using an SQL client)
+- `regionalschluessel-importer`: a one-shot container which imports the region code database, see
+  [Official region code](#official-region-code)
 - `rabbitmq`: the queue connecting `flask`, `worker-heartbeat` and `worker`
 - `mocked-loki`: a small flask service for mocking loki, outputting every data pushed to stdout
 
@@ -539,7 +558,7 @@ manually, too. For further details, please have a look at the `Makefile`.
 - `make generate-migration MSG="my new migration"`: creates a new database migration
 - `make import-regionalschluessel`: imports the region code database (VG25) into the `regionalschluessel` table
 - `make test-unit`: runs all unit tests
-- `make test-integration`: runs all integration tests
+- `make test-integration`: runs all integration tests in a separate environment (see [Testing](#testing))
 - `make lint-fix`: runs the formatter / linter and tries to fix issues
 - `make lint-check`: runs the formatter / linter and checks for issues
 
@@ -570,7 +589,7 @@ uv sync --frozen
 ```
 
 `--frozen` makes uv install strictly from `uv.lock` without re-resolving — this is what CI and the docker images use, so
-your environment matches them. Drop `--no-dev` if you want runtime-only dependencies (the production image uses `uv sync
+your environment matches them. Add `--no-dev` if you want runtime-only dependencies (the production image uses `uv sync
 --frozen --no-dev`).
 
 Keep in mind that ParkAPI still needs a PostgreSQL database and RabbitMQ to actually run, so a host-side `uv sync` is
@@ -639,6 +658,12 @@ ParkAPI testing is based on [pytest](https://docs.pytest.org/en/stable/). There 
 write tests, especially a flask test client which will reset the database for any new test run. Please have a look at
 the `conftest.py` files for more details.
 
+The docker compose setup is split into multiple files: `docker-compose.yml` contains the services, while
+`docker-compose.default.yml` adds the published ports and the persistent database volume for the dev environment.
+`make test-integration` instead combines `docker-compose.yml` with `docker-compose.testing.yml` in a separate compose
+project (`park-api_integrationtests`): the database runs on a tmpfs and no ports are published, so integration tests
+neither touch your dev database nor collide with a running dev environment.
+
 
 ## Prepare scripts environment
 
@@ -667,7 +692,7 @@ If you set a source at `DEBUG_SOURCES`, ParkAPI will create a subdirectory `./da
 dump all communication from this converter in this folder. Per request, there will be two files:
 
 - `{datetime}-metadata` for the request metadata, like path, HTTP status and HTTP headers
-- `{datetime}-response-body` for pull converters / `{datetime}request-body` for push converters for the actual data dump
+- `{datetime}-response-body` for pull converters / `{datetime}-request-body` for push converters for the actual data dump
 
 The `response-body` / `request-body` can be used as test data at ParkAPI sources to find specific issues at the data.
 Or, the headers might give a good idea what actually happened when something failed.
@@ -684,8 +709,8 @@ handle them the same way you would handle a password. These files should never b
 ParkAPI v3 provides a Prometheus endpoint at `/metrics` which helps to monitor the status of all data sources. It also
 provides a Loki and an OpenTelemetry integration to send properly tagged log messages to a Loki or other log collection
 instance. This is using the push handlers plus the formatters
-`webapp.common.logging.loki_formatter.LokiFormatter` or
-`webapp.common.logging.open_telemetry_formatter.OpenTelemetryFormatter`. See `config_dist_dev.yaml` for details.
+`webapp.common.logging.formatter.LokiFormatter` or
+`webapp.common.logging.formatter.OpenTelemetryFormatter`. See `config_dist_dev.yaml` for details.
 
 ## Extending and fixing ParkAPI
 

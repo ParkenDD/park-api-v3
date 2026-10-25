@@ -3,3 +3,5 @@
 !webapp
 !pyproject.toml
 !uv.lock
+!migrations
+!.flaskenv

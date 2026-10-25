@@ -10,6 +10,7 @@ from json.decoder import JSONDecodeError
 from typing import Optional, Union
 
 import structlog
+from parkapi_sources.util import RequestHelper
 from requests import request
 from requests.exceptions import ConnectionError
 from urllib3.exceptions import NewConnectionError
@@ -68,7 +69,10 @@ class RemoteHelper:
                 url=url,
                 auth=(remote_server.user, remote_server.password),
                 data=json_data,
-                headers={'content-type': 'application/json'},
+                headers={
+                    'content-type': 'application/json',
+                    'User-Agent': self.config_helper.get('USER_AGENT') or RequestHelper.DEFAULT_USER_AGENT,
+                },
                 verify=remote_server.cert,
                 timeout=300,
             )

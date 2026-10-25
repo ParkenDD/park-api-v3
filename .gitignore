@@ -27,6 +27,7 @@ __pycache__/
 
 /Makefile.env
 /docker-compose_local.yml
+/docker-compose.override.yml
 coverage.xml
 
 .ruff_cache/
