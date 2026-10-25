@@ -496,6 +496,13 @@ sensible defaults (shown below), so you only need to set them if you want to dev
 Note that `STATIC_IMPORT_PULL_*` and `REALTIME_IMPORT_PULL_FREQUENCY` only affect **pull** sources; **push** sources
 deliver data on their own schedule, which is why they get a separate `UNSET_REALTIME_PUSH_AFTER_MINUTES` threshold.
 
+### CORS
+
+Web applications served from another domain than ParkAPI, e.g. maps loading the vector tiles at
+`/api/public/v3/tiles/{z}/{x}/{y}.mvt`, need a CORS header for the browser to accept the responses. Set `CORS_ALLOW_ALL`
+to `true` (default: `false`) to send `Access-Control-Allow-Origin: *` with every response of the public API at
+`/api/public`. The admin API is never affected.
+
 
 ## Development setup
 
