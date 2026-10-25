@@ -3,7 +3,10 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from flask import Response
+
 from webapp.common.blueprint import Blueprint
+from webapp.dependencies import dependencies
 
 from .base_blueprint import PublicApiBaseBlueprint
 from .datex2 import Datex2Blueprint
@@ -33,3 +36,11 @@ class PublicRestApi(Blueprint):
 
         for blueprint_class in self.blueprints_classes:
             self.register_blueprint(blueprint_class())
+
+        self.after_request(self.add_cors_header)
+
+    @staticmethod
+    def add_cors_header(response: Response) -> Response:
+        if dependencies.get_config_helper().get('CORS_ALLOW_ALL'):
+            response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
