@@ -26,6 +26,11 @@ class SourceStatus(PythonEnum):
     PROVISIONED = 'PROVISIONED'
 
 
+class SourceConverterType(PythonEnum):
+    PULL = 'PULL'
+    PUSH = 'PUSH'
+
+
 class Source(BaseModel):
     __tablename__ = 'source'
 
@@ -48,6 +53,11 @@ class Source(BaseModel):
     uid: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(256), nullable=True)
     public_url: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
+    converter_type: Mapped[SourceConverterType] = mapped_column(
+        Enum(SourceConverterType),
+        nullable=False,
+        default=SourceConverterType.PUSH,
+    )
 
     static_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
     realtime_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
