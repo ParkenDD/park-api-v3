@@ -130,6 +130,11 @@ generate-migration: config
 import-regionalschluessel: config
 	$(DOCKER_COMPOSE) run --rm regionalschluessel-importer
 
+# Creates or updates all sources configured in PARK_API_CONVERTER in the database
+.PHONY: init-converters
+init-converters: config
+	$(FLASK_RUN) flask source init-converters
+
 
 # Cleanup
 # -------

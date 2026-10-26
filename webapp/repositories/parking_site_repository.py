@@ -3,6 +3,7 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
@@ -42,6 +43,7 @@ class ParkingSiteTileItem:
     has_realtime_data: bool
     realtime_data_updated_at: datetime | None
     realtime_free_capacity: int | None
+    geojson: dict | None = None
 
 
 class ParkingSiteRepository(BaseRepository):
@@ -251,35 +253,43 @@ class ParkingSiteRepository(BaseRepository):
         types: list[ParkingSiteType] | None = None,
         source_uids: list[str] | None = None,
         ignore_duplicates: bool = True,
+        exclude_types: list[ParkingSiteType] | None = None,
+        with_geojson: bool = False,
     ) -> list[ParkingSiteTileItem]:
-        query = (
-            self.session
-            .query(
-                ParkingSite.id,
-                Source.uid.label('source_uid'),
-                ParkingSite.name,
-                ParkingSite.lat,
-                ParkingSite.lon,
-                ParkingSite.purpose,
-                ParkingSite.type,
-                ParkingSite.capacity,
-                ParkingSite.has_realtime_data,
-                ParkingSite.realtime_data_updated_at,
-                ParkingSite.realtime_free_capacity,
-            )
-            .join(Source, Source.id == ParkingSite.source_id)
-            .filter(
-                func.ST_Within(
-                    ParkingSite.geometry,
-                    func.ST_MakeEnvelope(bbox.west, bbox.south, bbox.east, bbox.north, 4326),
-                ),
-            )
-        )
+        """
+        By default, returns all parking sites whose point is within the bbox. If with_geojson is set, it returns all
+        parking sites with a geojson geometry intersecting the bbox instead, including the geojson.
+        """
+        columns = [
+            ParkingSite.id,
+            Source.uid.label('source_uid'),
+            ParkingSite.name,
+            ParkingSite.lat,
+            ParkingSite.lon,
+            ParkingSite.purpose,
+            ParkingSite.type,
+            ParkingSite.capacity,
+            ParkingSite.has_realtime_data,
+            ParkingSite.realtime_data_updated_at,
+            ParkingSite.realtime_free_capacity,
+        ]
+        envelope = func.ST_MakeEnvelope(bbox.west, bbox.south, bbox.east, bbox.north, 4326)
+
+        if with_geojson:
+            columns.append(ParkingSite._geojson.label('geojson'))
+            bbox_filter = func.ST_Intersects(ParkingSite.geojson_geometry, envelope)
+        else:
+            bbox_filter = func.ST_Within(ParkingSite.geometry, envelope)
+
+        query = self.session.query(*columns).join(Source, Source.id == ParkingSite.source_id).filter(bbox_filter)
 
         if purpose is not None:
             query = query.filter(ParkingSite.purpose == purpose)
         if types:
             query = query.filter(ParkingSite.type.in_(types))
+        if exclude_types:
+            # Parking sites without type have to be checked explicitly, as NOT IN never matches NULL
+            query = query.filter(or_(ParkingSite.type.is_(None), ParkingSite.type.not_in(exclude_types)))
         if source_uids:
             query = query.filter(Source.uid.in_(source_uids))
         if ignore_duplicates:
@@ -298,6 +308,7 @@ class ParkingSiteRepository(BaseRepository):
                 has_realtime_data=bool(item.has_realtime_data),
                 realtime_data_updated_at=item.realtime_data_updated_at,
                 realtime_free_capacity=item.realtime_free_capacity,
+                geojson=json.loads(item.geojson) if with_geojson else None,
             )
             for item in query.all()
         ]

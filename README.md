@@ -388,7 +388,7 @@ The `source` command group bundles all data-source related commands. Run `flask 
   startup, so a fresh dev environment already has its sources set up.
 
   ```bash
-  make docker-run CMD="flask source init-converters"
+  make init-converters
   ```
 
 - `flask source pull SOURCE`: triggers an immediate pull import (static and realtime) for a single generic/pull source,
