@@ -16,7 +16,7 @@ from webapp.common.contexts import TelemetryContext
 from webapp.common.logging.models import LogMessageType
 from webapp.common.rest.exceptions import UnknownSourceException
 from webapp.models import Source
-from webapp.models.source import SourceStatus
+from webapp.models.source import SourceConverterType, SourceStatus
 from webapp.repositories import SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.base_service import BaseService
@@ -314,6 +314,9 @@ class GenericImportService(BaseService):
         except ObjectNotFoundException:
             source = Source()
             source.uid = source_uid
+            source.converter_type = (
+                SourceConverterType.PULL if self.is_pull_source(source_uid) else SourceConverterType.PUSH
+            )
 
         source_info = self.park_api_sources.converter_by_uid[source_uid].source_info
         for key, value in source_info.to_dict().items():
