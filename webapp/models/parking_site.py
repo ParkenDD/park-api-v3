@@ -40,6 +40,7 @@ from sqlalchemy_utc import UtcDateTime
 
 from webapp.common.dataclass import filter_unset_value_and_none
 from webapp.common.json import DefaultJSONEncoder
+from webapp.common.sqlalchemy.geometry import Geometry, geojson_to_sql_geometry
 from webapp.common.sqlalchemy.point import Point
 from webapp.extensions import db
 
@@ -177,6 +178,8 @@ class ParkingSite(BaseModel):
     opening_hours: Mapped[str | None] = mapped_column(String(512), nullable=True)
 
     geometry: Mapped[bytes] = mapped_column(Point(), nullable=False)
+    # Geo-indexed copy of geojson, e.g. for finding all shapes which intersect a vector tile
+    geojson_geometry: Mapped[bytes | None] = mapped_column(Geometry(), nullable=True)
 
     def to_dict(
         self,
@@ -192,6 +195,7 @@ class ParkingSite(BaseModel):
             ignore = []
         # Geometry is an internal geo-indexed field, so it should not be part of the default output
         ignore.append('geometry')
+        ignore.append('geojson_geometry')
         ignore.append('parking_site_group_id')
 
         result = super().to_dict(fields, ignore)
@@ -297,3 +301,13 @@ def set_geometry(mapper, connection, parking_site: ParkingSite):
             )
         else:
             raise NotImplementedError('The application just supports mysql, mariadb and postgresql.')
+
+
+@event.listens_for(ParkingSite, 'before_insert')
+@event.listens_for(ParkingSite, 'before_update')
+def set_geojson_geometry(mapper, connection, parking_site: ParkingSite):
+    # just update when there are changes in geojson
+    if not db.inspect(parking_site).attrs._geojson.history.has_changes():
+        return
+
+    parking_site.geojson_geometry = geojson_to_sql_geometry(parking_site.geojson)

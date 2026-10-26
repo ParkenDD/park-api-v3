@@ -5,7 +5,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 
 from flask import make_response
 from flask_openapi.decorator import Parameter, Response, ResponseData, document
-from flask_openapi.schema import ArrayField, BooleanField, EnumField, StringField
+from flask_openapi.schema import ArrayField, BooleanField, EnumField, IntegerField, StringField
 from parkapi_sources.models.enums import ParkingSiteType, PurposeType
 from validataclass.validators import DataclassValidator
 
@@ -13,7 +13,7 @@ from webapp.dependencies import dependencies
 from webapp.public_rest_api.base_blueprint import PublicApiBaseBlueprint
 from webapp.public_rest_api.base_method_view import PublicApiBaseMethodView
 
-from .tiles_handler import RENDER_PARKING_SITES_MIN_ZOOM, TilesHandler
+from .tiles_handler import RENDER_PARKING_SITE_GEOMETRIES_MIN_ZOOM, RENDER_PARKING_SITES_MIN_ZOOM, TilesHandler
 from .tiles_validators import TileFilterInput
 
 
@@ -49,9 +49,14 @@ class TilesMethodView(PublicApiBaseMethodView):
         self.tiles_handler = tiles_handler
 
     @document(
-        description='Generates a Mapbox Vector Tile with a layer `parking_sites`. Each feature contains the properties '
-        '`id`, `name`, `purpose`, `type` (if known), `capacity` (if known) and `free_capacity` (only if current realtime data is '
-        f'available). Tiles with a zoom level below {RENDER_PARKING_SITES_MIN_ZOOM} contain an empty layer.',
+        description='Generates a Mapbox Vector Tile with two layers. Layer `parking_sites` contains a point for each '
+        'parking site. Layer `parking_site_geometries` contains the actual shape (polygon or line) of each parking site '
+        'where it is known, clipped to the tile. Features in both layers contain the properties `id`, `name`, '
+        '`purpose`, `type` (if known), `capacity` (if known) and `free_capacity` (only if current realtime data is '
+        f'available). Tiles with a zoom level below {RENDER_PARKING_SITES_MIN_ZOOM} contain empty layers, tiles with a '
+        f'zoom level below {RENDER_PARKING_SITE_GEOMETRIES_MIN_ZOOM} contain an empty `parking_site_geometries` layer. '
+        'Points of parking sites whose shape is part of the same tile have the additional property `has_geometry` set to '
+        'true, so that clients can show the shape instead of the point.',
         path=[
             Parameter('z', schema=int, example=12),
             Parameter('x', schema=int, example=2144),
@@ -80,6 +85,13 @@ class TilesMethodView(PublicApiBaseMethodView):
                 'ignore_duplicates',
                 schema=BooleanField(),
                 description='Defaults to true. If set to false, you will get ParkingSites flagged as duplicates, too.',
+            ),
+            Parameter(
+                'hide_on_street_until_zoom',
+                schema=IntegerField(minimum=0),
+                description='If set, ParkingSites with type ON_STREET are hidden in tiles with a zoom level lower than or '
+                'equal to this value.',
+                example=12,
             ),
         ],
         response=[Response(ResponseData(mimetype='application/x-protobuf'), description='Tile in protobuf format.')],
