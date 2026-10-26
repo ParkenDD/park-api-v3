@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.54.0
+
+Released 2026-10-26
+
+### Features
+
+* [Incremental updates](https://github.com/ParkenDD/park-api-v3/pull/447)
+* [Improved tileserver](https://github.com/ParkenDD/park-api-v3/pull/448)
+* [Add type to source](https://github.com/ParkenDD/park-api-v3/pull/449)
+
+
 ## 0.53.0
 
 Released 2026-10-25
