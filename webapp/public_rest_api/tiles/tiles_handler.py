@@ -48,6 +48,8 @@ class TilesHandler(PublicApiBaseHandler):
         parking_sites = self.parking_site_repository.fetch_parking_site_tile_items_by_bounds(
             bbox,
             purpose=tile_filter_input.purpose,
+            types=tile_filter_input.types,
+            source_uids=tile_filter_input.source_uids,
             ignore_duplicates=tile_filter_input.ignore_duplicates,
         )
 
@@ -60,6 +62,8 @@ class TilesHandler(PublicApiBaseHandler):
                 'name': item.name,
                 'purpose': item.purpose.value,
             }
+            if item.type is not None:
+                properties['type'] = item.type.value
             if item.capacity is not None:
                 properties['capacity'] = item.capacity
             if item.realtime_free_capacity is not None and self._has_current_realtime_data(item):

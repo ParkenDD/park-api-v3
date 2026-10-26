@@ -124,6 +124,11 @@ class GenericImportService(BaseService):
 
         source = self.get_upserted_source(source_uid)
 
+        # A static pull is a full sync, so the next realtime pull of a mirror source has to be a full one, too
+        if isinstance(converter, MirrorPullConverter):
+            source.mirror_parking_site_cursor = None
+            source.mirror_parking_spot_cursor = None
+
         if isinstance(converter, ParkingSitePullConverter):
             try:
                 static_parking_site_inputs, static_parking_site_errors = converter.get_static_parking_sites()
@@ -213,6 +218,10 @@ class GenericImportService(BaseService):
         if source.realtime_status == SourceStatus.DISABLED:
             return
 
+        if isinstance(converter, MirrorPullConverter):
+            converter.parking_site_cursor = source.mirror_parking_site_cursor
+            converter.parking_spot_cursor = source.mirror_parking_spot_cursor
+
         if isinstance(converter, ParkingSitePullConverter):
             try:
                 realtime_parking_site_inputs, realtime_parking_site_errors = converter.get_realtime_parking_sites()
@@ -230,6 +239,9 @@ class GenericImportService(BaseService):
                 realtime_parking_site_inputs=realtime_parking_site_inputs,
                 realtime_parking_site_errors=realtime_parking_site_errors,
             )
+
+            if isinstance(converter, MirrorPullConverter):
+                source.mirror_parking_site_cursor = converter.parking_site_cursor
 
             if len(realtime_parking_site_errors):
                 logger.warning(
@@ -267,6 +279,9 @@ class GenericImportService(BaseService):
                 realtime_parking_spot_inputs=realtime_parking_spot_inputs,
                 realtime_parking_spot_errors=realtime_parking_spot_errors,
             )
+
+            if isinstance(converter, MirrorPullConverter):
+                source.mirror_parking_spot_cursor = converter.parking_spot_cursor
 
             if len(realtime_parking_spot_errors):
                 logger.warning(

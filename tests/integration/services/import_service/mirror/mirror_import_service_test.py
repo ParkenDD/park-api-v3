@@ -3,6 +3,7 @@ Copyright 2026 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+from datetime import datetime, timezone
 from typing import Any
 
 import pytest
@@ -77,6 +78,8 @@ UPSTREAM_PARKING_SPOT = {
     'lat': 49.5,
     'lon': 9.3,
     'id': 200,
+    'created_at': '2024-06-05T09:47:46Z',
+    'modified_at': '2026-10-25T10:05:00Z',
     'restrictions': [{'type': 'DISABLED'}],
 }
 
@@ -103,6 +106,7 @@ class FakeUpstream:
     def __init__(self, sources: dict, parking_sites: list[dict], parking_spots: list[dict]):
         self.sources = sources
         self.items_by_endpoint = {'parking-sites': parking_sites, 'parking-spots': parking_spots}
+        self.requested_params_by_endpoint: dict[str, list[dict]] = {'parking-sites': [], 'parking-spots': []}
 
     def get(self, url: str, params: dict | None = None, **kwargs) -> FakeResponse:
         path = url.removeprefix(f'{MIRROR_BASE_URL}/api/public/v3/')
@@ -114,9 +118,15 @@ class FakeUpstream:
 
         assert params['source_uid'] == 'mirror_source'
         assert params['calculate_has_realtime_data'] == 'false'
+        self.requested_params_by_endpoint[path].append(dict(params))
 
-        items = [item for item in self.items_by_endpoint[path] if item['id'] >= params.get('start', 0)][:1]
-        response_data = {'items': items, 'total_count': len(self.items_by_endpoint[path])}
+        items = self.items_by_endpoint[path]
+        if 'modified_since' in params:
+            modified_since = datetime.fromisoformat(params['modified_since'])
+            items = [item for item in items if datetime.fromisoformat(item['modified_at']) >= modified_since]
+        total_count = len(items)
+        items = [item for item in items if item['id'] >= params.get('start', 0)][:1]
+        response_data = {'items': items, 'total_count': total_count}
         if items:
             response_data['next_id'] = items[-1]['id'] + 1
         return FakeResponse(response_data)
@@ -214,3 +224,67 @@ class MirrorImportServiceTest:
         source = db.session.query(Source).one()
         assert source.static_status == SourceStatus.FAILED
         assert db.session.query(ParkingSite).count() == 0
+
+    @staticmethod
+    def test_update_source_realtime_is_incremental(
+        db: SQLAlchemy,
+        generic_import_service: GenericImportService,
+        fake_upstream: FakeUpstream,
+    ) -> None:
+        fake_upstream.items_by_endpoint['parking-sites'].append(
+            get_upstream_parking_site(3, modified_at='2026-10-25T10:01:00Z'),
+        )
+        generic_import_service.update_source_static('mirror_source')
+
+        # The first realtime pull is a full pull
+        generic_import_service.update_source_realtime('mirror_source')
+
+        source = db.session.query(Source).one()
+        assert source.mirror_parking_site_cursor == datetime(2026, 10, 25, 10, 5, tzinfo=timezone.utc)
+        assert source.mirror_parking_spot_cursor == datetime(2026, 10, 25, 10, 5, tzinfo=timezone.utc)
+        assert 'mirror_parking_site_cursor' not in source.to_dict()
+        assert 'modified_since' not in fake_upstream.requested_params_by_endpoint['parking-sites'][-1]
+
+        # parking-site-1 changes upstream, parking-site-3 is too old to be part of the incremental pull
+        fake_upstream.items_by_endpoint['parking-sites'][0].update(
+            realtime_free_capacity=10,
+            realtime_data_updated_at='2026-10-25T10:10:00Z',
+            modified_at='2026-10-25T10:10:00Z',
+        )
+        fake_upstream.items_by_endpoint['parking-sites'][2]['realtime_free_capacity'] = 20
+
+        generic_import_service.update_source_realtime('mirror_source')
+
+        # The cursor minus one minute overlap is used
+        params = fake_upstream.requested_params_by_endpoint['parking-sites'][-1]
+        assert datetime.fromisoformat(params['modified_since']) == datetime(2026, 10, 25, 10, 4, tzinfo=timezone.utc)
+        params = fake_upstream.requested_params_by_endpoint['parking-spots'][-1]
+        assert datetime.fromisoformat(params['modified_since']) == datetime(2026, 10, 25, 10, 4, tzinfo=timezone.utc)
+
+        source = db.session.query(Source).one()
+        assert source.realtime_status == SourceStatus.ACTIVE
+        assert source.mirror_parking_site_cursor == datetime(2026, 10, 25, 10, 10, tzinfo=timezone.utc)
+        assert source.mirror_parking_spot_cursor == datetime(2026, 10, 25, 10, 5, tzinfo=timezone.utc)
+
+        parking_sites = db.session.query(ParkingSite).order_by(ParkingSite.original_uid).all()
+        assert parking_sites[0].realtime_free_capacity == 10
+        assert parking_sites[2].realtime_free_capacity == 30
+
+    @staticmethod
+    def test_update_source_static_resets_cursors(
+        db: SQLAlchemy,
+        generic_import_service: GenericImportService,
+        fake_upstream: FakeUpstream,
+    ) -> None:
+        generic_import_service.update_source_static('mirror_source')
+        generic_import_service.update_source_realtime('mirror_source')
+        generic_import_service.update_source_static('mirror_source')
+
+        source = db.session.query(Source).one()
+        assert source.mirror_parking_site_cursor is None
+        assert source.mirror_parking_spot_cursor is None
+
+        generic_import_service.update_source_realtime('mirror_source')
+
+        assert 'modified_since' not in fake_upstream.requested_params_by_endpoint['parking-sites'][-1]
+        assert 'modified_since' not in fake_upstream.requested_params_by_endpoint['parking-spots'][-1]
