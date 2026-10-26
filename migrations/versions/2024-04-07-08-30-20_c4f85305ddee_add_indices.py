@@ -23,6 +23,9 @@ def upgrade():
     with op.batch_alter_table('source', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_source_uid'), ['uid'], unique=False)
 
+    with op.batch_alter_table('source', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_source_id'), ['id'], unique=False)
+
     # ### end Alembic commands ###
 
 
