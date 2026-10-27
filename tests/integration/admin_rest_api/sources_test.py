@@ -45,6 +45,7 @@ SOURCE_RESPONSE = {
     'uid': 'source',
     'name': 'Demo Source',
     'public_url': 'https://demo.source.com',
+    'converter_type': 'PUSH',
     'attribution_license': 'CC BY-SA 4.0',
     'attribution_contributor': 'Demo Contributor',
     'attribution_url': 'https://demo.source.com/attribution',

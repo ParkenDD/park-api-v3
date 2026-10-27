@@ -1,5 +1,100 @@
 # Changelog
 
+## 0.54.0
+
+Released 2026-10-26
+
+### Features
+
+* [Incremental updates](https://github.com/ParkenDD/park-api-v3/pull/447)
+* [Improved tileserver](https://github.com/ParkenDD/park-api-v3/pull/448)
+* [Add type to source](https://github.com/ParkenDD/park-api-v3/pull/449)
+
+
+## 0.53.0
+
+Released 2026-10-25
+
+### Features
+
+* [Mirror Mode support](https://github.com/ParkenDD/park-api-v3/pull/444)
+* [CORS support for all public endpoints](https://github.com/ParkenDD/park-api-v3/pull/445)
+* [ParkAPI Sources: licence clarifications](https://github.com/ParkenDD/parkapi-sources-v3/pull/449)
+* [ParkAPI Sources: BFRK stellplatzanzahl filter](https://github.com/ParkenDD/parkapi-sources-v3/pull/450)
+* [ParkAPI Sources: BFRK privatparkplatz filter](https://github.com/ParkenDD/parkapi-sources-v3/pull/451)
+* [ParkAPI Sources: Basel filter](https://github.com/ParkenDD/parkapi-sources-v3/pull/452)
+* [ParkAPI Sources: BFRK coordinates filter](https://github.com/ParkenDD/parkapi-sources-v3/pull/453)
+* [ParkAPI Sources: better defaults at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/456)
+* [ParkAPI Sources: new DATEX II converters via Mobilithek](https://github.com/ParkenDD/parkapi-sources-v3/pull/458)
+* [ParkAPI Sources: new Karlsruhe and Dortmund converters](https://github.com/ParkenDD/parkapi-sources-v3/pull/459)
+* [ParkAPI Sources: User-Agent for all HTTP requests](https://github.com/ParkenDD/parkapi-sources-v3/pull/460)
+
+
+### Fixes
+
+* [ParkAPI Sources: Freiburg capacity fix](https://github.com/ParkenDD/parkapi-sources-v3/pull/454)
+* [ParkAPI Sources: fix several Herrenberg bike issues](https://github.com/ParkenDD/parkapi-sources-v3/pull/455)
+* [ParkAPI Sources: fix missing readings at Karlsruhe](https://github.com/ParkenDD/parkapi-sources-v3/pull/457)
+
+
+### Maintenance
+
+* [Project maintenance and User-Agent](https://github.com/ParkenDD/park-api-v3/pull/446)
+
+
+## 0.52.0
+
+Released 2026-10-24
+
+### Features
+
+* [ParkAPI Sources: migrate ParkAPI v2 converters](https://github.com/ParkenDD/parkapi-sources-v3/pull/447)
+* [ParkAPI Sources: several smaller fixes](https://github.com/ParkenDD/parkapi-sources-v3/pull/448)
+
+
+### Fixes
+
+* [Handle negative realtime_free_capacity by setting it to zero](https://github.com/ParkenDD/park-api-v3/pull/438)
+
+
+## 0.51.0
+
+Released 2026-10-24
+
+### Features
+
+* [Internal vector tile server](https://github.com/ParkenDD/park-api-v3/pull/443)
+
+
+### Maintenance
+
+* [Dependency updates](https://github.com/ParkenDD/park-api-v3/pull/442)
+* [ParkAPI Sources: introduce syrupy](https://github.com/ParkenDD/parkapi-sources-v3/pull/434)
+* [ParkAPI Sources: dependency updates](https://github.com/ParkenDD/parkapi-sources-v3/pull/446)
+
+
+## 0.50.0
+
+Released 2026-10-20
+
+### Features
+
+* [Parking spot orientation](https://github.com/ParkenDD/park-api-v3/pull/440)
+* [ParkAPI Sources: Parking spot orientation](https://github.com/ParkenDD/parkapi-sources-v3/pull/436)
+
+
+### Fixes
+
+* [ParkAPI Sources: BFRK: Update bike parking types for SAFE_WALL_LOOPS and WALL_LOOPS](https://github.com/ParkenDD/parkapi-sources-v3/pull/437)
+* [ParkAPI Sources: fix definition](https://github.com/ParkenDD/parkapi-sources-v3/pull/444)
+* [ParkAPI Sources: Hotfix: bfrk_bw_bike - Add SAFE_WALL_LOOPS and WALL_LOOPS](https://github.com/ParkenDD/parkapi-sources-v3/pull/445)
+
+
+### Maintenance
+
+* [ParkAPI Sources: Add Herrenberg mapping for ParkingSite and ParkingSpot](https://github.com/ParkenDD/parkapi-sources-v3/pull/412)
+
+
 ## 0.49.2
 
 Released 2026-10-03

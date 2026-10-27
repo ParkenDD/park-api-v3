@@ -6,7 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from flask_openapi.decorator import Schema
 from flask_openapi.schema import DateTimeField, EnumField, IntegerField, JsonSchema, StringField, UriField
 
-from webapp.models.source import SourceStatus
+from webapp.models.source import SourceConverterType, SourceStatus
 
 source_schema = JsonSchema(
     title='Source',
@@ -17,6 +17,7 @@ source_schema = JsonSchema(
         'uid': StringField(minLength=1, maxLength=256),
         'name': StringField(maxLength=256, required=False),
         'public_url': UriField(maxLength=4096),
+        'converter_type': EnumField(enum=SourceConverterType),
         'last_import': DateTimeField(required=False),
         'attribution_license': StringField(required=False),
         'attribution_contributor': StringField(maxLength=256, required=False),
@@ -34,6 +35,7 @@ source_example = {
     'uid': 'demo-source',
     'name': 'Demo Source',
     'public_url': 'https://demo.source.com',
+    'converter_type': 'PUSH',
     'attribution_license': 'CC BY-SA 4.0',
     'attribution_contributor': 'Demo Contributor',
     'attribution_url': 'https://demo.source.com/attribution',

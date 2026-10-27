@@ -146,3 +146,28 @@ class GenericImportServiceTest:
         # Should be cut to capacity
         expected_response['realtime_free_capacity'] = 10
         assert parking_sites[0].to_dict() == expected_response
+
+    @staticmethod
+    def test_update_sources_create_parking_site_realtime_below_zero(
+        db: SQLAlchemy,
+        generic_import_service: GenericImportService,
+        parking_site_test_pull_converter: ParkingSiteTestPullConverter,
+    ) -> None:
+        parking_site_test_pull_converter.get_static_parking_sites_return_value = (
+            [get_static_parking_site_input()],
+            [],
+        )
+        parking_site_test_pull_converter.get_realtime_parking_sites_return_value = (
+            [get_realtime_parking_site_input(realtime_free_capacity=-5)],
+            [],
+        )
+        generic_import_service.update_sources_static()
+        generic_import_service.update_sources_realtime()
+
+        parking_sites = db.session.query(ParkingSite).all()
+
+        assert len(parking_sites) == 1
+        expected_response = deepcopy(CREATE_PARKING_SITE_REALTIME_DATA)
+        # Should be set to zero
+        expected_response['realtime_free_capacity'] = 0
+        assert parking_sites[0].to_dict() == expected_response

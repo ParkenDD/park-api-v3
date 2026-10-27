@@ -26,6 +26,11 @@ class SourceStatus(PythonEnum):
     PROVISIONED = 'PROVISIONED'
 
 
+class SourceConverterType(PythonEnum):
+    PULL = 'PULL'
+    PUSH = 'PUSH'
+
+
 class Source(BaseModel):
     __tablename__ = 'source'
 
@@ -48,9 +53,18 @@ class Source(BaseModel):
     uid: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(256), nullable=True)
     public_url: Mapped[Optional[str]] = mapped_column(String(4096), nullable=True)
+    converter_type: Mapped[SourceConverterType] = mapped_column(
+        Enum(SourceConverterType),
+        nullable=False,
+        default=SourceConverterType.PUSH,
+    )
 
     static_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
     realtime_data_updated_at: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
+
+    # Highest upstream modified_at seen at the last realtime pull of a mirrored source, used for incremental pulls
+    mirror_parking_site_cursor: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
+    mirror_parking_spot_cursor: Mapped[Optional[datetime]] = mapped_column(UtcDateTime(), nullable=True)
 
     attribution_license: Mapped[Optional[str]] = mapped_column(Text(), nullable=True)
     attribution_contributor: Mapped[Optional[str]] = mapped_column(String(256), nullable=True)
@@ -73,7 +87,7 @@ class Source(BaseModel):
     realtime_parking_spot_error_count: Mapped[int | None] = mapped_column(Integer(), nullable=True, default=0)
 
     def to_dict(self, *args, ignore: Optional[list[str]] = None, **kwargs) -> dict:
-        ignore = ignore or []
+        ignore = (ignore or []) + ['mirror_parking_site_cursor', 'mirror_parking_spot_cursor']
         if self.static_status in [SourceStatus.PROVISIONED, SourceStatus.DISABLED]:
             ignore += ['static_data_updated_at', 'static_parking_site_error_count', 'static_parking_spot_error_count']
         if self.realtime_status in [SourceStatus.PROVISIONED, SourceStatus.DISABLED]:

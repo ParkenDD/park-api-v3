@@ -3,11 +3,13 @@ Copyright 2023 binary butterfly GmbH
 Use of this source code is governed by an MIT-style license that can be found in the LICENSE.txt.
 """
 
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from parkapi_sources.models.enums import PurposeType
+from mercantile import LngLatBbox
+from parkapi_sources.models.enums import ParkingSiteType, PurposeType
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Query, aliased, joinedload, selectinload
 from sqlalchemy.orm.interfaces import LoaderOption
@@ -26,6 +28,22 @@ class ParkingSiteLocation:
     lat: float
     lon: float
     purpose: PurposeType
+
+
+@dataclass
+class ParkingSiteTileItem:
+    id: int
+    source_uid: str
+    name: str
+    lat: float
+    lon: float
+    purpose: PurposeType
+    type: ParkingSiteType | None
+    capacity: int | None
+    has_realtime_data: bool
+    realtime_data_updated_at: datetime | None
+    realtime_free_capacity: int | None
+    geojson: dict | None = None
 
 
 class ParkingSiteRepository(BaseRepository):
@@ -227,6 +245,73 @@ class ParkingSiteRepository(BaseRepository):
                 ),
             )
         return result
+
+    def fetch_parking_site_tile_items_by_bounds(
+        self,
+        bbox: LngLatBbox,
+        purpose: PurposeType | None = None,
+        types: list[ParkingSiteType] | None = None,
+        source_uids: list[str] | None = None,
+        ignore_duplicates: bool = True,
+        exclude_types: list[ParkingSiteType] | None = None,
+        with_geojson: bool = False,
+    ) -> list[ParkingSiteTileItem]:
+        """
+        By default, returns all parking sites whose point is within the bbox. If with_geojson is set, it returns all
+        parking sites with a geojson geometry intersecting the bbox instead, including the geojson.
+        """
+        columns = [
+            ParkingSite.id,
+            Source.uid.label('source_uid'),
+            ParkingSite.name,
+            ParkingSite.lat,
+            ParkingSite.lon,
+            ParkingSite.purpose,
+            ParkingSite.type,
+            ParkingSite.capacity,
+            ParkingSite.has_realtime_data,
+            ParkingSite.realtime_data_updated_at,
+            ParkingSite.realtime_free_capacity,
+        ]
+        envelope = func.ST_MakeEnvelope(bbox.west, bbox.south, bbox.east, bbox.north, 4326)
+
+        if with_geojson:
+            columns.append(ParkingSite._geojson.label('geojson'))
+            bbox_filter = func.ST_Intersects(ParkingSite.geojson_geometry, envelope)
+        else:
+            bbox_filter = func.ST_Within(ParkingSite.geometry, envelope)
+
+        query = self.session.query(*columns).join(Source, Source.id == ParkingSite.source_id).filter(bbox_filter)
+
+        if purpose is not None:
+            query = query.filter(ParkingSite.purpose == purpose)
+        if types:
+            query = query.filter(ParkingSite.type.in_(types))
+        if exclude_types:
+            # Parking sites without type have to be checked explicitly, as NOT IN never matches NULL
+            query = query.filter(or_(ParkingSite.type.is_(None), ParkingSite.type.not_in(exclude_types)))
+        if source_uids:
+            query = query.filter(Source.uid.in_(source_uids))
+        if ignore_duplicates:
+            query = query.filter(ParkingSite.duplicate_of_parking_site_id.is_(None))
+
+        return [
+            ParkingSiteTileItem(
+                id=item.id,
+                source_uid=item.source_uid,
+                name=item.name,
+                lat=float(item.lat),
+                lon=float(item.lon),
+                purpose=item.purpose,
+                type=item.type,
+                capacity=item.capacity,
+                has_realtime_data=bool(item.has_realtime_data),
+                realtime_data_updated_at=item.realtime_data_updated_at,
+                realtime_free_capacity=item.realtime_free_capacity,
+                geojson=json.loads(item.geojson) if with_geojson else None,
+            )
+            for item in query.all()
+        ]
 
     def fetch_parking_sites_duplicates(self, source_ids: list[int] | None = None) -> list[tuple[int, int]]:
         query = self.session.query(ParkingSite.id, ParkingSite.duplicate_of_parking_site_id)

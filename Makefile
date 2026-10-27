@@ -1,9 +1,9 @@
-DOCKER_COMPOSE = docker compose -f docker-compose.yml -f docker-compose.override.yml
+DOCKER_COMPOSE = docker compose -f docker-compose.yml -f docker-compose.default.yml
 FLASK_RUN = $(DOCKER_COMPOSE) run --rm flask
 
 # Separate environment for running integration tests
 TESTING_COMPOSE_PROJECT_NAME = park-api_integrationtests
-TESTING_DOCKER_COMPOSE = $(DOCKER_COMPOSE) -p $(TESTING_COMPOSE_PROJECT_NAME)
+TESTING_DOCKER_COMPOSE = docker compose -f docker-compose.yml -f docker-compose.testing.yml -p $(TESTING_COMPOSE_PROJECT_NAME)
 
 # Include local file with custom variables/rules (only if the file exists)
 -include Makefile.env
@@ -129,6 +129,11 @@ generate-migration: config
 .PHONY: import-regionalschluessel
 import-regionalschluessel: config
 	$(DOCKER_COMPOSE) run --rm regionalschluessel-importer
+
+# Creates or updates all sources configured in PARK_API_CONVERTER in the database
+.PHONY: init-converters
+init-converters: config
+	$(FLASK_RUN) flask source init-converters
 
 
 # Cleanup

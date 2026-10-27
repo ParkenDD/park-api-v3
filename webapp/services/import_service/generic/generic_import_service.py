@@ -16,10 +16,11 @@ from webapp.common.contexts import TelemetryContext
 from webapp.common.logging.models import LogMessageType
 from webapp.common.rest.exceptions import UnknownSourceException
 from webapp.models import Source
-from webapp.models.source import SourceStatus
+from webapp.models.source import SourceConverterType, SourceStatus
 from webapp.repositories import SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.base_service import BaseService
+from webapp.services.import_service.mirror import MirrorPullConverter
 
 from .generic_parking_site_import_service import GenericParkingSiteImportService
 from .generic_parking_spot_import_service import GenericParkingSpotImportService
@@ -56,7 +57,14 @@ class GenericImportService(BaseService):
             'DEBUG_DUMP_DIR': app.config['DEBUG_DUMP_DIR'],
             'DEBUG_SOURCES': app.config['DEBUG_SOURCES'],
         }
+        if app.config.get('USER_AGENT'):
+            park_api_sources_config['USER_AGENT'] = app.config['USER_AGENT']
+        mirror_source_dicts: list[dict] = []
         for source_dict in app.config.get('PARK_API_CONVERTER', []):
+            # Mirror sources pull from another ParkAPI instance, so they don't use a parkapi-sources converter
+            if source_dict.get('mirror_base_url'):
+                mirror_source_dicts.append(source_dict)
+                continue
             if source_dict.get('generic_source') is True:
                 continue
             park_api_source_uids.append(source_dict['uid'])
@@ -69,6 +77,14 @@ class GenericImportService(BaseService):
             custom_converters=app.config.get('PARK_API_SOURCES_CUSTOM_CONVERTERS'),
         )
         self.park_api_sources.check_credentials()
+
+        for source_dict in mirror_source_dicts:
+            self.park_api_sources.converter_by_uid[source_dict['uid']] = MirrorPullConverter(
+                config_helper=self.park_api_sources.config_helper,
+                request_helper=self.park_api_sources.request_helper,
+                source_uid=source_dict['uid'],
+                mirror_base_url=source_dict['mirror_base_url'],
+            )
 
     def is_pull_source(self, source_uid: str) -> bool:
         # Generic sources and push converters are not part of the pull converters, so everything else is push
@@ -87,8 +103,31 @@ class GenericImportService(BaseService):
     def update_source_static(self, source_uid: str):
         self.context_helper.set_telemetry_context(TelemetryContext.SOURCE, source_uid)
 
-        source = self.get_upserted_source(source_uid)
         converter = self.park_api_sources.converter_by_uid[source_uid]
+
+        # Mirror sources take their source metadata from upstream, so it has to be fetched before upserting the source
+        if isinstance(converter, MirrorPullConverter):
+            try:
+                converter.update_source_info()
+            except Exception as e:
+                logger.warning(
+                    f'Failed to pull {source_uid} source data from {converter.mirror_base_url}: {e}',
+                    type=LogMessageType.STATIC_SOURCE_HANDLING,
+                )
+                try:
+                    source = self.source_repository.fetch_source_by_uid(source_uid)
+                except ObjectNotFoundException:
+                    source = self.get_upserted_source(source_uid)
+                source.static_status = SourceStatus.FAILED
+                self.source_repository.save_source(source)
+                return
+
+        source = self.get_upserted_source(source_uid)
+
+        # A static pull is a full sync, so the next realtime pull of a mirror source has to be a full one, too
+        if isinstance(converter, MirrorPullConverter):
+            source.mirror_parking_site_cursor = None
+            source.mirror_parking_spot_cursor = None
 
         if isinstance(converter, ParkingSitePullConverter):
             try:
@@ -179,6 +218,10 @@ class GenericImportService(BaseService):
         if source.realtime_status == SourceStatus.DISABLED:
             return
 
+        if isinstance(converter, MirrorPullConverter):
+            converter.parking_site_cursor = source.mirror_parking_site_cursor
+            converter.parking_spot_cursor = source.mirror_parking_spot_cursor
+
         if isinstance(converter, ParkingSitePullConverter):
             try:
                 realtime_parking_site_inputs, realtime_parking_site_errors = converter.get_realtime_parking_sites()
@@ -196,6 +239,9 @@ class GenericImportService(BaseService):
                 realtime_parking_site_inputs=realtime_parking_site_inputs,
                 realtime_parking_site_errors=realtime_parking_site_errors,
             )
+
+            if isinstance(converter, MirrorPullConverter):
+                source.mirror_parking_site_cursor = converter.parking_site_cursor
 
             if len(realtime_parking_site_errors):
                 logger.warning(
@@ -234,6 +280,9 @@ class GenericImportService(BaseService):
                 realtime_parking_spot_errors=realtime_parking_spot_errors,
             )
 
+            if isinstance(converter, MirrorPullConverter):
+                source.mirror_parking_spot_cursor = converter.parking_spot_cursor
+
             if len(realtime_parking_spot_errors):
                 logger.warning(
                     f'Source {source.uid} successfully updated {len(realtime_parking_spot_inputs)} realtime '
@@ -265,6 +314,9 @@ class GenericImportService(BaseService):
         except ObjectNotFoundException:
             source = Source()
             source.uid = source_uid
+            source.converter_type = (
+                SourceConverterType.PULL if self.is_pull_source(source_uid) else SourceConverterType.PUSH
+            )
 
         source_info = self.park_api_sources.converter_by_uid[source_uid].source_info
         for key, value in source_info.to_dict().items():

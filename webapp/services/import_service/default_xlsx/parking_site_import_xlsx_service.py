@@ -16,7 +16,7 @@ from validataclass.validators import DataclassValidator
 
 from webapp.models import ParkingRestriction, ParkingSite, Source
 from webapp.models.parking_site import ParkingSiteType
-from webapp.models.source import SourceStatus
+from webapp.models.source import SourceConverterType, SourceStatus
 from webapp.repositories import ParkingSiteRepository, SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 from webapp.services.base_service import BaseService
@@ -94,6 +94,7 @@ class ParkingSiteXlsxImportService(BaseService):
         except ObjectNotFoundException:
             source = Source()
             source.uid = source_uid
+            source.converter_type = SourceConverterType.PUSH
             self.source_repository.save_source(source)
 
         worksheet = self.load_parking_sites(import_file_path)

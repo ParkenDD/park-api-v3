@@ -6,6 +6,7 @@ Use of this source code is governed by an MIT-style license that can be found in
 from webapp.admin_rest_api import AdminApiBaseHandler
 from webapp.admin_rest_api.sources.source_validators import SourceInput
 from webapp.models import Source
+from webapp.models.source import SourceConverterType
 from webapp.repositories import SourceRepository
 from webapp.repositories.exceptions import ObjectNotFoundException
 
@@ -22,7 +23,7 @@ class SourceHandler(AdminApiBaseHandler):
             source = self.source_repository.fetch_source_by_uid(source_input.uid)
             created = False
         except ObjectNotFoundException:
-            source = Source(uid=source_input.uid)
+            source = Source(uid=source_input.uid, converter_type=SourceConverterType.PUSH)
             created = True
 
         for key, value in source_input.to_dict().items():

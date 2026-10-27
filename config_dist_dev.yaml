@@ -19,10 +19,14 @@ PARK_API_CONVERTER:
   - uid: source
     hash: 9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
     generic_source: true
+  # Mirror a source from another ParkAPI instance instead of pulling or pushing it directly
+  # - uid: buchen
+  #   mirror_base_url: https://api.mobidata-bw.de/park-api/
 
-# Change hour of the day for static data pulling and the frequency in seconds for realtime data pulling
-PARKING_SITE_STATIC_PULL_HOUR: 1
-PARKING_SITE_REALTIME_PULL_FREQUENCY: 300
+# Change hour and minute of the day for static data pulling and the frequency in seconds for realtime data pulling
+STATIC_IMPORT_PULL_HOUR: 1
+STATIC_IMPORT_PULL_MINUTE: 0
+REALTIME_IMPORT_PULL_FREQUENCY: 300
 
 SERVER_AUTH_USERS:
   dev:

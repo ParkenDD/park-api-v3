@@ -17,7 +17,7 @@ from flask_openapi.schema import (
     Reference,
     StringField,
 )
-from parkapi_sources.models.enums import ExternalIdentifierType, ParkingSpotType, PurposeType
+from parkapi_sources.models.enums import ExternalIdentifierType, ParkingOrientation, ParkingSpotType, PurposeType
 
 from webapp.models.parking_spot import ParkingSpotStatus
 
@@ -37,6 +37,11 @@ parking_spot_schema = JsonSchema(
         ),
         'original_uid': StringField(maxLength=256, description='Unique Identifier in original system.'),
         'type': EnumField(enum=ParkingSpotType, required=False),
+        'orientation': EnumField(
+            enum=ParkingOrientation,
+            required=False,
+            description='Orientation of the parking spot relative to the road.',
+        ),
         'description': StringField(required=False, maxLength=4096),
         'address': StringField(required=False, maxLength=256),
         'lat': NumericField(),
@@ -106,6 +111,7 @@ parking_spot_example = {
     'original_uid': 'demo-parking-spot-1',
     'name': 'Demo Parking Spot 1',
     'type': 'ON_STREET',
+    'orientation': 'PARALLEL',
     'purpose': 'CAR',
     'lat': 50.1,
     'lon': 10.1,
