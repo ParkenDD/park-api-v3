@@ -43,7 +43,7 @@ searches in order not to rely on a city as a query parameter.
 
 A `ParkingZone` is a geographic area which defines specific properties for the whole zone. This can be tariffs as well as restrictions.
 
-`ParkingSite`s can be assigned to one or many ParkingZones. It’s possible that there are `ParkingSite`s within the area of the ParkingZone which are not assigned to this zone, for example underground parking within a larger off on street parking tariff zone.
+`ParkingSite`s can be assigned to one or many ParkingZones. It’s possible that there are `ParkingSite`s within the area of the ParkingZone which are not assigned to this zone, for example underground parking within a larger on street parking tariff zone.
 
 | Field        | Type                                      | Cardinality | Description                                                                  |
 |--------------|-------------------------------------------|-------------|------------------------------------------------------------------------------|
