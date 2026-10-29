@@ -158,7 +158,7 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | type                     | [LinearParkingSiteSideParkingType](#linearparkingsitesideparkingtype) | ?           | How the car is parked                                                                                                                                     |
 | orientation              | [LinearParkingSiteSideOrientation](#linearparkingsitesideorientation) | ?           | How the car is parked in relation to driving direction                                                                                                    |
 | side                     | [LinearParkingSiteSideType](#linearparkingsitesidetype)               | ?           |                                                                                                                                                           |
-| external_identifiers     | [ExternalIdentifier](#external-identifier)                                                    | *           |                                                                                                                                                           |
+| external_identifiers     | [ExternalIdentifier](#external-identifier)                            | *           |                                                                                                                                                           |
 | tags                     | str                                                                   | *           |                                                                                                                                                           |
 
 ## ParkingRestriction
@@ -176,24 +176,24 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 
 The `ParkingSpot` represents a single spot for a single car / bike. The only required relation is between `Source` and `ParkingSpot`, because every dataset needs a source where it comes from. It’s recommended to group `ParkingSpot` s at least to `ParkingSite`s, though, because in most times, it reflects reality: on street parking is usually a group of parking spots at one street.
 
-| Field                    | Type                                              | Cardinality | Description                                                                                                       |
-|--------------------------|---------------------------------------------------|-------------|-------------------------------------------------------------------------------------------------------------------|
-| uid                      | str                                               | 1           | Unique uid for this source                                                                                        |
-| lat                      | float                                             | 1           | lat                                                                                                               |
-| lon                      | float                                             | 1           | lon                                                                                                               |
-| name                     | str                                               | ?           |                                                                                                                   |
-| type                     | ParkingSpotType                                   |             |                                                                                                                   |
-| parking_site_uid         | str                                               | ?           | Reference to ParkingSite. Will be outputted as `parking_site_id`.                                                 |
+| Field                    | Type                                              | Cardinality | Description                                                                                                         |
+|--------------------------|---------------------------------------------------|-------------|---------------------------------------------------------------------------------------------------------------------|
+| uid                      | str                                               | 1           | Unique uid for this source                                                                                          |
+| lat                      | float                                             | 1           | lat                                                                                                                 |
+| lon                      | float                                             | 1           | lon                                                                                                                 |
+| name                     | str                                               | ?           |                                                                                                                     |
+| type                     | ParkingSpotType                                   |             |                                                                                                                     |
+| parking_site_uid         | str                                               | ?           | Reference to ParkingSite. Will be outputted as `parking_site_id`.                                                   |
 | address                  | str                                               | ?           | Full address including street postal code and city. Preferable in format {street with number}, {postal code} {city} |
-| geojson                  | [GeoJSON Geometry](#geojson-geometry)             | ?           | Polygon to describe                                                                                               |
-| purpose                  | [PurposeType](#purposetype)                       | 1           |                                                                                                                   |
-| static_data_updated_at   | string (date-time)                                | 1           |                                                                                                                   |
-| realtime_status          | [ParkingSpotStatus](#parkingspotstatus)           | ?           |                                                                                                                   |
-| realtime_data_updated_at | string (date-time)                                | ?           |                                                                                                                   |
-| restrictions             | [ParkingSpotRestriction](#parkingspotrestriction) | *           | If there are multiple options, they should be understood with an logical or.                                      |
-| tariffs                  | [Tariff](#tariff)                                 | *           |                                                                                                                   |
-| external_identifiers     | ExternalIdentifier                                | *           |                                                                                                                   |
-| tags                     | str                                               | *           |                                                                                                                   |
+| geojson                  | [GeoJSON Geometry](#geojson-geometry)             | ?           | Polygon to describe                                                                                                 |
+| purpose                  | [PurposeType](#purposetype)                       | 1           |                                                                                                                     |
+| static_data_updated_at   | string (date-time)                                | 1           |                                                                                                                     |
+| realtime_status          | [ParkingSpotStatus](#parkingspotstatus)           | ?           |                                                                                                                     |
+| realtime_data_updated_at | string (date-time)                                | ?           |                                                                                                                     |
+| restrictions             | [ParkingSpotRestriction](#parkingspotrestriction) | *           | If there are multiple options, they should be understood with an logical or.                                        |
+| tariffs                  | [Tariff](#tariff)                                 | *           |                                                                                                                     |
+| external_identifiers     | ExternalIdentifier                                | *           |                                                                                                                     |
+| tags                     | str                                               | *           |                                                                                                                     |
 
 ## ParkingSpotRestriction
 
@@ -401,7 +401,7 @@ GeoJSON geometry is the `geometry` part of a GeoJSON `feature`. Example:
 
 ## Examples
 
-### ParkingZone
+### Example ParkingZone
 
 Parking zone for 3 hours max parking, and 2 € per hour.
 
@@ -443,7 +443,7 @@ Parking zone for 3 hours max parking, and 2 € per hour.
 }
 ```
 
-### ParkingSite
+### Example ParkingSite
 
 Simple parking sites with 100 parking spots.
 
@@ -576,7 +576,7 @@ A on-street parking polygon for 3 hours max parking, and 2 € per hour.
 }
 ```
 
-### ParkingSpot
+### Example ParkingSpot
 
 ```json
 {
