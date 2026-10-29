@@ -130,7 +130,7 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | realtime_opening_status  | [OpeningStatus](#openingstatus)                                       | ?           | Required has_realtime_data is true                                                                                                                        |
 | operator_name            | str                                                                   | ?           |                                                                                                                                                           |
 | public_url               | str(url)                                                              | ?           | URL for human users to get more details about this parking site.                                                                                          |
-| type                     | [ParkingSiteType](#parkingsitetype)                                   | ?           |                                                                                                                                                           |
+| type                     | [ParkingType](#parkingtype)                                           | ?           |                                                                                                                                                           |
 | description              | str                                                                   | ?           |                                                                                                                                                           |
 | address                  | str                                                                   | ?           | Full address including street postal code and city. Preferable in format {street with number}, {postal code} {city}                                       |
 | max_height               | int                                                                   | ?           | Max height, in centimeters.                                                                                                                               |
@@ -155,8 +155,8 @@ A `ParkingSite` needs the following extension fields in addition to the existing
 | capacity_max             | int                                                                   | ?           | The max capacity if there is a uncertainty of measurement                                                                                                 |
 | realtime_capacity        | int                                                                   | ?           |                                                                                                                                                           |
 | realtime_free_capacity   | int                                                                   | ?           |                                                                                                                                                           |
-| type                     | [LinearParkingSiteSideParkingType](#linearparkingsitesideparkingtype) | ?           | How the car is parked                                                                                                                                     |
-| orientation              | [LinearParkingSiteSideOrientation](#linearparkingsitesideorientation) | ?           | How the car is parked in relation to driving direction                                                                                                    |
+| side_parking_type        | [SideParkingType](#sideparkingtype)                                   | ?           | How the car is parked                                                                                                                                     |
+| orientation              | [ParkingOrientation](#parkingorientation)                             | ?           | How the car is parked in relation to driving direction                                                                                                    |
 | side                     | [LinearParkingSiteSideType](#linearparkingsitesidetype)               | ?           |                                                                                                                                                           |
 | external_identifiers     | [ExternalIdentifier](#external-identifier)                            | *           |                                                                                                                                                           |
 | tags                     | str                                                                   | *           |                                                                                                                                                           |
@@ -182,7 +182,7 @@ The `ParkingSpot` represents a single spot for a single car / bike. The only req
 | lat                      | float                                             | 1           | lat                                                                                                                 |
 | lon                      | float                                             | 1           | lon                                                                                                                 |
 | name                     | str                                               | ?           |                                                                                                                     |
-| type                     | ParkingSpotType                                   |             |                                                                                                                     |
+| type                     | [ParkingType](#parkingtype)                       |             |                                                                                                                     |
 | parking_site_uid         | str                                               | ?           | Reference to ParkingSite. Will be outputted as `parking_site_id`.                                                   |
 | address                  | str                                               | ?           | Full address including street postal code and city. Preferable in format {street with number}, {postal code} {city} |
 | geojson                  | [GeoJSON Geometry](#geojson-geometry)             | ?           | Polygon to describe                                                                                                 |
@@ -221,7 +221,7 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objects.
 * MOTORCYCLE
 * ITEM
 
-## ParkingSiteType
+## ParkingType
 
 * ON_STREET
 * OFF_STREET_PARKING_GROUND
@@ -276,14 +276,14 @@ A generic grouping of several `ParkingSite` or `ParkingSpot` objects.
 * RIGHT
 * BOTH
 
-## LinearParkingSiteSideParkingType
+## SideParkingType
 
 * LANE
 * ON_KERB
 * HALF_ON_KERB
 * SHOULDER
 
-## LinearParkingSiteSideOrientation
+## ParkingOrientation
 
 * PARALLEL
 * DIAGONAL
